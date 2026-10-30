@@ -5,9 +5,16 @@ tasks:
   check:
     desc: Lint the shell scripts and the YAML files
     cmds:
-      - shellcheck -x scripts/*.sh vm/*.sh
-      - shfmt -i 2 -d scripts vm
+      - shellcheck -x scripts/*.sh vm/*.sh slides/*.sh
+      - shfmt -i 2 -d scripts vm slides
+      - >-
+        bash -c 'diff -u slides/prompts.js <(slides/build.sh /dev/stdout)
+        || { echo "slides/prompts.js is stale: run task slides"; exit 1; }'
       - yamllint .
+  slides:
+    desc: Generate slides/prompts.js from prompts/*.md
+    cmds:
+      - slides/build.sh
   test:
     desc: Run the bats tests
     cmds:

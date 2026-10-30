@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Code in a real day</title>
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<section class="slide">
+  <h1>Claude Code in a real day</h1>
+  <p>From an empty folder to production, in 45 minutes.</p>
+  <p class="muted">LLM Praxis, part 2. Part 1 gave the words. Now we use them.</p>
+</section>
+
+<section class="slide">
+  <h2>The playground</h2>
+  <ul>
+    <li>It looks like a company: a GitLab with pipelines.</li>
+    <li>Two servers: <code>test</code> and <code>prod</code>.</li>
+    <li>Company TLS and SSH.</li>
+    <li>Everything runs on this Mac.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>The app</h2>
+  <ul>
+    <li>A small Go web app, like <code>traefik/whoami</code>.</li>
+    <li>It shows the host name, the IP addresses and the request headers.</li>
+    <li>A merge to <code>main</code> deploys to <code>test</code>.</li>
+    <li><code>prod</code> is a manual job.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Three iterations</h2>
+  <div class="cols">
+    <div><h3>1. Plain text</h3>plan, build, review, merge request, deploy to prod</div>
+    <div><h3>2. JSON</h3>a new parameter, then an outage on prod</div>
+    <div><h3>3. Web UI</h3>a plugin and the browser</div>
+  </div>
+  <p class="muted">Each slide: one or two commands, then the prompt. Then we switch to the terminal.</p>
+</section>
+
+<section class="slide">
+  <h2>Iteration 1: start</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="Gets the project to your Mac. The repository is empty, as on day one of a new service.">git clone</button>
+    <button class="cmd" data-hint="Start Claude Code inside the folder. Then CLAUDE.md, the project settings and the hook all bind to this project.">claude</button>
+  </div>
+  <div class="hint"></div>
+  <p class="muted">First start: log in in the browser.</p>
+</section>
+
+<section class="slide">
+  <h2>Pick the model and the effort</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="Chooses the model. A bigger model plans better. A smaller one is faster and cheaper.">/model</button>
+    <button class="cmd" data-hint="Chooses how long Claude thinks before it answers. More effort for a plan, less for a typo.">/effort</button>
+  </div>
+  <div class="hint"></div>
+</section>
+
+<section class="slide">
+  <h2>/init writes CLAUDE.md</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="Claude reads the project and writes CLAUDE.md: the notes it loads in every session. Read what it wrote.">/init</button>
+  </div>
+  <div class="hint"></div>
+  <p>The folder is empty, so Claude cannot guess where the code lives. We tell it.</p>
+</section>
+
+<section class="slide">
+  <h2>Step: the environment</h2>
+  <p class="muted">What Claude cannot guess goes into CLAUDE.md. No secrets.</p>
+  <pre class="prompt" data-id="03-init-environment"></pre>
+</section>
+
+<section class="slide">
+  <h2>Step: the check commands</h2>
+  <p class="muted">A rule with a reason: the next commit must pass these.</p>
+  <pre class="prompt" data-id="04-claude-md-checks"></pre>
+</section>
+
+<section class="slide" data-cut>
+  <h2>Plan before code</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="Plan mode. Claude reads and plans, and changes nothing until you approve.">Shift+Tab</button>
+    <button class="cmd" data-hint="Opens the plan in your editor. Change one line yourself, then approve. The plan is yours.">Ctrl+G</button>
+  </div>
+  <div class="hint"></div>
+  <pre class="prompt" data-id="05-plan-whoami"></pre>
+</section>
+
+<section class="slide">
+  <h2>Step: build it</h2>
+  <p class="muted">Claude makes a branch, writes the app and the pipeline, and checks the app with curl.</p>
+  <pre class="prompt" data-id="06-build-whoami"></pre>
+</section>
+
+<section class="slide">
+  <h2>See what changed</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="Shows the diff of this session. Read it before you commit, as you would read a colleague's change.">/diff</button>
+  </div>
+  <div class="hint"></div>
+  <p>Commit on the branch, so the review has new files to read.</p>
+</section>
+
+<section class="slide">
+  <h2>A review before the merge</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="Reviews the branch against main for security problems. A live review can miss a point, so you look too.">/security-review</button>
+  </div>
+  <div class="hint"></div>
+  <p>Look at: the access log and the headers it writes, the PID file and its folder, the headers echoed back.</p>
+  <pre class="prompt" data-id="07-review-decision"></pre>
+</section>
+
+<section class="slide">
+  <h2>Connect GitLab: MCP</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="The ! runs the command yourself, not Claude. Project scope writes .mcp.json, which the team can commit. It holds no secret.">! claude mcp add --scope project --transport http GitLab https://gitlab.playground.localhost/api/v4/mcp</button>
+  </div>
+  <div class="hint"></div>
+  <p class="muted">Then <code>/mcp</code> and the login in the browser.</p>
+</section>
+
+<section class="slide">
+  <h2>The restart moment</h2>
+  <p>Claude Code asks you to approve a project server at startup. A server added now loads after a restart.</p>
+  <div class="cmds">
+    <button class="cmd" data-hint="Exit, then start again with this. Same chat, same context, and now the server shows up for approval.">claude --continue</button>
+    <button class="cmd" data-hint="Lists the MCP servers and runs the login in the browser.">/mcp</button>
+  </div>
+  <div class="hint"></div>
+</section>
+
+<section class="slide">
+  <h2>Ask the sample project</h2>
+  <p class="muted">The MCP server gives Claude typed GitLab tools, with their own login.</p>
+  <pre class="prompt" data-id="08-mcp-sample-questions"></pre>
+</section>
+
+<section class="slide">
+  <h2>A merge request through MCP</h2>
+  <pre class="prompt" data-id="09-mcp-sample-mr"></pre>
+</section>
+
+<section class="slide">
+  <h2>Our merge request</h2>
+  <p class="muted">The merge to main deploys to <code>test</code> while the next slides show.</p>
+  <pre class="prompt" data-id="10-mr-whoami"></pre>
+</section>
+
+<section class="slide">
+  <h2>MCP or CLI?</h2>
+  <div class="cols">
+    <div><h3>MCP</h3>Typed tools with their own login. Good for merge requests.</div>
+    <div><h3>CLI</h3>All that a terminal can do, with your credentials. Good for <code>glab</code> and <code>ssh</code>.</div>
+  </div>
+  <p class="muted">The MCP server cannot start a manual job. <code>glab</code> can.</p>
+</section>
+
+<section class="slide">
+  <h2>The settings, explained</h2>
+  <ul>
+    <li>A hook loads <code>.env</code> before each command.</li>
+    <li>A deny rule: Claude may not read <code>.env</code>.</li>
+    <li>An ask rule: Claude asks before the prod job.</li>
+  </ul>
+  <pre class="prompt" data-id="11-explain-settings"></pre>
+</section>
+
+<section class="slide">
+  <h2>The token goes into .env</h2>
+  <ul>
+    <li>You make the token in GitLab: the <code>api</code> scope, one day.</li>
+    <li>You put it into <code>.env</code>. Git ignores that file.</li>
+    <li>Claude never sees the value in the chat.</li>
+    <li>The deny rule and the CLAUDE.md line are a guard, not a wall.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Deploy to production</h2>
+  <p class="muted">Claude starts the manual job with <code>glab ci trigger</code>. It asks first. Read the request aloud.</p>
+  <pre class="prompt" data-id="12-deploy-prod"></pre>
+</section>
+
+<section class="slide">
+  <h2>A rule matches what is written</h2>
+  <ul>
+    <li>The ask rule matches the command as typed.</li>
+    <li>Not the effect.</li>
+    <li>Claude can take another path to the same job.</li>
+    <li>So we list each way to start a job.</li>
+  </ul>
+  <p class="muted">Part 1: autonomy and safety.</p>
+</section>
+
+<section class="slide">
+  <h2>Iteration 2: the window</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="Shows what fills the context window: the chat, the tools, CLAUDE.md.">/context</button>
+    <button class="cmd" data-hint="Replaces the chat with a summary. The words after it say what to keep, so the decisions survive.">/compact keep the decisions about the app</button>
+  </div>
+  <div class="hint"></div>
+</section>
+
+<section class="slide">
+  <h2>Read the summary</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="Shows the full summary that /compact wrote. Check that it kept what you need. Then run /context again.">Ctrl+O</button>
+  </div>
+  <div class="hint"></div>
+  <p class="muted">CLAUDE.md loads again after a compact. The new lines take effect.</p>
+</section>
+
+<section class="slide" data-cut>
+  <h2>JSON: red, then green</h2>
+  <p class="muted">The test fails first. Then the code makes it pass.</p>
+  <pre class="prompt" data-id="15-json-red-green"></pre>
+</section>
+
+<section class="slide">
+  <h2>Ship the JSON</h2>
+  <p class="muted">Same flow as iteration 1. Nothing new to explain.</p>
+  <pre class="prompt" data-id="16-ship-json"></pre>
+</section>
+
+<section class="slide">
+  <h2>The outage</h2>
+  <p>I kill the app on prod by hand: <code>kill -9</code>. The browser shows prod is down.</p>
+  <pre class="prompt" data-id="17-outage"></pre>
+</section>
+
+<section class="slide">
+  <h2>The fix</h2>
+  <p class="muted">The unit has no restart policy. The rule goes into CLAUDE.md.</p>
+  <pre class="prompt" data-id="18-fix-restart"></pre>
+</section>
+
+<section class="slide">
+  <h2>Iteration 3: a clean start</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="A new task needs a clean context. CLAUDE.md loads again, so it keeps our rules.">/clear</button>
+  </div>
+  <div class="hint"></div>
+  <pre class="prompt" data-id="19-first-after-clear"></pre>
+</section>
+
+<section class="slide">
+  <h2>A plugin</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="Browse and install plugins. We install frontend-design from the official marketplace. It is a skill for good UI.">/plugin</button>
+  </div>
+  <div class="hint"></div>
+</section>
+
+<section class="slide" data-cut>
+  <h2>Speak the prompt</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="Dictate the prompt with your voice. If the microphone fails, the same prompt is on the next slide.">/voice</button>
+  </div>
+  <div class="hint"></div>
+</section>
+
+<section class="slide">
+  <h2>Build the web UI</h2>
+  <pre class="prompt" data-id="20-ui"></pre>
+</section>
+
+<section class="slide">
+  <h2>Claude in Chrome</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="Shows the connection to the browser. Claude opens the page and checks it on screen.">/chrome</button>
+  </div>
+  <div class="hint"></div>
+  <p class="muted">The browser is an MCP tool too.</p>
+</section>
+
+<section class="slide" data-cut>
+  <h2>Ship the UI</h2>
+  <p class="muted">Then check test and prod in the browser.</p>
+  <pre class="prompt" data-id="21-ship-ui"></pre>
+</section>
+
+<section class="slide">
+  <h2>Recap</h2>
+  <ul>
+    <li>CLAUDE.md grew by a few lines, each with a reason.</li>
+    <li>Plan, build, review, merge, deploy.</li>
+    <li>MCP for typed tools. CLI for the rest.</li>
+    <li>Rules guard the risky step.</li>
+    <li>One task, one context.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>What does not go into CLAUDE.md</h2>
+  <ul>
+    <li>Secrets and tokens.</li>
+    <li>Long explanations.</li>
+    <li>What Claude can read from the code.</li>
+  </ul>
+  <p class="muted">At most about 15 lines.</p>
+</section>
+
+<section class="slide">
+  <h2>Phrases to stop writing</h2>
+  <table>
+    <tr><th>Instead of</th><th>Write</th></tr>
+    <tr><td>"Make it better"</td><td>The goal, and how you check it</td></tr>
+    <tr><td>"Be careful"</td><td>A limit: what not to touch</td></tr>
+    <tr><td>"You are an expert"</td><td>The context Claude cannot guess</td></tr>
+    <tr><td>"Fix it"</td><td>What fails, and the command that shows it</td></tr>
+  </table>
+</section>
+
+<section class="slide">
+  <h2>Go back, run, ask aside</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="The way back. Press Esc twice to rewind the chat and the code to an earlier point.">/rewind (Esc Esc)</button>
+    <button class="cmd" data-hint="Run a shell command yourself, and the output goes into the chat.">!</button>
+    <button class="cmd" data-hint="A side question. It does not enter the chat history or change the task.">/btw</button>
+  </div>
+  <div class="hint"></div>
+</section>
+
+<section class="slide">
+  <h2>Memory and permissions</h2>
+  <div class="cmds">
+    <button class="cmd" data-hint="Opens CLAUDE.md in your editor. The first row turns auto memory on or off.">/memory</button>
+    <button class="cmd" data-hint="Shows the allow, ask and deny rules, and lets you change them.">/permissions</button>
+  </div>
+  <div class="hint"></div>
+</section>
+
+<section class="slide">
+  <h2>Cheat sheet</h2>
+  <table>
+    <tr><td><code>/init</code></td><td>first CLAUDE.md</td></tr>
+    <tr><td><code>/context</code> <code>/compact</code> <code>/clear</code></td><td>manage the window</td></tr>
+    <tr><td><code>Shift+Tab</code> <code>Ctrl+G</code></td><td>plan, edit the plan</td></tr>
+    <tr><td><code>/diff</code> <code>/security-review</code></td><td>check the change</td></tr>
+    <tr><td><code>/mcp</code> <code>/plugin</code></td><td>add tools</td></tr>
+    <tr><td><code>/rewind</code> <code>!</code> <code>/btw</code></td><td>undo, run, ask aside</td></tr>
+    <tr><td><code>/memory</code> <code>/permissions</code></td><td>notes and rules</td></tr>
+  </table>
+</section>
+
+<nav>
+  <button id="prev" aria-label="Previous slide">&larr; Previous</button>
+  <span id="counter"></span>
+  <button id="next" aria-label="Next slide">Next &rarr;</button>
+</nav>
+
+<script src="prompts.js"></script>
+<script src="slides.js"></script>
+</body>
+</html>
