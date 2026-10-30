@@ -1,0 +1,90 @@
+---
+name: llm-praxis-part-2
+x-vm: &vm
+  build: vm
+  cgroup: host
+  tmpfs: [/tmp, /run, /run/lock]
+  stop_signal: SIGRTMIN+3
+services:
+  traefik:
+    image: traefik:v3.7.16
+    ports: ["127.0.0.1:443:443", "[::1]:443:443", "127.0.0.1:80:80", "[::1]:80:80"]
+    networks:
+      default:
+        aliases: [gitlab.playground.internal, test.playground.internal, prod.playground.internal]
+    volumes:
+      - ./traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro
+      - ./traefik/dynamic.yaml:/etc/traefik/dynamic.yaml:ro
+      - ./runtime/tls:/tls:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  gitlab:
+    image: gitlab/gitlab-ce:19.5.3-ce.0
+    hostname: gitlab.playground.localhost
+    environment:
+      GITLAB_ROOT_PASSWORD: P@ssw0rd
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url "https://gitlab.playground.localhost"
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        nginx['proxy_set_headers'] = { "X-Forwarded-Proto" => "https", "X-Forwarded-Ssl" => "on" }
+        letsencrypt['enable'] = false
+        gitlab_rails['gitlab_shell_ssh_port'] = 2222
+        prometheus_monitoring['enable'] = false
+        puma['worker_processes'] = 2
+    ports: ["127.0.0.1:2222:22", "[::1]:2222:22"]
+    volumes:
+      - gitlab-config:/etc/gitlab
+      - gitlab-data:/var/opt/gitlab
+      - gitlab-logs:/var/log/gitlab
+      # Writable on purpose: GitLab rewrites this folder at reconfigure.
+      - ./runtime/gitlab-trusted:/etc/gitlab/trusted-certs
+    shm_size: 256m
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gitlab.entrypoints=web,websecure
+      - traefik.http.routers.gitlab.rule=Host(`gitlab.playground.localhost`) || Host(`gitlab.playground.internal`)
+      - traefik.http.services.gitlab.loadbalancer.server.port=80
+  docker:
+    image: docker:29.9.2-dind
+    privileged: true
+    environment: { DOCKER_TLS_CERTDIR: "" }
+    command: ["--host=tcp://0.0.0.0:2375"]
+  runner:
+    image: gitlab/gitlab-runner:v19.5.2
+    volumes:
+      - ./runtime/runner:/etc/gitlab-runner
+      - ./runtime/tls:/tls:ro
+  test:
+    <<: *vm
+    hostname: test.playground.localhost
+    ports: ["127.0.0.1:2201:22", "[::1]:2201:22"]
+    volumes:
+      - ssh-test:/etc/ssh
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - ./runtime/ssh:/pg/ssh:ro
+      - ./runtime/tls:/pg/tls:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.test.entrypoints=web,websecure
+      - traefik.http.routers.test.rule=Host(`test.playground.localhost`) || Host(`test.playground.internal`)
+      - traefik.http.services.test.loadbalancer.server.port=80
+  prod:
+    <<: *vm
+    hostname: prod.playground.localhost
+    ports: ["127.0.0.1:2202:22", "[::1]:2202:22"]
+    volumes:
+      - ssh-prod:/etc/ssh
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - ./runtime/ssh:/pg/ssh:ro
+      - ./runtime/tls:/pg/tls:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.prod.entrypoints=web,websecure
+      - traefik.http.routers.prod.rule=Host(`prod.playground.localhost`) || Host(`prod.playground.internal`)
+      - traefik.http.services.prod.loadbalancer.server.port=80
+volumes:
+  gitlab-config:
+  gitlab-data:
+  gitlab-logs:
+  ssh-test:
+  ssh-prod:

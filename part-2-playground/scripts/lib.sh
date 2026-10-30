@@ -2,7 +2,7 @@
 # Shared helpers. Source this file; it sets no shell options.
 
 PG_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PG_RUNTIME="$PG_ROOT/runtime"
+PG_RUNTIME="${PG_RUNTIME:-$PG_ROOT/runtime}"
 PG_CA_DIR="${PG_CA_DIR:-$HOME/.config/playgrounds/tls}"
 
 log() { printf '%s\n' "$*" >&2; }

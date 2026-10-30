@@ -1,0 +1,11 @@
+[Unit]
+Description=Install the deploy keys and the playground CA
+Before=ssh.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/pg-setup.sh
+
+[Install]
+WantedBy=multi-user.target

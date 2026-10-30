@@ -12,3 +12,33 @@ tasks:
     desc: Run the bats tests
     cmds:
       - bats tests
+  start:
+    desc: Make the certificate and keys, start the playground and wait for GitLab
+    cmds:
+      - scripts/ca.sh ensure
+      - scripts/ca.sh trust
+      - scripts/certs.sh
+      - scripts/ssh.sh keys
+      - mkdir -p runtime/gitlab-trusted runtime/runner
+      - cp runtime/tls/ca.crt runtime/gitlab-trusted/playground-ca.crt
+      - docker compose up -d --build
+      - >-
+        bash -c 'source scripts/lib.sh;
+        wait_http https://gitlab.playground.localhost/users/sign_in 200 900 || die "GitLab did not answer in 900 s"'
+      - scripts/ssh.sh pin
+  stop:
+    desc: Stop the containers and keep the data
+    cmds:
+      - docker compose stop
+  status:
+    desc: Show the containers and the answers of GitLab and Traefik
+    cmds:
+      - docker compose ps
+      - >-
+        bash -c 'source scripts/lib.sh;
+        wait_http https://gitlab.playground.localhost/users/sign_in 200 5 && echo "gitlab: up" || echo "gitlab: down"'
+  terminate:
+    desc: Delete the containers, the volumes and runtime/ (never the root CA)
+    cmds:
+      - docker compose down -v
+      - rm -rf runtime
