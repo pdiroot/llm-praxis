@@ -19,6 +19,9 @@
       "Bash(glab api *play*)",
       "Bash(glab ci retry *)",
       "Bash(glab api *retry*)",
+      "Bash(glab api *Play*)",
+      "Bash(glab api -X POST *pipeline*)",
+      "Bash(glab api *pipeline* -X POST*)",
       "Bash(glab ci run-trig *)"
     ]
   },

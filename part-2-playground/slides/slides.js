@@ -32,6 +32,7 @@
         document.execCommand("copy");
       }
       btn.textContent = "Copied";
+      btn.blur(); // so the arrow keys keep turning the slides
       setTimeout(() => (btn.textContent = "Copy"), 1500);
     });
     box.append(pre, btn);
