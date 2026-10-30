@@ -49,6 +49,14 @@ tasks:
         ssh://git@gitlab.playground.localhost:2222/demo/whoami.git
         "$PG_RUNTIME/clone/whoami"'
       - scripts/demo-claude.sh
+  reset:
+    desc: Bring GitLab, the VMs and the demo Claude Code profile back to the start state
+    cmds:
+      - scripts/reset.sh
+  preflight:
+    desc: Check the playground before a rehearsal or the session
+    cmds:
+      - scripts/preflight.sh
   stop:
     desc: Stop the containers and keep the data
     cmds:
