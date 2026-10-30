@@ -8,7 +8,7 @@ your Mac.
 ## Requirements
 
 - A Mac on Apple silicon, with Docker Desktop running
-- `task`, `openssl`, `jq`, `git` and `curl`
+- `task`, `openssl`, `jq`, `git`, `curl`, `ssh` and `ssh-keygen`
 - `glab` 1.126.0
 - Claude Code 2.1.312 or later, and a Claude plan to log in with
 - To change the scripts: `bats`, `shellcheck`, `shfmt` and `yamllint`
@@ -39,7 +39,7 @@ task smoke
 
 `task smoke` deploys a small smoke app four times and empties the servers
 afterwards. Run `task preflight` before each rehearsal and before the
-session.
+session. It also lists the checks that need you.
 
 ## Accounts
 
@@ -63,8 +63,8 @@ there. The session has its own empty config folder in `runtime/claude-config`.
 Log in in the browser. Your own Claude Code setup stays untouched.
 
 `glab` needs a token. Create it in the GitLab UI as `demo`, and put it in
-`.env` in the clone (`runtime/clone/whoami/.env`) as `GITLAB_TOKEN` and
-`GITLAB_HOST`. Never put the token in a prompt or a commit.
+`.env` in the clone (`runtime/clone/whoami/.env`) as `GITLAB_TOKEN=<token>` and
+`GITLAB_HOST=gitlab.playground.localhost`. Never put the token in a prompt or a commit.
 
 ## Move around
 
