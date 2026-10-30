@@ -45,10 +45,13 @@ main_sha=$(commit_tree "$dir/main")
 # Drop every branch but main and this checkpoint's, so a jump back or a rerun does not collide.
 mrs=$(api GET "/projects/$p/merge_requests?state=opened&per_page=100" | jq -r '.[].iid')
 for iid in $mrs; do api PUT "/projects/$p/merge_requests/$iid" -d state_event=close >/dev/null; done
-for name in $(api GET "/projects/$p/repository/branches?per_page=100" | jq -r '.[].name'); do
-  [[ $name == main || $name == "$branch" ]] && continue
-  api DELETE "/projects/$p/repository/branches/$(uri "$name")" >/dev/null
-done
+# An empty repository answers 404 to the branch list.
+if [[ $(http_code "/projects/$p/repository/branches") == 200 ]]; then
+  for name in $(api GET "/projects/$p/repository/branches?per_page=100" | jq -r '.[].name'); do
+    [[ $name == main || $name == "$branch" ]] && continue
+    api DELETE "/projects/$p/repository/branches/$(uri "$name")" >/dev/null
+  done
+fi
 g push -q --force "$remote" main:main
 api PUT "/projects/$p" -d default_branch=main >/dev/null
 
