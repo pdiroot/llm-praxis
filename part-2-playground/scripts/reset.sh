@@ -12,7 +12,7 @@ projects=(demo/whoami demo/sample-service)
 
 demo_profile() {
   demo_logout
-  demo_home_ok || die "refusing to delete PG_DEMO_HOME='$PG_DEMO_HOME'"
+  demo_home_check
   rm -rf "$PG_DEMO_HOME/claude-config" "$PG_DEMO_HOME/whoami" "$PG_DEMO_HOME/sample-service"
 }
 

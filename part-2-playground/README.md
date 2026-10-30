@@ -78,7 +78,8 @@ browser. Your own Claude Code setup stays untouched.
 5. Select the `api` scope, then **Generate token**.
 6. Select the copy button next to the token. GitLab shows the token only
    one time.
-7. In a terminal, write the token from the clipboard to the
+7. In a terminal (steps 7 and 8 use `~/llm-praxis-demo`; change the path when
+   you set `PG_DEMO_HOME`), write the token from the clipboard to the
    `.env` of the clone:
 
    ```shell
@@ -104,7 +105,7 @@ can use `glab` at once. Never put the token in a prompt or a commit.
 | `task checkpoint -- <id>` | Jumps to a cut point of the session |
 | `task status` | Shows the containers and the answers of GitLab |
 | `task stop` | Stops the containers and keeps the data |
-| `task terminate` | Deletes the containers, the volumes the demo folder and `runtime/`. The root CA stays |
+| `task terminate` | Deletes the containers, the volumes, the demo folder and `runtime/`. The root CA stays |
 
 The checkpoint ids, in session order: `1a-app-written`, `1-end`,
 `2a-json-written`, `2-end`, `3a-ui-written`, `3-end`.

@@ -31,15 +31,16 @@ claude_new_enough() {
 # The demo clone must load no parent CLAUDE.md or .mcp.json, and the demo
 # profile must list no MCP server except the ones of the clone's own .mcp.json.
 demo_isolated() {
-  local clone="$PG_DEMO_HOME/whoami" hits listed extra
+  local clone="$PG_DEMO_HOME/whoami" hits extra
   [[ -d $clone ]] || return 0
   hits=$(isolation_scan "$clone") || {
     log "a parent folder of the clone has: $hits"
     return 1
   }
-  listed=$(cd "$clone" && CLAUDE_CONFIG_DIR="$PG_DEMO_HOME/claude-config" ENABLE_CLAUDEAI_MCP_SERVERS=false claude mcp list 2>/dev/null |
-    sed -nE 's/^([A-Za-z0-9_.-]+): .*/\1/p') || true
-  extra=$(comm -23 <(sort <<<"$listed") <({ [[ -f $clone/.mcp.json ]] && jq -r '.mcpServers // {} | keys[]' "$clone/.mcp.json"; } | sort) | sed '/^$/d')
+  extra=$(mcp_foreign "$clone") || {
+    log "claude mcp list failed"
+    return 1
+  }
   [[ -z $extra ]] || {
     log "the demo session lists MCP servers that are not its own: $extra"
     return 1

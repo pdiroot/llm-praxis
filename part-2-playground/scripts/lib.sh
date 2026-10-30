@@ -6,7 +6,8 @@ PG_RUNTIME="${PG_RUNTIME:-$PG_ROOT/runtime}"
 PG_CA_DIR="${PG_CA_DIR:-$HOME/.config/playgrounds/tls}"
 # The demo session lives outside this repository and the workspace, so Claude
 # Code finds no parent CLAUDE.md or .mcp.json.
-PG_DEMO_HOME="${PG_DEMO_HOME:-$HOME/llm-praxis-demo}"
+PG_DEMO_HOME="${PG_DEMO_HOME-$HOME/llm-praxis-demo}"
+while [[ $PG_DEMO_HOME == */ && $PG_DEMO_HOME != / ]]; do PG_DEMO_HOME=${PG_DEMO_HOME%/}; done
 
 log() { printf '%s\n' "$*" >&2; }
 die() {
@@ -151,19 +152,36 @@ wait_pipeline() {
   die "no pipeline for commit $1"
 }
 
-# demo_home_ok: 0 when PG_DEMO_HOME is a folder that is safe to delete.
-demo_home_ok() { [[ -n $PG_DEMO_HOME && $PG_DEMO_HOME != / && $PG_DEMO_HOME != "$HOME" ]]; }
+# demo_home_ok: 0 when PG_DEMO_HOME is an absolute folder that may be deleted:
+# not /, not $HOME, and neither contains $HOME or $PG_ROOT.
+demo_home_ok() {
+  [[ $PG_DEMO_HOME == /?* && $PG_DEMO_HOME != "$HOME" ]] || return 1
+  [[ $HOME/ != "$PG_DEMO_HOME"/* && $PG_ROOT/ != "$PG_DEMO_HOME"/* ]]
+}
 
-# demo_home_rm: delete PG_DEMO_HOME, never an empty, root or home folder.
+# demo_home_check: demo_home_ok, and an existing folder must hold the marker
+# that demo_ssh_config writes, so only a folder made by this playground goes.
+demo_home_check() {
+  demo_home_ok || die "refusing PG_DEMO_HOME='$PG_DEMO_HOME'"
+  [[ ! -e $PG_DEMO_HOME || -f $PG_DEMO_HOME/.llm-praxis-demo ]] ||
+    die "refusing PG_DEMO_HOME='$PG_DEMO_HOME': no .llm-praxis-demo marker"
+}
+
+# demo_home_rm: delete PG_DEMO_HOME after demo_home_check.
 demo_home_rm() {
-  demo_home_ok || die "refusing to delete PG_DEMO_HOME='$PG_DEMO_HOME'"
+  demo_home_check
   rm -rf "$PG_DEMO_HOME"
 }
 
 # demo_ssh_config: copy runtime/ssh/config to $PG_DEMO_HOME/ssh/config (mode
 # 600). Its key and known_hosts paths are absolute, so the keys stay in runtime/.
 demo_ssh_config() {
+  local fresh=0
+  demo_home_ok || die "refusing PG_DEMO_HOME='$PG_DEMO_HOME'"
+  [[ -e $PG_DEMO_HOME ]] || fresh=1
   mkdir -p "$PG_DEMO_HOME/ssh"
+  # Only a folder made here gets the marker, so terminate never deletes another one.
+  if ((fresh)); then touch "$PG_DEMO_HOME/.llm-praxis-demo"; fi
   (umask 077 && cp "$PG_RUNTIME/ssh/config" "$PG_DEMO_HOME/ssh/config")
   chmod 600 "$PG_DEMO_HOME/ssh/config"
 }
@@ -177,29 +195,44 @@ clone_demo() {
 }
 
 # isolation_scan <clone>: list every file in a parent folder of <clone>, up to
-# /, that Claude Code would load. Prints one path per line; 0 when none.
+# /, that Claude Code would load. It walks the physical and the logical path.
+# Prints one path per line; 0 when none, 1 when found, 2 on a missing parent.
 isolation_scan() {
-  local dir found=0 f
-  dir=$(cd "$1/.." && pwd -P)
-  while :; do
-    for f in CLAUDE.md CLAUDE.local.md .claude/CLAUDE.md .claude/rules .mcp.json; do
-      if [[ -e $dir/$f ]]; then
-        printf '%s\n' "$dir/$f"
-        found=1
-      fi
+  local mode dir f out=""
+  for mode in -P -L; do
+    dir=$(cd "$1/.." && pwd "$mode") || return 2
+    while :; do
+      for f in CLAUDE.md CLAUDE.local.md .claude/CLAUDE.md .claude/rules AGENTS.md .claude/AGENTS.md .mcp.json; do
+        [[ ! -e $dir/$f ]] || out+="${dir%/}/$f"$'\n'
+      done
+      [[ $dir == / ]] && break
+      dir=$(dirname "$dir")
     done
-    [[ $dir == / ]] && break
-    dir=$(dirname "$dir")
   done
-  return $found
+  [[ -z $out ]] || {
+    sort -u <<<"$out" | sed '/^$/d'
+    return 1
+  }
+}
+
+# mcp_foreign <clone>: run "claude mcp list" as the demo session and print the
+# servers that the clone's own .mcp.json does not name. Fails when claude fails.
+mcp_foreign() {
+  local clone=$1 listed own
+  listed=$(cd "$clone" && CLAUDE_CONFIG_DIR="$PG_DEMO_HOME/claude-config" ENABLE_CLAUDEAI_MCP_SERVERS=false claude mcp list 2>/dev/null) || return 2
+  own=$(if [[ -f $clone/.mcp.json ]]; then jq -r '.mcpServers // {} | keys[]' "$clone/.mcp.json"; fi)
+  # A server line is "name: url-or-command - status"; a name can hold ":" or " " but not ": ".
+  awk 'index($0, ": ") && index($0, " - ") { print substr($0, 1, index($0, ": ") - 1) }' <<<"$listed" |
+    grep -vxF -e "$own" -e '' || true
 }
 
 # demo_logout: log the demo profile out of Claude Code. The profile has its own
 # Keychain entry, so the owner's login stays. It runs only with the absolute
 # $PG_DEMO_HOME/claude-config folder in CLAUDE_CONFIG_DIR, and only when that exists.
 demo_logout() {
-  local config="${1:-$PG_DEMO_HOME/claude-config}" status
-  [[ $config == /* && -d $config ]] || return 0
+  local config="$PG_DEMO_HOME/claude-config" status
+  demo_home_ok || die "refusing PG_DEMO_HOME='$PG_DEMO_HOME'"
+  [[ -d $config ]] || return 0
   # "auth status" exits 1 on a profile that is not logged in; then there is nothing to log out.
   status=$(CLAUDE_CONFIG_DIR=$config claude auth status 2>/dev/null || true)
   if jq -e '.loggedIn == false' <<<"$status" >/dev/null 2>&1; then
