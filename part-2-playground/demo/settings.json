@@ -19,13 +19,13 @@
       "Bash(glab api *play*)",
       "Bash(glab ci retry *)",
       "Bash(glab api *retry*)",
-      "Bash(glab api graphql *)",
+      "Bash(glab api *graphql*)",
       "Bash(glab api -X POST *pipeline*)",
       "Bash(glab api *pipeline* -X POST*)",
-      "Bash(glab api *pipeline* -f *)",
-      "Bash(glab api *pipeline* -F *)",
-      "Bash(glab api *pipeline* --field *)",
-      "Bash(glab api *pipeline* --raw-field *)",
+      "Bash(glab api *-f*pipeline*)",
+      "Bash(glab api *pipeline*-f*)",
+      "Bash(glab api *-F*pipeline*)",
+      "Bash(glab api *pipeline*-F*)",
       "Bash(glab ci run-trig *)"
     ]
   },
