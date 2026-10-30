@@ -5,8 +5,8 @@ tasks:
   check:
     desc: Lint the shell scripts and the YAML files
     cmds:
-      - shellcheck -x scripts/*.sh
-      - shfmt -i 2 -d scripts
+      - shellcheck -x scripts/*.sh vm/*.sh
+      - shfmt -i 2 -d scripts vm
       - yamllint .
   test:
     desc: Run the bats tests

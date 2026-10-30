@@ -32,3 +32,7 @@ cat "$dir/leaf.crt" "$PG_CA_DIR/ca.crt" >"$dir/server.crt"
 cp "$PG_CA_DIR/ca.crt" "$dir/ca.crt"
 rm -f "$dir/leaf.crt" "$dir/server.csr" "$ext"
 log "created $dir/server.crt"
+# Traefik reads the certificate once; restart a running one (not in the tests).
+if [[ $PG_RUNTIME == "$PG_ROOT/runtime" && -n $(docker compose -f "$PG_ROOT/compose.yaml" ps -q --status running traefik 2>/dev/null) ]]; then
+  docker compose -f "$PG_ROOT/compose.yaml" restart traefik
+fi
