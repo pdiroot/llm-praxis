@@ -32,7 +32,7 @@ api() {
     (umask 077 && printf 'PRIVATE-TOKEN: %s\n' "$(<"$PG_RUNTIME/tokens/admin")" >"$header")
   fi
   if [[ -n ${API_SUDO:-} ]]; then sudo=(-H "Sudo: $API_SUDO"); fi
-  curl -sS --fail-with-body --cacert "$PG_CA_DIR/ca.crt" \
+  curl -sS --max-time 30 --fail-with-body --cacert "$PG_CA_DIR/ca.crt" \
     -X "$method" -H "@$header" "${sudo[@]}" \
     "https://gitlab.playground.localhost/api/v4$path" "$@"
 }

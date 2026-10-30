@@ -17,12 +17,13 @@ http_code() { api GET "$1" -o /dev/null -w '%{http_code}' 2>/dev/null || true; }
 # being created answers 403 to a cancel. The cancel runs as demo, the owner:
 # admin gets 403 on the pipelines of a project it is not a member of.
 cancel_pipelines() {
-  local path id left deadline=$((SECONDS + 180))
+  local path id list left deadline=$((SECONDS + 180))
   while ((SECONDS < deadline)); do
     left=0
     for path in "${projects[@]}"; do
       [[ $(http_code "/projects/$(uri "$path")") == 200 ]] || continue
-      for id in $(api GET "/projects/$(uri "$path")/pipelines?per_page=100" | jq -r --arg a "$active" '.[] | select(.status | test("^(" + $a + ")$")) | .id'); do
+      list=$(api GET "/projects/$(uri "$path")/pipelines?per_page=100") || die "cannot list the pipelines of $path"
+      for id in $(jq -r --arg a "$active" '.[] | select(.status | test("^(" + $a + ")$")) | .id' <<<"$list"); do
         left=$((left + 1))
         API_SUDO=demo api POST "/projects/$(uri "$path")/pipelines/$id/cancel" >/dev/null 2>&1 || true
       done
@@ -34,9 +35,17 @@ cancel_pipelines() {
 }
 
 demo_profile() {
-  local config="$PG_RUNTIME/claude-config"
+  local config="$PG_RUNTIME/claude-config" status
   # The demo profile has its own Keychain entry, so the logout leaves the owner's login alone.
-  if [[ -d $config ]]; then CLAUDE_CONFIG_DIR=$config claude auth logout || log "logout failed; continuing"; fi
+  # "auth status" exits 1 on a profile that is not logged in; then there is nothing to log out.
+  if [[ -d $config ]]; then
+    status=$(CLAUDE_CONFIG_DIR=$config claude auth status 2>/dev/null || true)
+    if jq -e '.loggedIn == false' <<<"$status" >/dev/null 2>&1; then
+      log "demo profile is not logged in"
+    else
+      CLAUDE_CONFIG_DIR=$config claude auth logout || die "the logout of the demo profile failed; the folder stays"
+    fi
+  fi
   rm -rf "$config" "$PG_RUNTIME/clone"
 }
 
@@ -56,14 +65,16 @@ remove_project() {
   if [[ -n $id ]]; then
     log "delete $path"
     api DELETE "/projects/$id" >/dev/null
-    # GitLab marks the project first; the second call removes it, under its renamed path.
-    marked=$(api GET "/projects/$id" 2>/dev/null | jq -r 'select(.marked_for_deletion_on != null) | .path_with_namespace' || true)
-    if [[ -n $marked ]]; then
-      api DELETE "/projects/$id?permanently_remove=true&full_path=$(uri "$marked")" >/dev/null || true
-    fi
   fi
   while ((SECONDS < deadline)); do
     if [[ $(http_code "/projects/$(uri "$path")") == 404 && (-z $id || $(http_code "/projects/$id") == 404) ]]; then return 0; fi
+    # The soft delete is asynchronous: once the project is marked, remove it for good under its renamed path.
+    if [[ -n $id ]]; then
+      marked=$(api GET "/projects/$id" 2>/dev/null | jq -r 'select(.marked_for_deletion_on != null) | .path_with_namespace' || true)
+      if [[ -n $marked ]]; then
+        api DELETE "/projects/$id?permanently_remove=true&full_path=$(uri "$marked")" >/dev/null 2>&1 || true
+      fi
+    fi
     sleep 2
   done
   die "$path still answers after 300 s"

@@ -13,10 +13,15 @@ setup() {
   chmod +x "$STUB/claude"
 }
 
+teardown() {
+  if [[ -n ${CREATED:-} ]]; then rm -rf "$PG_RUNTIME/claude-config" "$PG_RUNTIME/clone"; fi
+}
+
 keepers() { find "$PG_RUNTIME/ssh" "$PG_RUNTIME/tls" -type f -exec shasum {} + | sort; }
 
 @test "reset during a pipeline" {
-  mkdir -p "$PG_RUNTIME/claude-config" "$PG_RUNTIME/clone/whoami"
+  # A real demo login could sit in this folder, and the stub would not log it out.
+  [ ! -e "$PG_RUNTIME/claude-config" ] || skip "runtime/claude-config exists; run task reset first"
   before=$(keepers)
   dir="$ROOT/checkpoints/1-end/main"
   mapfile -t files < <(cd "$dir" && find . -type f | sed 's|^\./||')
@@ -28,6 +33,8 @@ keepers() { find "$PG_RUNTIME/ssh" "$PG_RUNTIME/tls" -type f -exec shasum {} + |
   done
   [[ $s == running || $s == pending || $s == created ]]
 
+  mkdir -p "$PG_RUNTIME/claude-config" "$PG_RUNTIME/clone/whoami"
+  CREATED=1
   PATH="$STUB:$PATH" run "$ROOT/scripts/reset.sh"
   echo "$output"
   [ "$status" -eq 0 ]
@@ -37,6 +44,7 @@ keepers() { find "$PG_RUNTIME/ssh" "$PG_RUNTIME/tls" -type f -exec shasum {} + |
   [ "$(jq 'if type == "array" then length else 0 end' <<<"$out")" -eq 0 ]
   run ssh -F "$PG_RUNTIME/ssh/config" test.playground.localhost 'systemctl is-enabled whoami'
   [ "$status" -ne 0 ]
+  [ "$status" -ne 255 ] # 255 is ssh itself failing
   [ ! -e "$PG_RUNTIME/claude-config" ]
   [ ! -e "$PG_RUNTIME/clone" ]
   grep -q "CLAUDE_CONFIG_DIR=$PG_RUNTIME/claude-config auth logout" "$BATS_TEST_TMPDIR/claude.log"
