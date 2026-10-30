@@ -10,19 +10,6 @@ compose=(docker compose -f "$PG_ROOT/compose.yaml")
 whoami_desc="A whoami web app that Claude Code builds and ships live in the LLM Praxis session"
 traefik_ip=172.30.42.250 test_ip=172.30.42.251 prod_ip=172.30.42.252
 
-admin_token() {
-  if [[ -s $PG_RUNTIME/tokens/admin ]] && api GET /user >/dev/null 2>&1; then return; fi
-  log "admin token"
-  mkdir -p "$PG_RUNTIME/tokens"
-  (
-    umask 077
-    printf 'glpat-%s' "$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 26)" >"$PG_RUNTIME/tokens/admin"
-  )
-  ADMIN_TOKEN=$(<"$PG_RUNTIME/tokens/admin") "${compose[@]}" exec -T -e ADMIN_TOKEN gitlab \
-    gitlab-rails runner - <"$PG_ROOT/scripts/bootstrap.rb" >/dev/null
-  api GET /user >/dev/null || die "the admin token does not work"
-}
-
 # Auto DevOps would start pipelines that never finish and hold the runner.
 no_auto_devops() {
   api PUT /application/settings -d auto_devops_enabled=false >/dev/null

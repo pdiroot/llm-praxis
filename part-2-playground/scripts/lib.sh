@@ -15,7 +15,7 @@ die() {
 wait_http() {
   local url=$1 code=$2 deadline=$((SECONDS + $3)) got
   while ((SECONDS < deadline)); do
-    got=$(curl -s --max-time $((deadline - SECONDS)) -o /dev/null -w '%{http_code}' --cacert "$PG_CA_DIR/ca.crt" "$url" 2>/dev/null || true)
+    got=$(curl -s --max-time $((deadline - SECONDS > 1 ? deadline - SECONDS : 1)) -o /dev/null -w '%{http_code}' --cacert "$PG_CA_DIR/ca.crt" "$url" 2>/dev/null || true)
     [[ $got == "$code" ]] && return 0
     sleep 1
   done
@@ -35,6 +35,21 @@ api() {
   curl -sS --max-time 30 --fail-with-body --cacert "$PG_CA_DIR/ca.crt" \
     -X "$method" -H "@$header" "${sudo[@]}" \
     "https://gitlab.playground.localhost/api/v4$path" "$@"
+}
+
+# admin_token: make sure runtime/tokens/admin works. The token expires after
+# 30 days; an expired or missing one is made again with bootstrap.rb.
+admin_token() {
+  if [[ -s $PG_RUNTIME/tokens/admin ]] && api GET /user >/dev/null 2>&1; then return; fi
+  log "admin token"
+  mkdir -p "$PG_RUNTIME/tokens"
+  (
+    umask 077
+    printf 'glpat-%s' "$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 26)" >"$PG_RUNTIME/tokens/admin"
+  )
+  ADMIN_TOKEN=$(<"$PG_RUNTIME/tokens/admin") docker compose -f "$PG_ROOT/compose.yaml" exec -T -e ADMIN_TOKEN gitlab gitlab-rails runner - <"$PG_ROOT/scripts/bootstrap.rb" >/dev/null ||
+    die "cannot renew the admin token; is the playground up? Run task start"
+  api GET /user >/dev/null || die "the admin token does not work; run task start"
 }
 
 # uri <text>: percent-encode.
@@ -70,12 +85,14 @@ http_code() { api GET "$1" -o /dev/null -w '%{http_code}' 2>/dev/null || true; }
 # being created answers 403 to a cancel. The cancel runs as demo, the owner:
 # root gets 403 on the pipelines of a project it is not a member of.
 cancel_pipelines() {
-  local path id list left deadline=$((SECONDS + 180))
+  local path id list left code deadline=$((SECONDS + 180))
   local active='running|pending|created|preparing|waiting_for_resource|canceling'
   while ((SECONDS < deadline)); do
     left=0
     for path in "$@"; do
-      [[ $(http_code "/projects/$(uri "$path")") == 200 ]] || continue
+      code=$(http_code "/projects/$(uri "$path")")
+      [[ $code == 404 ]] && continue
+      [[ $code == 200 ]] || die "cannot read $path: HTTP $code"
       list=$(api GET "/projects/$(uri "$path")/pipelines?per_page=100") || die "cannot list the pipelines of $path"
       for id in $(jq -r --arg a "$active" '.[] | select(.status | test("^(" + $a + ")$")) | .id' <<<"$list"); do
         left=$((left + 1))

@@ -7,6 +7,7 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 cd "$PG_ROOT"
+admin_token
 projects=(demo/whoami demo/sample-service)
 
 demo_profile() {

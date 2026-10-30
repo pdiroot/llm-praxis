@@ -6,6 +6,7 @@ set -euo pipefail
 # shellcheck source-path=SCRIPTDIR
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
+admin_token
 p=playground%2Fsmoke
 timeout_s=${SMOKE_TIMEOUT:-600} # used by wait_job in lib.sh
 

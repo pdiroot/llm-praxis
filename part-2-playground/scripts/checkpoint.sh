@@ -15,6 +15,7 @@ if [[ -z $id || ! -d $dir/main ]]; then
   exit 1
 fi
 
+admin_token
 p=demo%2Fwhoami
 export API_SUDO=demo # demo owns the project; root is not a member
 export GIT_SSH_COMMAND="ssh -F $PG_RUNTIME/ssh/config"
