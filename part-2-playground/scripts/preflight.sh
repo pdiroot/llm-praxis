@@ -28,6 +28,24 @@ claude_new_enough() {
   [[ $(printf '%s\n2.1.312\n' "$v" | sort -V | head -n 1) == 2.1.312 ]]
 }
 
+# The demo clone must load no parent CLAUDE.md or .mcp.json, and the demo
+# profile must list no MCP server except the ones of the clone's own .mcp.json.
+demo_isolated() {
+  local clone="$PG_DEMO_HOME/whoami" hits listed extra
+  [[ -d $clone ]] || return 0
+  hits=$(isolation_scan "$clone") || {
+    log "a parent folder of the clone has: $hits"
+    return 1
+  }
+  listed=$(cd "$clone" && CLAUDE_CONFIG_DIR="$PG_DEMO_HOME/claude-config" ENABLE_CLAUDEAI_MCP_SERVERS=false claude mcp list 2>/dev/null |
+    sed -nE 's/^([A-Za-z0-9_.-]+): .*/\1/p') || true
+  extra=$(comm -23 <(sort <<<"$listed") <({ [[ -f $clone/.mcp.json ]] && jq -r '.mcpServers // {} | keys[]' "$clone/.mcp.json"; } | sort) | sed '/^$/d')
+  [[ -z $extra ]] || {
+    log "the demo session lists MCP servers that are not its own: $extra"
+    return 1
+  }
+}
+
 step "GitLab answers 200 over HTTPS" gitlab_up
 step "test answers over HTTPS" answers https://test.playground.localhost/
 step "prod answers over HTTPS" answers https://prod.playground.localhost/
@@ -36,6 +54,7 @@ step "ssh to prod" vm_ssh prod
 admin_token
 step "the API answers" api GET /user -o /dev/null
 step "claude is 2.1.312 or later" claude_new_enough
+step "the demo session loads nothing from the workspace" demo_isolated
 
 cat <<'TEXT'
 

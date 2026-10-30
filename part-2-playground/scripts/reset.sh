@@ -12,7 +12,8 @@ projects=(demo/whoami demo/sample-service)
 
 demo_profile() {
   demo_logout
-  rm -rf "$PG_RUNTIME/claude-config" "$PG_RUNTIME/clone"
+  demo_home_ok || die "refusing to delete PG_DEMO_HOME='$PG_DEMO_HOME'"
+  rm -rf "$PG_DEMO_HOME/claude-config" "$PG_DEMO_HOME/whoami" "$PG_DEMO_HOME/sample-service"
 }
 
 revoke_tokens() {

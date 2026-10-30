@@ -3,7 +3,7 @@
 
 setup() {
   ROOT="$BATS_TEST_DIRNAME/.."
-  export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
+  export PG_DEMO_HOME="$BATS_TEST_TMPDIR/demo"
   mkdir -p "$BATS_TEST_TMPDIR/bin"
   # STATUS is the JSON of "auth status"; LOGOUT_RC is the exit code of "auth logout".
   cat >"$BATS_TEST_TMPDIR/bin/claude" <<'STUB'
@@ -26,21 +26,21 @@ logout() { bash -c "source '$ROOT/scripts/lib.sh'; demo_logout"; }
 }
 
 @test "logged out: no logout" {
-  mkdir -p "$PG_RUNTIME/claude-config"
+  mkdir -p "$PG_DEMO_HOME/claude-config"
   STATUS='{"loggedIn":false}' run logout
   [ "$status" -eq 0 ]
   ! grep -q logout "$BATS_TEST_TMPDIR/claude.log"
 }
 
 @test "logged in: logout runs with the absolute demo folder" {
-  mkdir -p "$PG_RUNTIME/claude-config"
+  mkdir -p "$PG_DEMO_HOME/claude-config"
   run logout
   [ "$status" -eq 0 ]
-  grep -qx "CLAUDE_CONFIG_DIR=$PG_RUNTIME/claude-config auth logout" "$BATS_TEST_TMPDIR/claude.log"
+  grep -qx "CLAUDE_CONFIG_DIR=$PG_DEMO_HOME/claude-config auth logout" "$BATS_TEST_TMPDIR/claude.log"
 }
 
 @test "a failed logout dies" {
-  mkdir -p "$PG_RUNTIME/claude-config"
+  mkdir -p "$PG_DEMO_HOME/claude-config"
   LOGOUT_RC=1 run logout
   [ "$status" -ne 0 ]
   [[ $output == *"logout of the demo profile failed"* ]]

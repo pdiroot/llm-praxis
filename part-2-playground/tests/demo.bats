@@ -56,7 +56,9 @@ asks() {
 
 @test "the launch keeps the owner's config" {
   export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
-  mkdir -p "$PG_RUNTIME/clone/whoami" "$BATS_TEST_TMPDIR/bin"
+  export PG_DEMO_HOME="$BATS_TEST_TMPDIR/demo"
+  mkdir -p "$PG_RUNTIME/ssh" "$PG_DEMO_HOME/whoami"; echo "Host x" >"$PG_RUNTIME/ssh/config"
+  mkdir -p "$BATS_TEST_TMPDIR/bin"
   cat >"$BATS_TEST_TMPDIR/bin/claude" <<'STUB'
 #!/usr/bin/env bash
 echo "$CLAUDE_CONFIG_DIR"
@@ -70,22 +72,70 @@ STUB
   PATH="$BATS_TEST_TMPDIR/bin:$PATH" run "$ROOT/scripts/demo-claude.sh" --resume
   [ "$status" -eq 0 ]
   # Absolute paths: macOS may resolve the temp dir through a symlink, so compare the pwd by suffix.
-  [ "${lines[0]}" = "$PG_RUNTIME/claude-config" ]
+  [ "${lines[0]}" = "$PG_DEMO_HOME/claude-config" ]
   [ "${lines[1]}" = false ]
   [ "${lines[2]}" = "$PG_RUNTIME/tls/ca.crt" ]
   [ "${lines[3]}" = nano ]
-  [[ ${lines[4]} == */runtime/clone/whoami ]]
+  [[ ${lines[4]} == */demo/whoami ]]
   [ "${lines[5]}" = "--chrome --resume" ]
 }
 
 @test "the settings are copied once and never overwritten" {
   export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
-  mkdir -p "$PG_RUNTIME/clone/whoami" "$BATS_TEST_TMPDIR/bin"
+  export PG_DEMO_HOME="$BATS_TEST_TMPDIR/demo"
+  mkdir -p "$PG_RUNTIME/ssh" "$PG_DEMO_HOME/whoami"; echo "Host x" >"$PG_RUNTIME/ssh/config"
+  mkdir -p "$BATS_TEST_TMPDIR/bin"
   printf '#!/usr/bin/env bash\n' >"$BATS_TEST_TMPDIR/bin/claude"
   chmod +x "$BATS_TEST_TMPDIR/bin/claude"
   PATH="$BATS_TEST_TMPDIR/bin:$PATH" "$ROOT/scripts/demo-claude.sh"
-  cmp "$SETTINGS" "$PG_RUNTIME/claude-config/settings.json"
-  echo '{"mine":1}' >"$PG_RUNTIME/claude-config/settings.json"
+  cmp "$SETTINGS" "$PG_DEMO_HOME/claude-config/settings.json"
+  echo '{"mine":1}' >"$PG_DEMO_HOME/claude-config/settings.json"
   PATH="$BATS_TEST_TMPDIR/bin:$PATH" "$ROOT/scripts/demo-claude.sh"
-  [ "$(cat "$PG_RUNTIME/claude-config/settings.json")" = '{"mine":1}' ]
+  [ "$(cat "$PG_DEMO_HOME/claude-config/settings.json")" = '{"mine":1}' ]
+}
+
+@test "the launch copies the ssh config with mode 600" {
+  export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
+  export PG_DEMO_HOME="$BATS_TEST_TMPDIR/demo"
+  mkdir -p "$PG_RUNTIME/ssh" "$PG_DEMO_HOME/whoami" "$BATS_TEST_TMPDIR/bin"
+  echo "Host x" >"$PG_RUNTIME/ssh/config"
+  printf '#!/usr/bin/env bash\n' >"$BATS_TEST_TMPDIR/bin/claude"
+  chmod +x "$BATS_TEST_TMPDIR/bin/claude"
+  PATH="$BATS_TEST_TMPDIR/bin:$PATH" "$ROOT/scripts/demo-claude.sh"
+  cmp "$PG_RUNTIME/ssh/config" "$PG_DEMO_HOME/ssh/config"
+  [ "$(stat -f %Lp "$PG_DEMO_HOME/ssh/config")" = 600 ]
+}
+
+@test "a launch refuses when a parent folder has a CLAUDE.md" {
+  export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
+  export PG_DEMO_HOME="$BATS_TEST_TMPDIR/up/mid/demo"
+  mkdir -p "$PG_RUNTIME/ssh" "$PG_DEMO_HOME/whoami" "$BATS_TEST_TMPDIR/bin"
+  echo "Host x" >"$PG_RUNTIME/ssh/config"
+  touch "$BATS_TEST_TMPDIR/up/CLAUDE.md"
+  printf '#!/usr/bin/env bash\necho started\n' >"$BATS_TEST_TMPDIR/bin/claude"
+  chmod +x "$BATS_TEST_TMPDIR/bin/claude"
+  PATH="$BATS_TEST_TMPDIR/bin:$PATH" run "$ROOT/scripts/demo-claude.sh"
+  [ "$status" -ne 0 ]
+  [[ $output == *"up/CLAUDE.md"* ]]
+  [[ $output != *started* ]]
+}
+
+scan() { bash -c "source '$ROOT/scripts/lib.sh'; isolation_scan '$1'"; }
+
+@test "the parent scan fails on each file Claude Code loads" {
+  for f in CLAUDE.md CLAUDE.local.md .claude/CLAUDE.md .claude/rules/a.md .mcp.json; do
+    t="$BATS_TEST_TMPDIR/tree-${f//\//_}"
+    mkdir -p "$t/a/b/whoami" "$t/$(dirname "$f")"
+    touch "$t/$f"
+    run scan "$t/a/b/whoami"
+    [ "$status" -ne 0 ]
+    [[ $output == *"${f%/a.md}"* ]]
+  done
+}
+
+@test "the parent scan passes on a clean tree" {
+  mkdir -p "$BATS_TEST_TMPDIR/clean/a/b/whoami"
+  echo "x" >"$BATS_TEST_TMPDIR/clean/a/b/whoami/CLAUDE.md"
+  run scan "$BATS_TEST_TMPDIR/clean/a/b/whoami"
+  [ "$status" -eq 0 ]
 }

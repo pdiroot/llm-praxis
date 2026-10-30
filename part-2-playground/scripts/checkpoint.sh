@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # checkpoint.sh <id>: jump demo/whoami, both VMs and the demo clone to the
 # state in checkpoints/<id>/, forward or backward. Touches only the playground
-# GitLab, the VMs and runtime/clone/whoami.
+# GitLab, the VMs and $PG_DEMO_HOME/whoami.
 set -euo pipefail
 # shellcheck source=lib.sh
 # shellcheck source-path=SCRIPTDIR
@@ -73,7 +73,7 @@ if [[ -n $branch ]]; then
 fi
 
 log "4/5 demo clone"
-clone="$PG_RUNTIME/clone/whoami"
+clone="$PG_DEMO_HOME/whoami"
 target=${branch:-main}
 if [[ -d $clone/.git ]]; then
   git -C "$clone" fetch -q --prune origin
@@ -83,7 +83,7 @@ if [[ -d $clone/.git ]]; then
     [[ $name == "$target" ]] || git -C "$clone" branch -q -D "$name"
   done
 else
-  mkdir -p "$PG_RUNTIME/clone"
+  mkdir -p "$PG_DEMO_HOME"
   clone_demo "$target"
 fi
 

@@ -59,8 +59,12 @@ task demo
 ```
 
 `task demo` clones `demo/whoami` when it is missing and starts Claude Code
-there. The session has its own empty config folder in `runtime/claude-config`.
-Log in in the browser. Your own Claude Code setup stays untouched.
+there. The demo lives in `~/llm-praxis-demo` (`PG_DEMO_HOME` changes the
+folder): the clone `whoami/`, the config folder `claude-config/` and a copy
+of the SSH config in `ssh/`. It lives outside this repository on purpose, so
+that Claude Code loads no parent `CLAUDE.md` or `.mcp.json`. `task demo` and
+`task preflight` refuse to run when a parent folder has one. Log in in the
+browser. Your own Claude Code setup stays untouched.
 
 ### Make the GitLab token
 
@@ -74,17 +78,17 @@ Log in in the browser. Your own Claude Code setup stays untouched.
 5. Select the `api` scope, then **Generate token**.
 6. Select the copy button next to the token. GitLab shows the token only
    one time.
-7. In a terminal in this folder, write the token from the clipboard to the
+7. In a terminal, write the token from the clipboard to the
    `.env` of the clone:
 
    ```shell
-   (umask 077; printf 'GITLAB_TOKEN=%s\nGITLAB_HOST=gitlab.playground.localhost\n' "$(pbpaste)" > runtime/clone/whoami/.env)
+   (umask 077; printf 'GITLAB_TOKEN=%s\nGITLAB_HOST=gitlab.playground.localhost\n' "$(pbpaste)" > ~/llm-praxis-demo/whoami/.env)
    ```
 
 8. Check the token. This command prints `demo`:
 
    ```shell
-   (set -a; . runtime/clone/whoami/.env; glab api user | jq -r .username)
+   (set -a; . ~/llm-praxis-demo/whoami/.env; glab api user | jq -r .username)
    ```
 
 The clone ignores `.env` in git, and the demo session cannot read it. A
@@ -100,7 +104,7 @@ can use `glab` at once. Never put the token in a prompt or a commit.
 | `task checkpoint -- <id>` | Jumps to a cut point of the session |
 | `task status` | Shows the containers and the answers of GitLab |
 | `task stop` | Stops the containers and keeps the data |
-| `task terminate` | Deletes the containers, the volumes and `runtime/`. The root CA stays |
+| `task terminate` | Deletes the containers, the volumes the demo folder and `runtime/`. The root CA stays |
 
 The checkpoint ids, in session order: `1a-app-written`, `1-end`,
 `2a-json-written`, `2-end`, `3a-ui-written`, `3-end`.

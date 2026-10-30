@@ -1,5 +1,5 @@
 ## Goal
-Read `../../claude-config/settings.json` (the demo user settings) and explain each part in plain words.
+Read `../claude-config/settings.json` (the demo user settings) and explain each part in plain words.
 Then add one line to CLAUDE.md: the GitLab token is in `.env`. Never print or commit it.
 
 ## Limits

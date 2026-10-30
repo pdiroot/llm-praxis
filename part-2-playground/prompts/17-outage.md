@@ -10,7 +10,7 @@ The app on prod is down. Connect to the server and find out what happened.
 - Say what would stop it from happening again.
 
 ## Context
-- Server: prod.playground.localhost, user deploy. Use `ssh -F ../../ssh/config prod.playground.localhost`.
+- Server: prod.playground.localhost, user deploy. Use `ssh -F ../ssh/config prod.playground.localhost`.
 - The service is `whoami`. Logs: `journalctl -u whoami` and /var/log/whoami/access.log.
 
 Change nothing yet.

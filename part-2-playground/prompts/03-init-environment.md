@@ -13,5 +13,5 @@ Add a short "Environment" section to CLAUDE.md. Then commit CLAUDE.md to main an
 ## Context
 - The code is at https://gitlab.playground.localhost, project demo/whoami.
 - A merge to main deploys to test. The deploy to prod is a manual job.
-- Reach the servers from the clone with `ssh -F ../../ssh/config test.playground.localhost`. The same for prod.
+- Reach the servers from the clone with `ssh -F ../ssh/config test.playground.localhost`. The same for prod.
 - The GitLab MCP server (https://gitlab.playground.localhost/api/v4/mcp) handles merge requests. `glab` handles pipelines and jobs.

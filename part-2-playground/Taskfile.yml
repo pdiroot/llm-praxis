@@ -54,7 +54,7 @@ tasks:
     cmds:
       - >-
         bash -c 'source scripts/lib.sh;
-        [[ -d "$PG_RUNTIME/clone/whoami" ]] || { mkdir -p "$PG_RUNTIME/clone"; clone_demo; }'
+        [[ -d "$PG_DEMO_HOME/whoami" ]] || clone_demo'
       - scripts/demo-claude.sh
   reset:
     desc: Bring GitLab, the VMs and the demo Claude Code profile back to the start state
@@ -80,8 +80,8 @@ tasks:
         bash -c 'source scripts/lib.sh;
         wait_http https://gitlab.playground.localhost/users/sign_in 200 5 && echo "gitlab: up" || echo "gitlab: down"'
   terminate:
-    desc: Delete the containers, the volumes and runtime/ (never the root CA)
+    desc: Delete the containers, the volumes, the demo folder and runtime/ (never the root CA)
     cmds:
-      - bash -c 'source scripts/lib.sh; demo_logout'
+      - bash -c 'source scripts/lib.sh; demo_logout; demo_home_rm'
       - docker compose down -v
       - rm -rf runtime
