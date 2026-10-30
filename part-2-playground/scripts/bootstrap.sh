@@ -18,20 +18,21 @@ admin_token() {
     umask 077
     printf 'glpat-%s' "$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 26)" >"$PG_RUNTIME/tokens/admin"
   )
-  "${compose[@]}" exec -T -e ADMIN_TOKEN="$(cat "$PG_RUNTIME/tokens/admin")" gitlab \
+  ADMIN_TOKEN=$(<"$PG_RUNTIME/tokens/admin") "${compose[@]}" exec -T -e ADMIN_TOKEN gitlab \
     gitlab-rails runner - <"$PG_ROOT/scripts/bootstrap.rb" >/dev/null
   api GET /user >/dev/null || die "the admin token does not work"
 }
 
 demo_user() {
-  local id
+  local id keys
   id=$(api GET '/users?username=demo' | jq -r '.[0].id // empty')
   if [[ -z $id ]]; then
     log "user demo"
     id=$(api POST /users -d username=demo -d name=Demo -d email=demo@playground.internal \
       -d password='P@ssw0rd' -d skip_confirmation=true | jq -r .id)
   fi
-  if [[ $(api GET "/users/$id/keys" | jq length) -eq 0 ]]; then
+  keys=$(api GET "/users/$id/keys" | jq length)
+  if [[ $keys -eq 0 ]]; then
     api POST "/users/$id/keys" -d title=mac --data-urlencode "key@$PG_RUNTIME/ssh/mac.pub" >/dev/null
   fi
 }
@@ -58,17 +59,17 @@ whoami_project() {
 }
 
 sample_project() {
-  local p=demo%2Fsample-service seed="$PG_ROOT/seed" i n msg title
+  local p=demo%2Fsample-service seed="$PG_ROOT/seed" i n msg title have found mrs
   project sample-service
   export API_SUDO=demo
-  if ! api GET "/projects/$p/repository/branches/main" >/dev/null 2>&1; then
-    n=$(jq length "$seed/commits.json")
-    for ((i = 0; i < n; i++)); do
-      msg=$(jq -r ".[$i].message" "$seed/commits.json")
-      mapfile -t files < <(jq -r ".[$i].files[]" "$seed/commits.json")
-      push_dir "$p" main "$msg" "$seed/sample-service" "${files[@]}"
-    done
-  fi
+  # The commit count on main resumes a run that stopped part way.
+  have=$(api GET "/projects/$p/repository/commits?ref_name=main&per_page=100" | jq length)
+  n=$(jq length "$seed/commits.json")
+  for ((i = have; i < n; i++)); do
+    msg=$(jq -r ".[$i].message" "$seed/commits.json")
+    mapfile -t files < <(jq -r ".[$i].files[]" "$seed/commits.json")
+    push_dir "$p" main "$msg" "$seed/sample-service" "${files[@]}"
+  done
   local overlay branch
   overlay=$seed/$(jq -r .merge_request.overlay "$seed/issues.json")
   branch=$(jq -r .merge_request.source_branch "$seed/issues.json")
@@ -80,12 +81,14 @@ sample_project() {
   n=$(jq '.issues | length' "$seed/issues.json")
   for ((i = 0; i < n; i++)); do
     title=$(jq -r ".issues[$i].title" "$seed/issues.json")
-    [[ $(api GET "/projects/$p/issues?search=$(uri "$title")&in=title" | jq --arg t "$title" '[.[] | select(.title == $t)] | length') -gt 0 ]] && continue
+    found=$(api GET "/projects/$p/issues?search=$(uri "$title")&in=title" | jq --arg t "$title" '[.[] | select(.title == $t)] | length')
+    [[ $found -gt 0 ]] && continue
     api POST "/projects/$p/issues" --data-urlencode "title=$title" \
       --data-urlencode "description=$(jq -r ".issues[$i].description" "$seed/issues.json")" \
       --data-urlencode "labels=$(jq -r ".issues[$i].labels | join(\",\")" "$seed/issues.json")" >/dev/null
   done
-  if [[ $(api GET "/projects/$p/merge_requests?source_branch=$(uri "$branch")" | jq length) -eq 0 ]]; then
+  mrs=$(api GET "/projects/$p/merge_requests?source_branch=$(uri "$branch")" | jq length)
+  if [[ $mrs -eq 0 ]]; then
     api POST "/projects/$p/merge_requests" -d "source_branch=$branch" -d target_branch=main \
       --data-urlencode "title=$(jq -r .merge_request.title "$seed/issues.json")" \
       --data-urlencode "description=$(jq -r .merge_request.description "$seed/issues.json")" >/dev/null
@@ -96,13 +99,15 @@ sample_project() {
 runner() {
   if grep -q '^\[\[runners\]\]' "$PG_RUNTIME/runner/config.toml" 2>/dev/null; then return; fi
   log "runner"
-  local id token
+  local id ids token
   # An earlier run may have made the runner and stopped before it registered.
-  for id in $(api GET /runners/all | jq -r '.[].id'); do api DELETE "/runners/$id" >/dev/null; done
+  ids=$(api GET /runners/all | jq -r '.[].id')
+  for id in $ids; do api DELETE "/runners/$id" >/dev/null; done
   token=$(api POST /user/runners -d runner_type=instance_type -d description=playground | jq -r .token)
-  "${compose[@]}" exec -T runner gitlab-runner register --non-interactive \
+  [[ -n $token && $token != null ]] || die "no runner token"
+  CI_SERVER_TOKEN=$token "${compose[@]}" exec -T -e CI_SERVER_TOKEN runner gitlab-runner register --non-interactive \
     --url https://gitlab.playground.internal --clone-url https://gitlab.playground.internal \
-    --token "$token" --executor docker --docker-image alpine:3.22 \
+    --executor docker --docker-image alpine:3.22 \
     --docker-host tcp://docker:2375 --tls-ca-file /tls/ca.crt \
     --docker-extra-hosts "gitlab.playground.internal:$traefik_ip" \
     --docker-extra-hosts "test.playground.internal:$traefik_ip" \

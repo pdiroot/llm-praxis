@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# smoke.sh: push smoke/ to admin/smoke and run four deploys (test and prod,
+# smoke.sh: push smoke/ to playground/smoke and run four deploys (test and prod,
 # twice), check the commit on both sites, then empty both VMs.
 set -euo pipefail
 # shellcheck source=lib.sh
@@ -47,7 +47,7 @@ wait_pipeline() {
 }
 
 run_round() {
-  local n=$1 sha pipeline site
+  local n=$1 sha pipeline site body jid
   shift
   # The API cannot make an empty commit; a new STAMP makes each commit differ.
   printf 'round %s at %s\n' "$n" "$(date +%s)" >"$PG_RUNTIME/smoke/STAMP"
@@ -57,18 +57,20 @@ run_round() {
   log "round $n: commit ${sha:0:8}, pipeline $pipeline"
   wait_job "$pipeline" deploy-test success
   wait_job "$pipeline" deploy-prod manual
-  api POST "/projects/$p/jobs/$(job_id "$pipeline" deploy-prod)/play" >/dev/null
+  jid=$(job_id "$pipeline" deploy-prod)
+  api POST "/projects/$p/jobs/$jid/play" >/dev/null
   wait_job "$pipeline" deploy-prod success
   for site in test prod; do
-    curl -fsS --cacert "$PG_CA_DIR/ca.crt" "https://$site.playground.localhost/" | grep -q "Commit: ${sha:0:8}" ||
-      die "$site does not show commit ${sha:0:8}"
+    body=$(curl -fsS --cacert "$PG_CA_DIR/ca.crt" "https://$site.playground.localhost/")
+    grep -q "Commit: ${sha:0:8}" <<<"$body" || die "$site does not show commit ${sha:0:8}"
     log "round $n: deploy-test and deploy-prod green, $site shows ${sha:0:8}"
   done
 }
 
 # GitLab reserves the path admin/, so the admin's project lives in a group.
-if ! api GET "/projects/$p" >/dev/null 2>&1; then
-  group=$(api GET /groups/playground 2>/dev/null | jq -r .id || true)
+# A deleted project leaves a redirect, which answers 301 with no id.
+if ! api GET "/projects/$p" 2>/dev/null | jq -e .id >/dev/null 2>&1; then
+  group=$(api GET /groups/playground 2>/dev/null | jq -r '.id // empty' || true)
   [[ -n $group ]] || group=$(api POST /groups -d name=playground -d path=playground -d visibility=private | jq -r .id)
   api POST /projects -d name=smoke -d "namespace_id=$group" -d visibility=private >/dev/null
 fi

@@ -40,3 +40,10 @@ teardown() {
   [ "$(api GET /projects/demo%2Fsample-service/issues | jq length)" -eq 3 ]
   [ "$(api GET '/projects/demo%2Fsample-service/merge_requests?state=opened' | jq length)" -eq 1 ]
 }
+
+@test "admin and demo have the fixed password" {
+  run docker compose -f "$ROOT/compose.yaml" exec -T gitlab gitlab-rails runner \
+    'puts %w[admin demo].map { |n| User.find_by_username(n).valid_password?("P@ssw0rd") }.join(",")'
+  [ "$status" -eq 0 ]
+  [ "${lines[-1]}" = "true,true" ]
+}

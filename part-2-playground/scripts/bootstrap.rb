@@ -4,7 +4,7 @@ value = ENV.fetch('ADMIN_TOKEN')
 user = User.find_by_username('root') || User.find_by_username('admin')
 if user.username == 'root'
   user.username = 'admin'
-  # GitLab reserves the name, so the rename skips the validation.
+  # Skip validation: GitLab reserves the name admin, and the owner chose it.
   user.save!(validate: false)
 end
 user.personal_access_tokens.where(name: 'bootstrap').each(&:revoke!)
