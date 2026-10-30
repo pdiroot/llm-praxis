@@ -173,21 +173,30 @@ demo_home_rm() {
   rm -rf "$PG_DEMO_HOME"
 }
 
+# demo_home_init: make PG_DEMO_HOME with its marker when it is missing, keep a
+# marked folder, die on a folder without the marker. Call it before any step
+# that creates something in the folder.
+demo_home_init() {
+  demo_home_ok || die "refusing PG_DEMO_HOME='$PG_DEMO_HOME'"
+  if [[ ! -e $PG_DEMO_HOME ]]; then
+    mkdir -p "$PG_DEMO_HOME"
+    touch "$PG_DEMO_HOME/.llm-praxis-demo"
+  fi
+  demo_home_check
+}
+
 # demo_ssh_config: copy runtime/ssh/config to $PG_DEMO_HOME/ssh/config (mode
 # 600). Its key and known_hosts paths are absolute, so the keys stay in runtime/.
 demo_ssh_config() {
-  local fresh=0
-  demo_home_ok || die "refusing PG_DEMO_HOME='$PG_DEMO_HOME'"
-  [[ -e $PG_DEMO_HOME ]] || fresh=1
+  demo_home_init
   mkdir -p "$PG_DEMO_HOME/ssh"
-  # Only a folder made here gets the marker, so terminate never deletes another one.
-  if ((fresh)); then touch "$PG_DEMO_HOME/.llm-praxis-demo"; fi
   (umask 077 && cp "$PG_RUNTIME/ssh/config" "$PG_DEMO_HOME/ssh/config")
   chmod 600 "$PG_DEMO_HOME/ssh/config"
 }
 
 # clone_demo [branch]: clone demo/whoami to $PG_DEMO_HOME/whoami, on <branch> when given.
 clone_demo() {
+  demo_home_init
   demo_ssh_config
   local args=(-c "core.sshCommand=ssh -F '$PG_DEMO_HOME/ssh/config'")
   [[ -z ${1:-} ]] || args+=(-b "$1")

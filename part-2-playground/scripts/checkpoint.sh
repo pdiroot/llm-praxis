@@ -73,6 +73,7 @@ if [[ -n $branch ]]; then
 fi
 
 log "4/5 demo clone"
+demo_home_init
 clone="$PG_DEMO_HOME/whoami"
 target=${branch:-main}
 if [[ -d $clone/.git ]]; then
@@ -83,7 +84,6 @@ if [[ -d $clone/.git ]]; then
     [[ $name == "$target" ]] || git -C "$clone" branch -q -D "$name"
   done
 else
-  mkdir -p "$PG_DEMO_HOME"
   clone_demo "$target"
 fi
 

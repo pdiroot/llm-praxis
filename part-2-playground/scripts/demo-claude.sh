@@ -8,6 +8,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 config="$PG_DEMO_HOME/claude-config"
 clone="$PG_DEMO_HOME/whoami"
+demo_home_init
 mkdir -p "$config"
 [[ -e $config/settings.json ]] || cp "$PG_ROOT/demo/settings.json" "$config/settings.json"
 

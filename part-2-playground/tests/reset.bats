@@ -33,6 +33,7 @@ keepers() { find "$PG_RUNTIME/ssh" "$PG_RUNTIME/tls" -type f -exec shasum {} + |
   done
   [[ $s == running || $s == pending || $s == created ]]
 
+  demo_home_init
   mkdir -p "$PG_DEMO_HOME/claude-config" "$PG_DEMO_HOME/whoami" "$PG_DEMO_HOME/sample-service"
   CREATED=1
   PATH="$STUB:$PATH" run "$ROOT/scripts/reset.sh"

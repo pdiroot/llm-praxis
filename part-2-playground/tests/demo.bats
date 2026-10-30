@@ -58,6 +58,7 @@ asks() {
   export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
   export PG_DEMO_HOME="$BATS_TEST_TMPDIR/demo"
   mkdir -p "$PG_RUNTIME/ssh" "$PG_DEMO_HOME/whoami"
+  touch "$PG_DEMO_HOME/.llm-praxis-demo"
   echo "Host x" >"$PG_RUNTIME/ssh/config"
   mkdir -p "$BATS_TEST_TMPDIR/bin"
   cat >"$BATS_TEST_TMPDIR/bin/claude" <<'STUB'
@@ -85,6 +86,7 @@ STUB
   export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
   export PG_DEMO_HOME="$BATS_TEST_TMPDIR/demo"
   mkdir -p "$PG_RUNTIME/ssh" "$PG_DEMO_HOME/whoami"
+  touch "$PG_DEMO_HOME/.llm-praxis-demo"
   echo "Host x" >"$PG_RUNTIME/ssh/config"
   mkdir -p "$BATS_TEST_TMPDIR/bin"
   printf '#!/usr/bin/env bash\n' >"$BATS_TEST_TMPDIR/bin/claude"
@@ -100,6 +102,7 @@ STUB
   export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
   export PG_DEMO_HOME="$BATS_TEST_TMPDIR/demo"
   mkdir -p "$PG_RUNTIME/ssh" "$PG_DEMO_HOME/whoami" "$BATS_TEST_TMPDIR/bin"
+  touch "$PG_DEMO_HOME/.llm-praxis-demo"
   echo "Host x" >"$PG_RUNTIME/ssh/config"
   printf '#!/usr/bin/env bash\n' >"$BATS_TEST_TMPDIR/bin/claude"
   chmod +x "$BATS_TEST_TMPDIR/bin/claude"
@@ -112,6 +115,7 @@ STUB
   export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
   export PG_DEMO_HOME="$BATS_TEST_TMPDIR/up/mid/demo"
   mkdir -p "$PG_RUNTIME/ssh" "$PG_DEMO_HOME/whoami" "$BATS_TEST_TMPDIR/bin"
+  touch "$PG_DEMO_HOME/.llm-praxis-demo"
   echo "Host x" >"$PG_RUNTIME/ssh/config"
   touch "$BATS_TEST_TMPDIR/up/CLAUDE.md"
   printf '#!/usr/bin/env bash\necho started\n' >"$BATS_TEST_TMPDIR/bin/claude"
@@ -185,14 +189,33 @@ home_ok() { PG_DEMO_HOME="$1" bash -c "source '$ROOT/scripts/lib.sh'; $2"; }
   [ ! -e "$d" ]
 }
 
-@test "demo_ssh_config marks a new folder only" {
-  export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
-  mkdir -p "$PG_RUNTIME/ssh" "$BATS_TEST_TMPDIR/old"
-  echo "Host x" >"$PG_RUNTIME/ssh/config"
-  run home_ok "$BATS_TEST_TMPDIR/new" demo_ssh_config
+@test "demo_home_init marks a new folder, keeps a marked one, dies on an unmarked one" {
+  run home_ok "$BATS_TEST_TMPDIR/new" demo_home_init
+  [ "$status" -eq 0 ]
   [ -f "$BATS_TEST_TMPDIR/new/.llm-praxis-demo" ]
-  run home_ok "$BATS_TEST_TMPDIR/old" demo_ssh_config
-  [ ! -e "$BATS_TEST_TMPDIR/old/.llm-praxis-demo" ]
+  run home_ok "$BATS_TEST_TMPDIR/new" demo_home_init
+  [ "$status" -eq 0 ]
+  mkdir "$BATS_TEST_TMPDIR/old"
+  run home_ok "$BATS_TEST_TMPDIR/old" demo_home_init
+  [ "$status" -ne 0 ]
+}
+
+@test "the checkpoint clone step marks a fresh home" {
+  # Run only the clone step of checkpoint.sh, with git stubbed.
+  export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
+  export PG_DEMO_HOME="$BATS_TEST_TMPDIR/fresh"
+  mkdir -p "$PG_RUNTIME/ssh" "$BATS_TEST_TMPDIR/bin"
+  echo "Host x" >"$PG_RUNTIME/ssh/config"
+  printf '#!/usr/bin/env bash\nmkdir -p "${@: -1}/.git"\n' >"$BATS_TEST_TMPDIR/bin/git"
+  chmod +x "$BATS_TEST_TMPDIR/bin/git"
+  start=$(grep -n 'log "4/5 demo clone"' "$ROOT/scripts/checkpoint.sh" | cut -d: -f1)
+  end=$(grep -n 'log "5/5 check"' "$ROOT/scripts/checkpoint.sh" | cut -d: -f1)
+  { echo "source '$ROOT/scripts/lib.sh'; set -euo pipefail; branch=''"; sed -n "${start},$((end - 1))p" "$ROOT/scripts/checkpoint.sh"; } >"$BATS_TEST_TMPDIR/step.sh"
+  PATH="$BATS_TEST_TMPDIR/bin:$PATH" run bash "$BATS_TEST_TMPDIR/step.sh"
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [ -f "$PG_DEMO_HOME/.llm-praxis-demo" ]
+  [ -d "$PG_DEMO_HOME/whoami/.git" ]
 }
 
 # mcp_check <list-file> <rc> [mcp.json content]: run mcp_foreign with a claude stub.
