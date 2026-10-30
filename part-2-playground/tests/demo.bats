@@ -1,5 +1,6 @@
 #!/usr/bin/env bats
 
+bats_require_minimum_version 1.5.0
 setup() {
   ROOT="$BATS_TEST_DIRNAME/.."
   SETTINGS="$ROOT/demo/settings.json"
@@ -23,11 +24,13 @@ asks() {
   asks 'glab api -X POST projects/:id/jobs/49/play'
   asks 'glab api projects/:id/jobs/49/play -X POST'
   asks 'glab ci retry 49'
+  asks 'glab api -X POST projects/:id/jobs/49/retry'
+  asks 'glab ci run-trig -t x -b main'
 }
 
 @test "a read does not ask" {
-  ! asks 'glab api user'
-  ! asks 'glab ci list'
+  run ! asks 'glab api user'
+  run ! asks 'glab ci list'
 }
 
 @test "the settings deny .env, run the hook and extend the auto mode" {
@@ -45,6 +48,7 @@ asks() {
 echo "$CLAUDE_CONFIG_DIR"
 echo "$ENABLE_CLAUDEAI_MCP_SERVERS"
 echo "$NODE_EXTRA_CA_CERTS"
+echo "$EDITOR"
 echo "$PWD"
 echo "$*"
 STUB
@@ -55,8 +59,9 @@ STUB
   [ "${lines[0]}" = "$PG_RUNTIME/claude-config" ]
   [ "${lines[1]}" = false ]
   [ "${lines[2]}" = "$PG_RUNTIME/tls/ca.crt" ]
-  [[ ${lines[3]} == */runtime/clone/whoami ]]
-  [ "${lines[4]}" = "--chrome --resume" ]
+  [ "${lines[3]}" = nano ]
+  [[ ${lines[4]} == */runtime/clone/whoami ]]
+  [ "${lines[5]}" = "--chrome --resume" ]
 }
 
 @test "the settings are copied once and never overwritten" {
