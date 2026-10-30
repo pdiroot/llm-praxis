@@ -62,9 +62,35 @@ task demo
 there. The session has its own empty config folder in `runtime/claude-config`.
 Log in in the browser. Your own Claude Code setup stays untouched.
 
-`glab` needs a token. Create it in the GitLab UI as `demo`, and put it in
-`.env` in the clone (`runtime/clone/whoami/.env`) as `GITLAB_TOKEN=<token>` and
-`GITLAB_HOST=gitlab.playground.localhost`. Never put the token in a prompt or a commit.
+### Make the GitLab token
+
+`glab` needs a token. Make it in the GitLab UI, in step 9 of the session:
+
+1. Sign in at <https://gitlab.playground.localhost> as `demo`.
+2. Open
+   <https://gitlab.playground.localhost/-/user_settings/personal_access_tokens>.
+3. Select **Generate token**, then **Legacy token**.
+4. Type a name, such as `glab demo`. Set the expiration date to tomorrow.
+5. Select the `api` scope, then **Generate token**.
+6. Select the copy button next to the token. GitLab shows the token only
+   one time.
+7. In a terminal in this folder, write the token from the clipboard to the
+   `.env` of the clone:
+
+   ```shell
+   (umask 077; printf 'GITLAB_TOKEN=%s\nGITLAB_HOST=gitlab.playground.localhost\n' "$(pbpaste)" > runtime/clone/whoami/.env)
+   ```
+
+8. Check the token. This command prints `demo`:
+
+   ```shell
+   (set -a; . runtime/clone/whoami/.env; glab api user | jq -r .username)
+   ```
+
+The clone ignores `.env` in git, and the demo session cannot read it. A
+hook of the session loads it before each command, so a running session
+can use `glab` at once. Never put the token in a prompt or a commit.
+`task reset` revokes the token.
 
 ## Move around
 
