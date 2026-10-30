@@ -154,3 +154,18 @@ clone_demo() {
   [[ -z ${1:-} ]] || args+=(-b "$1")
   git clone "${args[@]}" ssh://git@gitlab.playground.localhost:2222/demo/whoami.git "$PG_RUNTIME/clone/whoami"
 }
+
+# demo_logout: log the demo profile out of Claude Code. The profile has its own
+# Keychain entry, so the owner's login stays. It runs only with the absolute
+# runtime/claude-config folder in CLAUDE_CONFIG_DIR, and only when that exists.
+demo_logout() {
+  local config="$PG_RUNTIME/claude-config" status
+  [[ -d $config ]] || return 0
+  # "auth status" exits 1 on a profile that is not logged in; then there is nothing to log out.
+  status=$(CLAUDE_CONFIG_DIR=$config claude auth status 2>/dev/null || true)
+  if jq -e '.loggedIn == false' <<<"$status" >/dev/null 2>&1; then
+    log "demo profile is not logged in"
+  else
+    CLAUDE_CONFIG_DIR=$config claude auth logout || die "the logout of the demo profile failed; the folder stays"
+  fi
+}

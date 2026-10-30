@@ -11,18 +11,8 @@ admin_token
 projects=(demo/whoami demo/sample-service)
 
 demo_profile() {
-  local config="$PG_RUNTIME/claude-config" status
-  # The demo profile has its own Keychain entry, so the logout leaves the owner's login alone.
-  # "auth status" exits 1 on a profile that is not logged in; then there is nothing to log out.
-  if [[ -d $config ]]; then
-    status=$(CLAUDE_CONFIG_DIR=$config claude auth status 2>/dev/null || true)
-    if jq -e '.loggedIn == false' <<<"$status" >/dev/null 2>&1; then
-      log "demo profile is not logged in"
-    else
-      CLAUDE_CONFIG_DIR=$config claude auth logout || die "the logout of the demo profile failed; the folder stays"
-    fi
-  fi
-  rm -rf "$config" "$PG_RUNTIME/clone"
+  demo_logout
+  rm -rf "$PG_RUNTIME/claude-config" "$PG_RUNTIME/clone"
 }
 
 revoke_tokens() {

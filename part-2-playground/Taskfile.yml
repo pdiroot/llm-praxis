@@ -77,5 +77,6 @@ tasks:
   terminate:
     desc: Delete the containers, the volumes and runtime/ (never the root CA)
     cmds:
+      - bash -c 'source scripts/lib.sh; demo_logout'
       - docker compose down -v
       - rm -rf runtime
