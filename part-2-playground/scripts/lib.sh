@@ -64,15 +64,16 @@ api() {
 }
 
 # new_admin_token: write a random token to runtime/tokens/admin and give it
-# to root with bootstrap.rb.
+# to root with bootstrap.rb. The caller runs it with ||, which turns off
+# errexit here, so each step returns on its own failure.
 new_admin_token() {
   local token="$PG_RUNTIME/tokens/admin"
 
-  mkdir -p "$PG_RUNTIME/tokens"
+  mkdir -p "$PG_RUNTIME/tokens" || return
   (
     umask 077
     printf 'glpat-%s' "$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 26)" >"$token"
-  )
+  ) || return
 
   ADMIN_TOKEN=$(<"$token") docker compose -f "$PG_ROOT/compose.yaml" \
     exec -T -e ADMIN_TOKEN gitlab gitlab-rails runner - <"$PG_ROOT/scripts/bootstrap.rb" >/dev/null
@@ -96,6 +97,7 @@ http_code() { api GET "$1" -o /dev/null -w '%{http_code}' 2>/dev/null || true; }
 
 # commit_actions <project> <ref> <dir> <file>...: print the JSON actions of a
 # commit: "update" for a file that exists on <ref>, else "create".
+# It runs in $(...), where errexit is off, so a failed jq returns at once.
 commit_actions() {
   local project=$1 ref=$2 dir=$3 file action actions='[]'
   shift 3
@@ -106,7 +108,7 @@ commit_actions() {
       action=update
     fi
     actions=$(jq --arg a "$action" --arg f "$file" --rawfile c "$dir/$file" \
-      '. + [{action: $a, file_path: $f, content: $c}]' <<<"$actions")
+      '. + [{action: $a, file_path: $f, content: $c}]' <<<"$actions") || return
   done
 
   printf '%s\n' "$actions"
@@ -125,7 +127,7 @@ push_dir() {
     ref=${start:-$branch}
   fi
 
-  actions=$(commit_actions "$project" "$ref" "$dir" "$@")
+  actions=$(commit_actions "$project" "$ref" "$dir" "$@") || return
 
   jq -n --arg b "$branch" --arg s "$start" --arg m "$message" --argjson a "$actions" \
     '{branch: $b, commit_message: $m, actions: $a} + (if $s != "" then {start_branch: $s} else {} end)' |

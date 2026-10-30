@@ -27,11 +27,11 @@ smoke_project() {
   done
 }
 
-# deploy_both <sha>: wait for deploy-test, then start deploy-prod and wait for it.
+# deploy_both <round> <sha>: wait for deploy-test, then start deploy-prod and wait for it.
 deploy_both() {
   local pipeline
-  pipeline=$(wait_pipeline "$1")
-  log "commit ${1:0:8}, pipeline $pipeline"
+  pipeline=$(wait_pipeline "$2")
+  log "round $1: commit ${2:0:8}, pipeline $pipeline"
 
   wait_job "$pipeline" deploy-test success
   wait_job "$pipeline" deploy-prod manual
@@ -50,7 +50,7 @@ run_round() {
   push_dir "$p" main "chore: smoke round $n" "$PG_RUNTIME/smoke" STAMP "$@"
   sha=$(api GET "/projects/$p/repository/commits/main" | jq -r .id)
 
-  deploy_both "$sha"
+  deploy_both "$n" "$sha"
 
   for site in test prod; do
     body=$(curl -fsS --cacert "$PG_CA_DIR/ca.crt" "https://$site.playground.localhost/")
