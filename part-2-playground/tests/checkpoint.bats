@@ -51,7 +51,7 @@ head_of() { API_SUDO=demo api GET "/projects/$P/repository/branches/$1" | jq -r 
   run "$ROOT/scripts/checkpoint.sh" 1-end
   echo "$output"
   [ "$status" -eq 0 ]
-  [ "$(API_SUDO=demo api GET "/projects/$P/repository/branches" | jq -r 'map(.name) | join(",")')" = main ]
+  [ "$(GIT_SSH_COMMAND="ssh -F $PG_RUNTIME/ssh/config" git ls-remote --heads ssh://git@gitlab.playground.localhost:2222/demo/whoami.git | sed 's|.*refs/heads/||')" = main ]
   [ "$(git -C "$PG_RUNTIME/clone/whoami" branch --show-current)" = main ]
   [ "$(git -C "$PG_RUNTIME/clone/whoami" branch | wc -l | tr -d ' ')" -eq 1 ]
 }
