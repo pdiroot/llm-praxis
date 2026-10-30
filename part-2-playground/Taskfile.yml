@@ -25,8 +25,9 @@ tasks:
     cmds:
       - bats --filter-tags '!live' tests
   test:live:
-    desc: Run the bats tests that need the running playground, then reset it
+    desc: Reset the playground, run the bats tests that need it, then reset it again
     cmds:
+      - task reset
       - bats --filter-tags live tests || { task reset; exit 1; }
       - task reset
   start:

@@ -120,5 +120,5 @@ The checkpoint ids, in session order: `1a-app-written`, `1-end`,
 
 - `task check` runs `shellcheck`, `shfmt` and `yamllint`.
 - `task test` runs the tests that need no playground.
-- `task test:live` runs the tests that need the running playground, then
+- `task test:live` resets the playground, runs the tests that need it, then
   runs `task reset`.
