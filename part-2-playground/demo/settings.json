@@ -1,0 +1,39 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"set -a; [ -f '$CLAUDE_PROJECT_DIR/.env' ] && . '$CLAUDE_PROJECT_DIR/.env'; set +a\" >> \"$CLAUDE_ENV_FILE\""
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "deny": ["Read(**/.env)"],
+    "ask": [
+      "Bash(glab ci trigger *)",
+      "Bash(glab ci run *)",
+      "Bash(glab api *play*)",
+      "Bash(glab ci retry *)",
+      "Bash(glab api *retry*)",
+      "Bash(glab api *graphql*)",
+      "Bash(glab api -X POST *pipeline*)",
+      "Bash(glab api *pipeline* -X POST*)",
+      "Bash(glab api *-f*pipeline*)",
+      "Bash(glab api *pipeline*-f*)",
+      "Bash(glab api *-F*pipeline*)",
+      "Bash(glab api *pipeline*-F*)",
+      "Bash(glab ci run-trig *)"
+    ]
+  },
+  "autoMode": {
+    "environment": [
+      "$defaults",
+      "Source control: the local GitLab at gitlab.playground.localhost (gitlab.playground.internal inside the containers), a training playground on this Mac, with the projects demo/whoami and demo/sample-service",
+      "Trusted internal domains: *.playground.localhost and *.playground.internal are local training containers on this Mac. test and prod are Debian containers that act as the team's test and production servers. SSH to them, deploys to them and merges in demo/whoami and demo/sample-service are the purpose of the training"
+    ]
+  }
+}

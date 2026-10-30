@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>whoami</title>
+<style>
+  :root { color-scheme: light dark; --fg: #1d2330; --bg: #f6f7f9; --card: #fff; --accent: #2a6df4; --line: #dde1e8; }
+  @media (prefers-color-scheme: dark) { :root { --fg: #e6e9ef; --bg: #14171d; --card: #1d222b; --accent: #7aa7ff; --line: #2c333f; } }
+  body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: var(--fg); background: var(--bg); }
+  main { max-width: 52rem; margin: 0 auto; padding: 2rem 1rem; }
+  h1 { margin: 0 0 .25rem; font-size: 2rem; }
+  .sub { margin: 0 0 1.5rem; opacity: .7; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: .75rem; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  h2 { margin: 0 0 .5rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .big { font-size: 1.25rem; font-weight: 600; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { padding: .15rem 0; font-family: ui-monospace, monospace; font-size: .9rem; overflow-wrap: anywhere; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { text-align: left; padding: .35rem .5rem; border-top: 1px solid var(--line); vertical-align: top; }
+  th { width: 11rem; font-weight: 600; white-space: nowrap; }
+  td { font-family: ui-monospace, monospace; overflow-wrap: anywhere; }
+  @media (max-width: 30rem) { th { width: auto; white-space: normal; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>whoami</h1>
+  <p class="sub">This is what the server sees of you.</p>
+  <section><h2>Host name</h2><div class="big">{{.Hostname}}</div></section>
+  <section><h2>IP addresses</h2><ul>{{range .IPs}}<li>{{.}}</li>{{end}}</ul></section>
+  <section><h2>Request headers</h2><table>{{range $k, $v := .Headers}}<tr><th>{{$k}}</th><td>{{range $v}}{{.}} {{end}}</td></tr>{{end}}</table></section>
+  <section><h2>Version</h2><div>Commit: <code>{{.Commit}}</code></div></section>
+</main>
+</body>
+</html>

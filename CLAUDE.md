@@ -30,3 +30,12 @@ each part. `README.md` lists the parts.
 - Do not add `Signed-off-by`.
 - Do not name the agent, the model or its version in a commit, a PR or a
   comment.
+
+## Part 2 commands
+
+Run these in `part-2-playground/`:
+
+- `task check` runs `shellcheck`, `shfmt -i 2 -d` and `yamllint`.
+- `task test` runs the `bats` tests that need no running playground.
+- `task test:live` runs `task reset`, the live `bats` tests, then `task reset` again.
+- `part-2-playground/README.md` lists the other tasks.
