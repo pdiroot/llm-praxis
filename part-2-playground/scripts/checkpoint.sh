@@ -46,10 +46,12 @@ main_sha=$(commit_tree "$dir/main")
 mrs=$(api GET "/projects/$p/merge_requests?state=opened&per_page=100" | jq -r '.[].iid')
 for iid in $mrs; do api PUT "/projects/$p/merge_requests/$iid" -d state_event=close >/dev/null; done
 # The git remote lists the branches; the API list can lag a push by a few seconds.
-for name in $(git ls-remote --heads "$remote" | sed 's|.*refs/heads/||'); do
-  [[ $name == main || $name == "$branch" ]] && continue
+heads=$(git ls-remote --heads "$remote") || die "git ls-remote failed"
+while read -r _ ref; do
+  name=${ref#refs/heads/}
+  [[ -z $name || $name == main || $name == "$branch" ]] && continue
   g push -q "$remote" --delete "$name"
-done
+done <<<"$heads"
 g push -q --force "$remote" main:main
 api PUT "/projects/$p" -d default_branch=main >/dev/null
 

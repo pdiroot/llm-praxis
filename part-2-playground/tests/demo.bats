@@ -29,6 +29,9 @@ asks() {
   asks 'glab api graphql -f query=mutation{jobPlay(input:{id:"gid://gitlab/Ci::Build/49"}){job{id}}}'
   asks 'glab api -X POST projects/:id/pipelines -f ref=main'
   asks 'glab api projects/:id/pipelines -X POST -f ref=main'
+  asks 'glab api graphql -f query=mutation{jobRetry(input:{id:"gid://gitlab/Ci::Build/49"}){job{id}}}'
+  asks 'glab api projects/:id/pipelines -f ref=main'
+  asks 'glab api projects/:id/pipeline --field ref=main'
 }
 
 @test "a read does not ask" {
@@ -36,6 +39,7 @@ asks() {
   run ! asks 'glab ci list'
   run ! asks 'glab api projects/:id/pipelines'
   run ! asks 'glab api projects/:id/pipelines/12/jobs'
+  run ! asks 'glab api projects/:id/jobs'
 }
 
 @test "the settings deny .env, run the hook and extend the auto mode" {

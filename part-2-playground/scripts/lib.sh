@@ -150,7 +150,7 @@ wait_pipeline() {
 
 # clone_demo [branch]: clone demo/whoami to runtime/clone/whoami, on <branch> when given.
 clone_demo() {
-  local args=(-c "core.sshCommand=ssh -F $PG_RUNTIME/ssh/config")
+  local args=(-c "core.sshCommand=ssh -F '$PG_RUNTIME/ssh/config'")
   [[ -z ${1:-} ]] || args+=(-b "$1")
   git clone "${args[@]}" ssh://git@gitlab.playground.localhost:2222/demo/whoami.git "$PG_RUNTIME/clone/whoami"
 }

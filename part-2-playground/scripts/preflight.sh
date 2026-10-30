@@ -33,6 +33,7 @@ step "test answers over HTTPS" answers https://test.playground.localhost/
 step "prod answers over HTTPS" answers https://prod.playground.localhost/
 step "ssh to test" vm_ssh test
 step "ssh to prod" vm_ssh prod
+admin_token
 step "the API answers" api GET /user -o /dev/null
 step "claude is 2.1.312 or later" claude_new_enough
 

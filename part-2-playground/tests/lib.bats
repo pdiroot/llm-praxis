@@ -4,6 +4,10 @@ setup() {
   ROOT="$(cd "$BATS_TEST_DIRNAME/.." && pwd)"
 }
 
+teardown() {
+  kill "${NC_PID:-}" "${SLEEP_PID:-}" 2>/dev/null || true
+}
+
 @test "wait_http returns 1 after the timeout" {
   run bash -c "source '$ROOT/scripts/lib.sh'; start=\$SECONDS; wait_http http://127.0.0.1:1/ 200 2; rc=\$?; [ \$((SECONDS - start)) -le 5 ] || exit 99; exit \$rc"
   [ "$status" -eq 1 ]
@@ -21,11 +25,12 @@ setup() {
   touch "$BATS_TEST_TMPDIR/ca.crt"
   export PG_CA_DIR=$BATS_TEST_TMPDIR
   # the pipe keeps nc stdin open, so it accepts and stays silent
-  sleep 20 | nc -l 127.0.0.1 "$port" >/dev/null &
+  mkfifo "$BATS_TEST_TMPDIR/hold"
+  sleep 20 >"$BATS_TEST_TMPDIR/hold" &
+  SLEEP_PID=$!
+  nc -l 127.0.0.1 "$port" <"$BATS_TEST_TMPDIR/hold" >/dev/null &
   NC_PID=$!
   sleep 1
   run bash -c "source '$ROOT/scripts/lib.sh'; start=\$SECONDS; wait_http http://127.0.0.1:$port/ 200 2; rc=\$?; [ \$((SECONDS - start)) -le 4 ] || exit 99; exit \$rc"
-  kill "$NC_PID" 2>/dev/null || true
-  pkill -f "sleep 20" 2>/dev/null || true
   [ "$status" -eq 1 ]
 }
