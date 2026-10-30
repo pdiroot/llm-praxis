@@ -11,6 +11,11 @@ tasks:
         bash -c 'diff -u slides/prompts.js <(slides/build.sh /dev/stdout)
         || { echo "slides/prompts.js is stale: run task slides"; exit 1; }'
       - yamllint .
+      - diff -r checkpoints/1-end/main checkpoints/2a-json-written/main
+      - diff -r checkpoints/2-end/main checkpoints/3a-ui-written/main
+      - >-
+        bash -c 'for f in checkpoints/*/*/.gitlab-ci.yml; do
+        cmp "$f" smoke/.gitlab-ci.yml || exit 1; done'
   slides:
     desc: Generate slides/prompts.js from prompts/*.md
     cmds:
