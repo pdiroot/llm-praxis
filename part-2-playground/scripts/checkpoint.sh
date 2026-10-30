@@ -9,7 +9,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 id=${1:-}
 dir="$PG_ROOT/checkpoints/$id"
-if [[ -z $id || ! -d $dir/main ]]; then
+if [[ ! $id =~ ^[0-9a-z-]+$ || ! -d $dir/main ]]; then
   log "unknown checkpoint '$id'; valid ids:"
   find "$PG_ROOT/checkpoints" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort >&2
   exit 1
@@ -32,6 +32,7 @@ trap 'rm -rf "$work"' EXIT
 g() { git -C "$work" -c commit.gpgsign=false -c user.name=demo -c user.email=demo@playground.internal "$@"; }
 # commit_tree <src>: replace the tree of the temp repo with <src> in one commit.
 commit_tree() {
+  [[ -d $work/.git ]] || die "no work repository in $work"
   g rm -rqf --ignore-unmatch . >/dev/null
   find "$work" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
   cp -R "$1/." "$work/"
@@ -41,12 +42,15 @@ commit_tree() {
 }
 g init -q -b main
 main_sha=$(commit_tree "$dir/main")
-# Smaller than unprotecting: allow the force push on main once it is protected.
-allow_force() { api PATCH "/projects/$p/protected_branches/main" -d allow_force_push=true >/dev/null 2>&1 || true; }
-allow_force
+# Drop every branch but main and this checkpoint's, so a jump back or a rerun does not collide.
+mrs=$(api GET "/projects/$p/merge_requests?state=opened&per_page=100" | jq -r '.[].iid')
+for iid in $mrs; do api PUT "/projects/$p/merge_requests/$iid" -d state_event=close >/dev/null; done
+for name in $(api GET "/projects/$p/repository/branches?per_page=100" | jq -r '.[].name'); do
+  [[ $name == main || $name == "$branch" ]] && continue
+  api DELETE "/projects/$p/repository/branches/$(uri "$name")" >/dev/null
+done
 g push -q --force "$remote" main:main
 api PUT "/projects/$p" -d default_branch=main >/dev/null
-allow_force # a push that creates main also protects it
 
 log "3/5 deployments"
 if [[ -f $dir/main/.gitlab-ci.yml ]]; then
@@ -67,11 +71,17 @@ fi
 
 log "4/5 demo clone"
 clone="$PG_RUNTIME/clone/whoami"
+target=${branch:-main}
 if [[ -d $clone/.git ]]; then
-  target=${branch:-main}
   git -C "$clone" fetch -q --prune origin
   git -C "$clone" switch -q -f -C "$target" "origin/$target"
   git -C "$clone" reset -q --hard "origin/$target"
+  for name in $(git -C "$clone" for-each-ref --format='%(refname:short)' refs/heads); do
+    [[ $name == "$target" ]] || git -C "$clone" branch -q -D "$name"
+  done
+else
+  mkdir -p "$PG_RUNTIME/clone"
+  clone_demo "$target"
 fi
 
 log "5/5 check"

@@ -44,8 +44,19 @@ file_var() {
   api POST "/projects/$1/variables" -d "key=$2" -d variable_type=file --data-urlencode "value@$3" >/dev/null
 }
 
+# main is protected before it exists, with force pushes allowed for task checkpoint.
+protect_main() {
+  local p=demo%2Fwhoami
+  if api GET "/projects/$p/protected_branches/main" >/dev/null 2>&1; then
+    api PATCH "/projects/$p/protected_branches/main" -d allow_force_push=true >/dev/null
+  else
+    api POST "/projects/$p/protected_branches" -d name=main -d allow_force_push=true >/dev/null
+  fi
+}
+
 whoami_project() {
   project whoami --data-urlencode "description=$whoami_desc"
+  protect_main
   file_var demo%2Fwhoami SSH_PRIVATE_KEY "$PG_RUNTIME/ssh/ci"
   file_var demo%2Fwhoami SSH_KNOWN_HOSTS "$PG_RUNTIME/ssh/known_hosts_ci"
 }

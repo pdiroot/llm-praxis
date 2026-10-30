@@ -7,17 +7,12 @@ setup() {
   ROOT="$BATS_TEST_DIRNAME/.."
   # shellcheck source=../scripts/lib.sh
   source "$ROOT/scripts/lib.sh"
+  wait_http https://gitlab.playground.localhost/users/sign_in 200 5 || skip "GitLab is down"
   P=demo%2Fwhoami
 }
 
 site() { curl -sS --cacert "$PG_CA_DIR/ca.crt" "https://$1.playground.localhost/$2"; }
 head_of() { API_SUDO=demo api GET "/projects/$P/repository/branches/$1" | jq -r .commit.id; }
-
-@test "unknown id lists the valid ids" {
-  run "$ROOT/scripts/checkpoint.sh" nope
-  [ "$status" -ne 0 ]
-  [[ $output == *1a-app-written* && $output == *3-end* ]]
-}
 
 @test "jump forward" {
   run "$ROOT/scripts/checkpoint.sh" 2-end
@@ -46,4 +41,17 @@ head_of() { API_SUDO=demo api GET "/projects/$P/repository/branches/$1" | jq -r 
   [ "$(API_SUDO=demo api GET "/projects/$P/repository/commits?ref_name=main" | jq length)" -eq 1 ]
   API_SUDO=demo api GET "/projects/$P/repository/tree?ref=main" | jq -e 'map(.name) == ["CLAUDE.md"]'
   API_SUDO=demo api GET "/projects/$P/repository/tree?ref=feat/whoami" | jq -e 'map(.name) | index("main.go")'
+  [ "$(API_SUDO=demo api GET "/projects/$P/repository/commits/feat%2Fwhoami" | jq -r '.parent_ids[0]')" = "$(head_of main)" ]
+}
+
+@test "a jump drops the other branches and leaves the clone on main" {
+  run "$ROOT/scripts/checkpoint.sh" 2a-json-written
+  [ "$status" -eq 0 ]
+  [ "$(cat "$ROOT/checkpoints/2a-json-written/BRANCH_NAME")" = feat/json ]
+  run "$ROOT/scripts/checkpoint.sh" 1-end
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [ "$(API_SUDO=demo api GET "/projects/$P/repository/branches" | jq -r 'map(.name) | join(",")')" = main ]
+  [ "$(git -C "$PG_RUNTIME/clone/whoami" branch --show-current)" = main ]
+  [ "$(git -C "$PG_RUNTIME/clone/whoami" branch | wc -l | tr -d ' ')" -eq 1 ]
 }

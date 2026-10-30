@@ -49,10 +49,7 @@ tasks:
     cmds:
       - >-
         bash -c 'source scripts/lib.sh;
-        [[ -d "$PG_RUNTIME/clone/whoami" ]] || git clone
-        -c core.sshCommand="ssh -F \"$PG_RUNTIME/ssh/config\""
-        ssh://git@gitlab.playground.localhost:2222/demo/whoami.git
-        "$PG_RUNTIME/clone/whoami"'
+        [[ -d "$PG_RUNTIME/clone/whoami" ]] || { mkdir -p "$PG_RUNTIME/clone"; clone_demo; }'
       - scripts/demo-claude.sh
   reset:
     desc: Bring GitLab, the VMs and the demo Claude Code profile back to the start state
