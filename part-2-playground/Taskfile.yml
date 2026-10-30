@@ -16,9 +16,14 @@ tasks:
     cmds:
       - slides/build.sh
   test:
-    desc: Run the bats tests
+    desc: Run the bats tests that need no running playground
     cmds:
-      - bats tests
+      - bats --filter-tags '!live' tests
+  test:live:
+    desc: Run the bats tests that need the running playground, then reset it
+    cmds:
+      - bats --filter-tags live tests || { task reset; exit 1; }
+      - task reset
   start:
     desc: Make the certificate and keys, start the playground and wait for GitLab
     cmds:

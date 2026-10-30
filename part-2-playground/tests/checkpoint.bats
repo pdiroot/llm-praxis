@@ -1,4 +1,5 @@
 #!/usr/bin/env bats
+# bats file_tags=live
 # Live test: needs the running playground. It rewrites demo/whoami and the
 # deployments of both VMs; run "task reset" afterwards.
 

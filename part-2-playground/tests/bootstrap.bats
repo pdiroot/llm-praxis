@@ -1,4 +1,5 @@
 #!/usr/bin/env bats
+# bats file_tags=live
 # Runs against the started playground; skips when GitLab does not answer.
 
 setup() {

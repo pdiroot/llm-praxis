@@ -36,4 +36,6 @@ each part. `README.md` lists the parts.
 Run these in `part-2-playground/`:
 
 - `task check` runs `shellcheck`, `shfmt -i 2 -d` and `yamllint`.
-- `task test` runs the `bats` tests.
+- `task test` runs the `bats` tests that need no running playground.
+- `task test:live` runs the live `bats` tests, then `task reset`.
+- `part-2-playground/README.md` lists the other tasks.

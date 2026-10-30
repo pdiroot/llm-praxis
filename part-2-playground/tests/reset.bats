@@ -1,4 +1,5 @@
 #!/usr/bin/env bats
+# bats file_tags=live
 # Live test: needs the running playground. It resets the real one, so the
 # CA, the certificates, the SSH keys and the tokens must stay as they are.
 
