@@ -12,6 +12,6 @@ the IP addresses and the request headers, and shows the commit it was built from
 ## Rules
 
 - Before each commit, run `go fmt ./...`, `go vet ./...` and `go test ./...`.
-- The access log `/var/log/whoami/access.log` holds the time, the remote address, the method, the path and the status. It never holds a header: Authorization and Cookie must not reach a file.
+- The access log `/var/log/whoami/access.log` holds the time, the remote address, the method, the path and the status. It never holds a header: Authorization and Cookie must not reach a file. The answer echoes the caller's own headers on purpose.
 - The PID file `/run/whoami/whoami.pid` is written in the unit's `RuntimeDirectory`, and the unit runs as `nobody`, not root. The PID is no secret, so the file stays world-readable.
 - The GitLab token is in `.env`. Never print it and never commit it.

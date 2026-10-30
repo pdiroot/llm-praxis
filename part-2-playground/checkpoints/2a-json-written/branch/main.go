@@ -2,24 +2,31 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // commit is set at build time: -ldflags "-X main.commit=<sha>".
 var commit = "dev"
 
-const (
-	logPath = "/var/log/whoami/access.log"
-	pidPath = "/run/whoami/whoami.pid"
-)
+// dir returns the directory systemd sets in env (LogsDirectory= and
+// RuntimeDirectory=), or a folder in the temp dir when the app runs by hand.
+func dir(env string) string {
+	if v := os.Getenv(env); v != "" {
+		return v
+	}
+	return filepath.Join(os.TempDir(), "whoami")
+}
 
 type info struct {
 	Hostname string      `json:"hostname"`
@@ -33,7 +40,9 @@ func collect(r *http.Request) info {
 	var ips []string
 	addrs, _ := net.InterfaceAddrs()
 	for _, a := range addrs {
-		ips = append(ips, a.String())
+		if n, ok := a.(*net.IPNet); ok {
+			ips = append(ips, n.IP.String())
+		}
 	}
 	h := r.Header.Clone()
 	h.Set("Host", r.Host) // net/http moves Host out of r.Header
@@ -93,13 +102,22 @@ func handler() http.Handler {
 }
 
 func main() {
-	f, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o640)
+	addr := flag.String("addr", ":80", "listen address")
+	flag.Parse()
+	logDir, runDir := dir("LOGS_DIRECTORY"), dir("RUNTIME_DIRECTORY")
+	for _, d := range []string{logDir, runDir} {
+		if err := os.MkdirAll(d, 0o755); err != nil {
+			log.Fatal(err)
+		}
+	}
+	f, err := os.OpenFile(filepath.Join(logDir, "access.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o640)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
-	if err := os.WriteFile(pidPath, []byte(strconv.Itoa(os.Getpid())+"\n"), 0o644); err != nil {
+	pid := []byte(strconv.Itoa(os.Getpid()) + "\n")
+	if err := os.WriteFile(filepath.Join(runDir, "whoami.pid"), pid, 0o644); err != nil {
 		log.Fatal(err)
 	}
-	log.Fatal(http.ListenAndServe(":80", logged(f, handler())))
+	log.Fatal((&http.Server{Addr: *addr, Handler: logged(f, handler()), ReadHeaderTimeout: 5 * time.Second}).ListenAndServe())
 }

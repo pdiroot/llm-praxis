@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -30,5 +32,16 @@ func TestAccessLogHasNoHeaders(t *testing.T) {
 	line := buf.String()
 	if strings.Contains(line, "secret") || !strings.Contains(line, `GET "/x" 404`) {
 		t.Errorf("unexpected log line: %q", line)
+	}
+}
+
+func TestDirChoice(t *testing.T) {
+	t.Setenv("LOGS_DIRECTORY", "/var/log/x")
+	if got := dir("LOGS_DIRECTORY"); got != "/var/log/x" {
+		t.Errorf("env set: got %q", got)
+	}
+	t.Setenv("LOGS_DIRECTORY", "")
+	if got := dir("LOGS_DIRECTORY"); got != filepath.Join(os.TempDir(), "whoami") {
+		t.Errorf("env unset: got %q", got)
 	}
 }
