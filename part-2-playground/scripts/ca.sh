@@ -14,6 +14,7 @@ ensure() {
   elif [[ -e $crt || -e $key ]]; then
     die "only one of $crt and $key exists; fix it by hand"
   fi
+
   mkdir -p "$PG_CA_DIR"
   # step has no flag for the organization, so openssl makes the CA.
   (umask 077 && openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:P-256 -nodes \
@@ -21,6 +22,7 @@ ensure() {
     -addext "basicConstraints=critical,CA:TRUE" \
     -addext "keyUsage=critical,keyCertSign,cRLSign" \
     -keyout "$key" -out "$crt" 2>/dev/null)
+
   chmod 644 "$crt"
   chmod 600 "$key"
   log "created $crt"
@@ -32,6 +34,7 @@ trust() {
     log "CA already trusted"
     return 0
   fi
+
   # PG_CA_TRUST_CMD is split on purpose; the tests replace it with echo.
   # shellcheck disable=SC2086
   ${PG_CA_TRUST_CMD:-sudo security add-trusted-cert} -d -r trustRoot -k /Library/Keychains/System.keychain "$crt"
