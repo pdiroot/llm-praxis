@@ -50,7 +50,7 @@
     <button class="cmd" data-hint="Gets the project to your Mac. The repository is empty, as on day one of a new service.">git clone</button>
     <button class="cmd" data-hint="Start Claude Code inside the folder. Then CLAUDE.md, the project settings and the hook all bind to this project.">claude</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
   <p class="muted">First start: log in in the browser.</p>
 </section>
 
@@ -60,7 +60,7 @@
     <button class="cmd" data-hint="Chooses the model. A bigger model plans better. A smaller one is faster and cheaper.">/model</button>
     <button class="cmd" data-hint="Chooses how long Claude thinks before it answers. More effort for a plan, less for a typo.">/effort</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
 </section>
 
 <section class="slide">
@@ -68,7 +68,7 @@
   <div class="cmds">
     <button class="cmd" data-hint="Claude reads the project and writes CLAUDE.md: the notes it loads in every session. Read what it wrote.">/init</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
   <p>The folder is empty, so Claude cannot guess where the code lives. We tell it.</p>
 </section>
 
@@ -84,13 +84,25 @@
   <pre class="prompt" data-id="04-claude-md-checks"></pre>
 </section>
 
-<section class="slide" data-cut>
+<section class="slide">
   <h2>Plan before code</h2>
   <div class="cmds">
-    <button class="cmd" data-hint="Plan mode. Claude reads and plans, and changes nothing until you approve.">Shift+Tab</button>
+    <button class="cmd" data-hint="Cycles the modes; press until the footer says plan mode. Or type /plan.">Shift+Tab</button>
+  </div>
+  <div class="hint" aria-live="polite"></div>
+  <p>In plan mode Claude reads and plans. It changes nothing until you approve.</p>
+</section>
+
+<section class="slide" data-cut>
+  <h2>Edit the plan</h2>
+  <div class="cmds">
     <button class="cmd" data-hint="Opens the plan in your editor. Change one line yourself, then approve. The plan is yours.">Ctrl+G</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
+</section>
+
+<section class="slide">
+  <h2>Step: the plan</h2>
   <pre class="prompt" data-id="05-plan-whoami"></pre>
 </section>
 
@@ -105,7 +117,7 @@
   <div class="cmds">
     <button class="cmd" data-hint="Shows the diff of this session. Read it before you commit, as you would read a colleague's change.">/diff</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
   <p>Commit on the branch, so the review has new files to read.</p>
 </section>
 
@@ -114,18 +126,23 @@
   <div class="cmds">
     <button class="cmd" data-hint="Reviews the branch against main for security problems. A live review can miss a point, so you look too.">/security-review</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
   <p>Look at: the access log and the headers it writes, the PID file and its folder, the headers echoed back.</p>
+</section>
+
+<section class="slide">
+  <h2>Step: the decision</h2>
   <pre class="prompt" data-id="07-review-decision"></pre>
 </section>
 
 <section class="slide">
   <h2>Connect GitLab: MCP</h2>
   <div class="cmds">
-    <button class="cmd" data-hint="The ! runs the command yourself, not Claude. Project scope writes .mcp.json, which the team can commit. It holds no secret.">! claude mcp add --scope project --transport http GitLab https://gitlab.playground.localhost/api/v4/mcp</button>
+    <button class="cmd" data-hint="The ! runs the command yourself, not Claude. Project scope writes .mcp.json, which the team can commit. It holds no secret.">claude mcp add</button>
   </div>
-  <div class="hint"></div>
-  <p class="muted">Then <code>/mcp</code> and the login in the browser.</p>
+  <div class="hint" aria-live="polite"></div>
+  <p><code>! claude mcp add --scope project --transport http GitLab https://gitlab.playground.localhost/api/v4/mcp</code></p>
+  <p class="muted">Then exit and restart (next slide).</p>
 </section>
 
 <section class="slide">
@@ -133,9 +150,9 @@
   <p>Claude Code asks you to approve a project server at startup. A server added now loads after a restart.</p>
   <div class="cmds">
     <button class="cmd" data-hint="Exit, then start again with this. Same chat, same context, and now the server shows up for approval.">claude --continue</button>
-    <button class="cmd" data-hint="Lists the MCP servers and runs the login in the browser.">/mcp</button>
+    <button class="cmd" data-hint="After the approval, lists the MCP servers and runs the login in the browser.">/mcp</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
 </section>
 
 <section class="slide">
@@ -169,7 +186,7 @@
   <ul>
     <li>A hook loads <code>.env</code> before each command.</li>
     <li>A deny rule: Claude may not read <code>.env</code>.</li>
-    <li>An ask rule: Claude asks before the prod job.</li>
+    <li>Ask rules: Claude Code asks before each way to start the prod job.</li>
   </ul>
   <pre class="prompt" data-id="11-explain-settings"></pre>
 </section>
@@ -207,15 +224,15 @@
     <button class="cmd" data-hint="Shows what fills the context window: the chat, the tools, CLAUDE.md.">/context</button>
     <button class="cmd" data-hint="Replaces the chat with a summary. The words after it say what to keep, so the decisions survive.">/compact keep the decisions about the app</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
 </section>
 
 <section class="slide">
   <h2>Read the summary</h2>
   <div class="cmds">
-    <button class="cmd" data-hint="Shows the full summary that /compact wrote. Check that it kept what you need. Then run /context again.">Ctrl+O</button>
+    <button class="cmd" data-hint="Toggles the transcript view. After /compact it can show the summary.">Ctrl+O</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
   <p class="muted">CLAUDE.md loads again after a compact. The new lines take effect.</p>
 </section>
 
@@ -248,7 +265,11 @@
   <div class="cmds">
     <button class="cmd" data-hint="A new task needs a clean context. CLAUDE.md loads again, so it keeps our rules.">/clear</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
+</section>
+
+<section class="slide">
+  <h2>Step: the first prompt</h2>
   <pre class="prompt" data-id="19-first-after-clear"></pre>
 </section>
 
@@ -257,7 +278,7 @@
   <div class="cmds">
     <button class="cmd" data-hint="Browse and install plugins. We install frontend-design from the official marketplace. It is a skill for good UI.">/plugin</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
 </section>
 
 <section class="slide" data-cut>
@@ -265,7 +286,7 @@
   <div class="cmds">
     <button class="cmd" data-hint="Dictate the prompt with your voice. If the microphone fails, the same prompt is on the next slide.">/voice</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
 </section>
 
 <section class="slide">
@@ -278,11 +299,11 @@
   <div class="cmds">
     <button class="cmd" data-hint="Shows the connection to the browser. Claude opens the page and checks it on screen.">/chrome</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
   <p class="muted">The browser is an MCP tool too.</p>
 </section>
 
-<section class="slide" data-cut>
+<section class="slide" data-cut="cut: the prod deploy">
   <h2>Ship the UI</h2>
   <p class="muted">Then check test and prod in the browser.</p>
   <pre class="prompt" data-id="21-ship-ui"></pre>
@@ -323,20 +344,20 @@
 <section class="slide">
   <h2>Go back, run, ask aside</h2>
   <div class="cmds">
-    <button class="cmd" data-hint="The way back. Press Esc twice to rewind the chat and the code to an earlier point.">/rewind (Esc Esc)</button>
+    <button class="cmd" data-hint="The way back. Press Esc twice with an empty prompt to rewind the chat and the code to an earlier point.">/rewind (Esc Esc)</button>
     <button class="cmd" data-hint="Run a shell command yourself, and the output goes into the chat.">!</button>
     <button class="cmd" data-hint="A side question. It does not enter the chat history or change the task.">/btw</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
 </section>
 
 <section class="slide">
   <h2>Memory and permissions</h2>
   <div class="cmds">
-    <button class="cmd" data-hint="Opens CLAUDE.md in your editor. The first row turns auto memory on or off.">/memory</button>
+    <button class="cmd" data-hint="Lists the memory files. Pick one to open in your editor. Turns auto memory on or off.">/memory</button>
     <button class="cmd" data-hint="Shows the allow, ask and deny rules, and lets you change them.">/permissions</button>
   </div>
-  <div class="hint"></div>
+  <div class="hint" aria-live="polite"></div>
 </section>
 
 <section class="slide">
@@ -350,6 +371,15 @@
     <tr><td><code>/rewind</code> <code>!</code> <code>/btw</code></td><td>undo, run, ask aside</td></tr>
     <tr><td><code>/memory</code> <code>/permissions</code></td><td>notes and rules</td></tr>
   </table>
+</section>
+
+<section class="slide">
+  <h2>A look at part 3</h2>
+  <ul>
+    <li>Several repositories in one workspace.</li>
+    <li>Terraform.</li>
+    <li>A deployment to AWS.</li>
+  </ul>
 </section>
 
 <nav>

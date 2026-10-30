@@ -18,6 +18,7 @@ code { background: var(--code); padding: 0 .2em; border-radius: 4px; font-size: 
 .slide.on { display: block; }
 .slide[data-cut]::after { content: "cut point"; position: fixed; top: 10px; right: 16px;
   font-size: 14px; color: var(--muted); opacity: .6; }
+.slide[data-cut]:not([data-cut=""])::after { content: attr(data-cut); }
 h1 { font-size: 64px; margin: .3em 0 .2em; line-height: 1.1; }
 h2 { font-size: 44px; margin: 0 0 .5em; color: var(--accent); line-height: 1.15; }
 ul { padding-left: 1.1em; margin: 0; }
@@ -35,7 +36,7 @@ li { margin: .25em 0; }
 .hint:empty::before { content: "Hover over a command or press Tab."; color: var(--muted); }
 .prompt-box { position: relative; margin-top: 16px; }
 pre.prompt { margin: 0; padding: 16px 20px; background: var(--code); border-radius: 12px;
-  font-size: 21px; line-height: 1.35; white-space: pre-wrap; max-height: 48vh; overflow: auto; }
+  font-size: 24px; line-height: 1.35; white-space: pre-wrap; max-height: 48vh; overflow: auto; }
 .copy { position: absolute; top: 8px; right: 8px; font-size: 18px; padding: 4px 12px;
   border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--fg); cursor: pointer; }
 table { border-collapse: collapse; width: 100%; }

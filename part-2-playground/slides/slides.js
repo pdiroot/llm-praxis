@@ -47,7 +47,10 @@
       };
       b.addEventListener("mouseenter", set);
       b.addEventListener("focus", set);
-      b.addEventListener("click", set);
+      b.addEventListener("click", () => {
+        set();
+        b.blur();
+      });
     });
   });
 
