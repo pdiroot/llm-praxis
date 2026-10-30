@@ -33,7 +33,7 @@ teardown() {
   run env GITLAB_HOST=gitlab.playground.localhost GITLAB_TOKEN="$(jq -r .token <<<"$resp")" glab api user
   [ "$status" -eq 0 ]
   [ "$(jq -r .username <<<"$output")" = demo ]
-  [ "$(api GET '/users?username=admin' | jq length)" -eq 1 ]
+  [ "$(api GET '/users?username=root' | jq length)" -eq 1 ]
 }
 
 @test "the sample repository has its issues and MR" {
@@ -41,9 +41,9 @@ teardown() {
   [ "$(api GET '/projects/demo%2Fsample-service/merge_requests?state=opened' | jq length)" -eq 1 ]
 }
 
-@test "admin and demo have the fixed password" {
+@test "root and demo have the fixed password" {
   run docker compose -f "$ROOT/compose.yaml" exec -T gitlab gitlab-rails runner \
-    'puts %w[admin demo].map { |n| User.find_by_username(n).valid_password?("P@ssw0rd") }.join(",")'
+    'puts %w[root demo].map { |n| User.find_by_username(n).valid_password?("P@ssw0rd") }.join(",")'
   [ "$status" -eq 0 ]
   [ "${lines[-1]}" = "true,true" ]
 }

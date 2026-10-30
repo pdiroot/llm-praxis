@@ -23,6 +23,11 @@ admin_token() {
   api GET /user >/dev/null || die "the admin token does not work"
 }
 
+# Auto DevOps would start pipelines that never finish and hold the runner.
+no_auto_devops() {
+  api PUT /application/settings -d auto_devops_enabled=false >/dev/null
+}
+
 demo_user() {
   local id keys
   id=$(api GET '/users?username=demo' | jq -r '.[0].id // empty')
@@ -116,6 +121,7 @@ runner() {
 }
 
 admin_token
+no_auto_devops
 demo_user
 whoami_project
 sample_project

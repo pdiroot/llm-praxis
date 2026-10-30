@@ -1,12 +1,7 @@
-# Run with gitlab-rails runner. Renames root to admin and gives it a
+# Run with gitlab-rails runner. Gives root a
 # personal access token with the known value in ADMIN_TOKEN.
 value = ENV.fetch('ADMIN_TOKEN')
-user = User.find_by_username('root') || User.find_by_username('admin')
-if user.username == 'root'
-  user.username = 'admin'
-  # Skip validation: GitLab reserves the name admin, and the owner chose it.
-  user.save!(validate: false)
-end
+user = User.find_by_username!('root')
 user.personal_access_tokens.where(name: 'bootstrap').each(&:revoke!)
 token = user.personal_access_tokens.build(
   name: 'bootstrap',
