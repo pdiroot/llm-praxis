@@ -38,6 +38,16 @@ tasks:
     desc: Prove the playground with four deploys of the smoke app, then empty the VMs
     cmds:
       - scripts/smoke.sh
+  demo:
+    desc: Clone demo/whoami when missing, then start the demo Claude Code session
+    cmds:
+      - >-
+        bash -c 'source scripts/lib.sh;
+        [[ -d "$PG_RUNTIME/clone/whoami" ]] || git clone
+        -c core.sshCommand="ssh -F $PG_RUNTIME/ssh/config"
+        ssh://git@gitlab.playground.localhost:2222/demo/whoami.git
+        "$PG_RUNTIME/clone/whoami"'
+      - scripts/demo-claude.sh
   stop:
     desc: Stop the containers and keep the data
     cmds:
