@@ -1,0 +1,14 @@
+---
+version: "3"
+
+tasks:
+  check:
+    desc: Lint the shell scripts and the YAML files
+    cmds:
+      - shellcheck scripts/*.sh
+      - shfmt -i 2 -d scripts
+      - yamllint .
+  test:
+    desc: Run the bats tests
+    cmds:
+      - bats tests
