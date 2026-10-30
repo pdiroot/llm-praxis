@@ -62,3 +62,71 @@ push_dir() {
     '{branch: $b, commit_message: $m, actions: $a} + (if $s != "" then {start_branch: $s} else {} end)' |
     api POST "/projects/$project/repository/commits" -H 'Content-Type: application/json' -d @- >/dev/null
 }
+
+# http_code <path>: the status code of a GET, 000 when curl fails.
+http_code() { api GET "$1" -o /dev/null -w '%{http_code}' 2>/dev/null || true; }
+
+# cancel_pipelines <path>...: cancel again each round, because a pipeline that is still
+# being created answers 403 to a cancel. The cancel runs as demo, the owner:
+# root gets 403 on the pipelines of a project it is not a member of.
+cancel_pipelines() {
+  local path id list left deadline=$((SECONDS + 180))
+  local active='running|pending|created|preparing|waiting_for_resource|canceling'
+  while ((SECONDS < deadline)); do
+    left=0
+    for path in "$@"; do
+      [[ $(http_code "/projects/$(uri "$path")") == 200 ]] || continue
+      list=$(api GET "/projects/$(uri "$path")/pipelines?per_page=100") || die "cannot list the pipelines of $path"
+      for id in $(jq -r --arg a "$active" '.[] | select(.status | test("^(" + $a + ")$")) | .id' <<<"$list"); do
+        left=$((left + 1))
+        API_SUDO=demo api POST "/projects/$(uri "$path")/pipelines/$id/cancel" >/dev/null 2>&1 || true
+      done
+    done
+    ((left == 0)) && return 0
+    sleep 2
+  done
+  die "pipelines still run after 180 s"
+}
+
+# These use $p (the project path, URL-encoded) and $timeout_s (default 600).
+# job_status <pipeline> <name>: the status of a job, empty when it is missing.
+# shellcheck disable=SC2154
+job_status() { api GET "/projects/$p/pipelines/$1/jobs" | jq -r --arg n "$2" '.[] | select(.name == $n) | .status'; }
+# shellcheck disable=SC2154
+job_id() { api GET "/projects/$p/pipelines/$1/jobs" | jq -r --arg n "$2" '.[] | select(.name == $n) | .id'; }
+
+# shellcheck disable=SC2154
+fail_job() {
+  log "job $2 of pipeline $1 failed; log tail:"
+  api GET "/projects/$p/jobs/$(job_id "$1" "$2")/trace" | tail -n 30 >&2 || true
+  exit 1
+}
+
+# wait_job <pipeline> <name> <status>
+# shellcheck disable=SC2154
+wait_job() {
+  local deadline=$((SECONDS + ${timeout_s:-600})) got
+  while ((SECONDS < deadline)); do
+    got=$(job_status "$1" "$2")
+    [[ $got == "$3" ]] && return 0
+    [[ $got == failed || $got == canceled ]] && fail_job "$1" "$2"
+    sleep 3
+  done
+  log "timeout: job $2 of pipeline $1 is '$got', wanted $3"
+  fail_job "$1" "$2"
+}
+
+# wait_pipeline <sha>: print the id of the pipeline of a commit.
+# shellcheck disable=SC2154
+wait_pipeline() {
+  local deadline=$((SECONDS + 60)) id
+  while ((SECONDS < deadline)); do
+    id=$(api GET "/projects/$p/pipelines?sha=$1" | jq -r '.[0].id // empty')
+    [[ -n $id ]] && {
+      echo "$id"
+      return 0
+    }
+    sleep 2
+  done
+  die "no pipeline for commit $1"
+}

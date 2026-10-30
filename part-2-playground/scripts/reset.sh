@@ -8,31 +8,6 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 cd "$PG_ROOT"
 projects=(demo/whoami demo/sample-service)
-active='running|pending|created|preparing|waiting_for_resource|canceling'
-
-# http_code <path>: the status code of a GET, 000 when curl fails.
-http_code() { api GET "$1" -o /dev/null -w '%{http_code}' 2>/dev/null || true; }
-
-# cancel_pipelines: cancel again each round, because a pipeline that is still
-# being created answers 403 to a cancel. The cancel runs as demo, the owner:
-# admin gets 403 on the pipelines of a project it is not a member of.
-cancel_pipelines() {
-  local path id list left deadline=$((SECONDS + 180))
-  while ((SECONDS < deadline)); do
-    left=0
-    for path in "${projects[@]}"; do
-      [[ $(http_code "/projects/$(uri "$path")") == 200 ]] || continue
-      list=$(api GET "/projects/$(uri "$path")/pipelines?per_page=100") || die "cannot list the pipelines of $path"
-      for id in $(jq -r --arg a "$active" '.[] | select(.status | test("^(" + $a + ")$")) | .id' <<<"$list"); do
-        left=$((left + 1))
-        API_SUDO=demo api POST "/projects/$(uri "$path")/pipelines/$id/cancel" >/dev/null 2>&1 || true
-      done
-    done
-    ((left == 0)) && return 0
-    sleep 2
-  done
-  die "pipelines still run after 180 s"
-}
 
 demo_profile() {
   local config="$PG_RUNTIME/claude-config" status
@@ -81,7 +56,7 @@ remove_project() {
 }
 
 log "1/5 cancel the pipelines"
-cancel_pipelines
+cancel_pipelines "${projects[@]}"
 log "2/5 demo Claude Code profile"
 demo_profile
 log "3/5 revoke the tokens of demo"

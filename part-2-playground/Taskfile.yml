@@ -53,6 +53,10 @@ tasks:
     desc: Bring GitLab, the VMs and the demo Claude Code profile back to the start state
     cmds:
       - scripts/reset.sh
+  checkpoint:
+    desc: "Jump to a checkpoint of the session: task checkpoint -- 2-end"
+    cmds:
+      - scripts/checkpoint.sh {{.CLI_ARGS}}
   preflight:
     desc: Check the playground before a rehearsal or the session
     cmds:

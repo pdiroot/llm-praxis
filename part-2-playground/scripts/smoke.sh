@@ -7,44 +7,7 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 p=playground%2Fsmoke
-timeout_s=${SMOKE_TIMEOUT:-600}
-
-# job_status <pipeline> <name>: the status of a job, empty when it is missing.
-job_status() { api GET "/projects/$p/pipelines/$1/jobs" | jq -r --arg n "$2" '.[] | select(.name == $n) | .status'; }
-job_id() { api GET "/projects/$p/pipelines/$1/jobs" | jq -r --arg n "$2" '.[] | select(.name == $n) | .id'; }
-
-fail_job() {
-  log "job $2 of pipeline $1 failed; log tail:"
-  api GET "/projects/$p/jobs/$(job_id "$1" "$2")/trace" | tail -n 30 >&2 || true
-  exit 1
-}
-
-# wait_job <pipeline> <name> <status>
-wait_job() {
-  local deadline=$((SECONDS + timeout_s)) got
-  while ((SECONDS < deadline)); do
-    got=$(job_status "$1" "$2")
-    [[ $got == "$3" ]] && return 0
-    [[ $got == failed || $got == canceled ]] && fail_job "$1" "$2"
-    sleep 3
-  done
-  log "timeout: job $2 of pipeline $1 is '$got', wanted $3"
-  fail_job "$1" "$2"
-}
-
-# wait_pipeline <sha>: print the id of the pipeline of a commit.
-wait_pipeline() {
-  local deadline=$((SECONDS + 60)) id
-  while ((SECONDS < deadline)); do
-    id=$(api GET "/projects/$p/pipelines?sha=$1" | jq -r '.[0].id // empty')
-    [[ -n $id ]] && {
-      echo "$id"
-      return 0
-    }
-    sleep 2
-  done
-  die "no pipeline for commit $1"
-}
+timeout_s=${SMOKE_TIMEOUT:-600} # used by wait_job in lib.sh
 
 run_round() {
   local n=$1 sha pipeline site body jid
@@ -67,7 +30,7 @@ run_round() {
   done
 }
 
-# GitLab reserves the path admin/, so the admin's project lives in a group.
+# The smoke project lives in its own group, apart from the demo projects.
 # A deleted project leaves a redirect, which answers 301 with no id.
 if ! api GET "/projects/$p" 2>/dev/null | jq -e .id >/dev/null 2>&1; then
   group=$(api GET /groups/playground 2>/dev/null | jq -r '.id // empty' || true)
