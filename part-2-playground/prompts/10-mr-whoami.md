@@ -7,8 +7,7 @@ Push the branch. Open a merge request to main in demo/whoami and merge it.
 - Merge only this merge request.
 
 ## Check
-- Show the pipeline of the merge and the status of deploy-test.
-- Open https://test.playground.localhost. The Commit matches the merge.
+- Show the merge and the pipeline link. Do not wait for the pipeline.
 
 ## Context
 - A merge to main starts the build and deploy-test. The deploy-prod job waits for a click.

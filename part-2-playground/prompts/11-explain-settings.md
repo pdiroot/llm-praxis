@@ -1,11 +1,10 @@
 ## Goal
-Read the demo user settings and explain each part in plain words.
+Read `../../claude-config/settings.json` (the demo user settings) and explain each part in plain words.
+Then add one line to CLAUDE.md: the GitLab token is in `.env`. Never print or commit it.
 
 ## Limits
-- Read only. Change nothing.
-- Read `demo/settings.json`, not `.claude/settings.json`.
+- Change nothing except that one line.
 - Do not read `.env`. Never print the token.
-- Then add one line to CLAUDE.md: the GitLab token is in `.env`. Never print or commit it.
 
 ## Check
 - Name the hook, the deny rule and the ask rules, and say what each one does.

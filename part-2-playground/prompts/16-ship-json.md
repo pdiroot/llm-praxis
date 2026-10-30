@@ -1,5 +1,5 @@
 ## Goal
-Commit, push, open a merge request and merge it. Then deploy to test and prod.
+Commit, push, open a merge request and merge it. Then start deploy-prod.
 
 ## Limits
 - Merge request and merge through the GitLab MCP server.
@@ -11,4 +11,5 @@ Commit, push, open a merge request and merge it. Then deploy to test and prod.
 - `curl 'https://test.playground.localhost/?format=json'` and the same for prod return JSON.
 
 ## Context
-- The same flow as in iteration 1. The ask rule applies to prod.
+- The merge deploys to test; then start deploy-prod. Same flow as in iteration 1.
+- Claude Code asks me before the deploy-prod command.

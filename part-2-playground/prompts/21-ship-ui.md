@@ -1,5 +1,5 @@
 ## Goal
-Open a merge request, merge it, deploy to test and prod. Check both pages in the browser.
+Commit and push. Open a merge request, merge it, deploy to test and prod. Check both pages in the browser.
 
 ## Limits
 - Merge through the GitLab MCP server. Start deploy-prod with `glab ci trigger`.
@@ -10,4 +10,5 @@ Open a merge request, merge it, deploy to test and prod. Check both pages in the
 - Both pages show the new UI and the same Commit.
 
 ## Context
-- The same flow as before. The ask rule applies to prod.
+- The same flow as before.
+- Claude Code asks me before the deploy-prod command.

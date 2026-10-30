@@ -8,5 +8,5 @@ First run the tests and read the last commits. Then tell me the state of the app
 - Report the test result, the last 5 commits and the branch.
 
 ## Context
-- The context is clear. CLAUDE.md is the only memory you have.
+- The chat is empty. CLAUDE.md and the repository are what you know.
 - Next task: a web UI.
