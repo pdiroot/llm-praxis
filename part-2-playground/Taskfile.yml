@@ -5,7 +5,7 @@ tasks:
   check:
     desc: Lint the shell scripts and the YAML files
     cmds:
-      - shellcheck scripts/*.sh
+      - shellcheck -x scripts/*.sh
       - shfmt -i 2 -d scripts
       - yamllint .
   test:
