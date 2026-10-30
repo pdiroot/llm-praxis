@@ -15,7 +15,7 @@ die() {
 wait_http() {
   local url=$1 code=$2 deadline=$((SECONDS + $3)) got
   while ((SECONDS < deadline)); do
-    got=$(curl -s -o /dev/null -w '%{http_code}' --cacert "$PG_CA_DIR/ca.crt" "$url" 2>/dev/null || true)
+    got=$(curl -s --max-time $((deadline - SECONDS)) -o /dev/null -w '%{http_code}' --cacert "$PG_CA_DIR/ca.crt" "$url" 2>/dev/null || true)
     [[ $got == "$code" ]] && return 0
     sleep 1
   done

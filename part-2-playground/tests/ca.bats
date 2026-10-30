@@ -21,6 +21,7 @@ stub_security() {
   [[ $output == *"CN=Playgrounds Root CA"* ]]
   [[ $output == *"O=Dmytro Pinchukov (github.com/pdiroot)"* ]]
   [ "$(stat -f %Lp "$PG_CA_DIR/ca.key")" = 600 ]
+  [ "$(stat -f %Lp "$PG_CA_DIR/ca.crt")" = 644 ]
 }
 
 @test "ensure keeps an existing CA" {

@@ -16,11 +16,12 @@ ensure() {
   fi
   mkdir -p "$PG_CA_DIR"
   # step has no flag for the organization, so openssl makes the CA.
-  (umask 077 && openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:P-256 -noenc \
+  (umask 077 && openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:P-256 -nodes \
     -days 3650 -subj "/O=Dmytro Pinchukov (github.com\\/pdiroot)/CN=Playgrounds Root CA" \
     -addext "basicConstraints=critical,CA:TRUE" \
     -addext "keyUsage=critical,keyCertSign,cRLSign" \
     -keyout "$key" -out "$crt" 2>/dev/null)
+  chmod 644 "$crt"
   chmod 600 "$key"
   log "created $crt"
 }
