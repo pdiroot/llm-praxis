@@ -33,6 +33,11 @@ tasks:
         bash -c 'source scripts/lib.sh;
         wait_http https://gitlab.playground.localhost/users/sign_in 200 900 || die "GitLab did not answer in 900 s"'
       - scripts/ssh.sh pin
+      - scripts/bootstrap.sh
+  smoke:
+    desc: Prove the playground with four deploys of the smoke app, then empty the VMs
+    cmds:
+      - scripts/smoke.sh
   stop:
     desc: Stop the containers and keep the data
     cmds:

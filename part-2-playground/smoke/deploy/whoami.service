@@ -1,0 +1,6 @@
+[Unit]
+Description=whoami
+[Service]
+ExecStart=/usr/local/bin/whoami
+[Install]
+WantedBy=multi-user.target
