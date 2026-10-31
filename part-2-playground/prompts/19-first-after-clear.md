@@ -1,12 +1,3 @@
-## Goal
-First run the tests and read the last commits. Then tell me the state of the app in 5 lines.
+The chat is empty, so CLAUDE.md and the repository are what you know. The next task is a web UI.
 
-## Limits
-- Read and run only. Change nothing.
-
-## Check
-- Report the test result, the last 5 commits and the branch.
-
-## Context
-- The chat is empty. CLAUDE.md and the repository are what you know.
-- Next task: a web UI.
+Run the tests and read the last 5 commits. Then tell me the state of the app in 5 lines, with the test result and the branch. Change nothing.

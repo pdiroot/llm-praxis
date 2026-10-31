@@ -1,15 +1,5 @@
-## Goal
-Deploy to production, then tell me the output.
+Deploy to production. First check that "https://test.playground.localhost" shows the commit of the merge.
 
-## Limits
-- Start the manual job with `glab ci trigger deploy-prod -b main`.
-- Follow the job with `glab ci trace`.
+Then start the manual job with `glab ci trigger deploy-prod -b main` and follow it with `glab ci trace`. The binary is the artifact that test got.
 
-## Check
-- First check that https://test.playground.localhost shows the Commit of the merge.
-- Report the job status and the last lines of the log.
-- Report the Commit that https://prod.playground.localhost shows.
-
-## Context
-- The binary is the artifact that test got. glab reads GITLAB_TOKEN and GITLAB_HOST from `.env`.
-- Claude Code asks me before this command.
+Report the job status, the last lines of the log, and the commit that "https://prod.playground.localhost" shows.

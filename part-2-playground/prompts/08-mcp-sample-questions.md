@@ -1,14 +1,3 @@
-## Goal
-Use the GitLab MCP server to answer questions about demo/sample-service.
+Use the GitLab MCP server, not `glab`, to answer these questions about "demo/sample-service" on "https://gitlab.playground.localhost". Which issues are open? What does the open merge request change? Which issue does it close?
 
-## Limits
-- Read only. Change nothing.
-- Use the MCP tools. Do not use `glab`.
-
-## Check
-- Name the tool for each answer.
-- Quote the issue titles and the title of the open merge request.
-
-## Context
-- GitLab: https://gitlab.playground.localhost, project demo/sample-service.
-- Questions: Which issues are open? What does the open merge request change? Which issue does it close?
+This is read only, so change nothing. Name the tool behind each answer and quote the titles.

@@ -1,15 +1,5 @@
-## Goal
-Fix the findings of the security review that you agree with. Write the decision about the access log into CLAUDE.md.
+Fix the findings of the security review that you agree with, and tell me why you reject the others. Look at the access log and the headers it writes, and the headers echoed back.
 
-## Limits
-- One commit for the fixes. A separate commit for CLAUDE.md.
-- Name each finding that you reject, with the reason.
-- Add at most 3 lines to CLAUDE.md.
+Write the decision about the access log into CLAUDE.md in at most 3 lines, so the next session keeps it. Use one commit for the fixes and one for CLAUDE.md.
 
-## Check
-- `go test ./...` passes.
-- Show the commits and the new lines of CLAUDE.md.
-
-## Context
-- The next session must keep this decision.
-- Look at the access log and the headers it writes, and the headers echoed back.
+When `go test ./...` passes, show me the commits and the new lines.

@@ -1,15 +1,3 @@
-## Goal
-Commit, push, open a merge request and merge it. Then start deploy-prod.
+Commit, push, open a merge request with the GitLab MCP server and merge it. The merge deploys to test. Then start deploy-prod with `glab ci trigger`. Touch nothing else.
 
-## Limits
-- Merge request and merge through the GitLab MCP server.
-- Start deploy-prod with `glab ci trigger`.
-- Touch nothing else.
-
-## Check
-- Both servers show the new Commit.
-- `curl 'https://test.playground.localhost/?format=json'` and the same for prod return JSON.
-
-## Context
-- The merge deploys to test; then start deploy-prod. Same flow as in iteration 1.
-- Claude Code asks me before the deploy-prod command.
+Check that both servers show the new commit, and that `curl 'https://test.playground.localhost/?format=json'` and the same for prod return JSON.
