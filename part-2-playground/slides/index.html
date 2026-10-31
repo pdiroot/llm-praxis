@@ -373,13 +373,36 @@ Status line      model, effort, cost and context</pre>
 
 <section class="slide">
   <div class="theory">
-    <h2>Close the iteration</h2>
+    <h2>Fix the findings</h2>
     <p>Fix what matters and update <code>CLAUDE.md</code>.</p>
+    <p>The fixes stay on the branch for now.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="07-review-decision"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Test it yourself</h2>
+    <p>The last review is yours: run the app and see the answers.</p>
+    <p>Nothing goes to origin before you say so.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="07-run-local"></pre>
+    <p class="note">Run the command in your own shell, then try /health too</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Close the iteration</h2>
+    <p>You are happy, so you tell Claude to push.</p>
     <p>The branch goes straight into <code>main</code>. It deploys nothing yet, so we need no merge request.</p>
     <p>Then see what the iteration cost, and free the context for the next one.</p>
   </div>
   <div class="term">
-    <pre class="prompt" data-id="07-review-decision"></pre>
+    <pre class="prompt" data-id="07-close"></pre>
     <p class="note">See what this iteration cost</p>
     <pre class="cmd">/usage</pre>
     <p class="note">Keep a summary of the chat</p>
