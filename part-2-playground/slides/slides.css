@@ -145,11 +145,10 @@ nav button {
 
 .slide[data-cut]:not([data-cut=""])::after { content: attr(data-cut); }
 
-/* A badge that says which iteration of the demo this slide belongs to. */
+/* A quiet label that says which iteration of the demo this slide belongs to. */
 .slide[data-iter]::before {
-  content: attr(data-iter); position: fixed; left: 4vw; top: 4vh;
-  padding: .3em .8em; border-radius: 5px;
-  font: 600 .72em var(--mono); color: var(--pine); background: var(--amber);
+  content: attr(data-iter); position: fixed; left: 4vw; bottom: 6.5vh;
+  font: .62em var(--mono); color: var(--ink-soft);
 }
 
 @media (max-width: 760px) {
