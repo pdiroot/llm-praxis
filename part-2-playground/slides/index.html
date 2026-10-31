@@ -334,44 +334,26 @@ Status line      model, effort, cost and context</pre>
   </div>
 </section>
 
-<section class="slide">
+<section class="slide" data-cut>
   <div class="theory">
     <h2>Plan before code</h2>
     <p>In plan mode Claude reads and plans. It changes nothing until you approve.</p>
+    <p>The plan is yours: open it in your editor, change one line, then approve.</p>
   </div>
   <div class="term">
     <p class="note">Press until the footer shows plan mode</p>
     <p class="keys"><kbd>Shift</kbd><kbd>Tab</kbd></p>
-    <p class="note">Or type</p>
-    <pre class="cmd">/plan</pre>
-  </div>
-</section>
-
-<section class="slide" data-cut>
-  <div class="theory">
-    <h2>Edit the plan</h2>
-    <p>The plan opens in your editor. Change one line, then approve.</p>
-    <p class="muted">The plan is yours.</p>
-  </div>
-  <div class="term">
+    <p class="note">Then ask for the plan</p>
+    <pre class="prompt" data-id="05-plan-whoami"></pre>
+    <p class="note">Open the plan in your editor</p>
     <p class="keys"><kbd>Ctrl</kbd><kbd>G</kbd></p>
   </div>
 </section>
 
 <section class="slide">
   <div class="theory">
-    <h2>The plan</h2>
-    <p>A prompt has three parts: the goal, the limits and the check.</p>
-  </div>
-  <div class="term">
-    <pre class="prompt" data-id="05-plan-whoami"></pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
     <h2>Build it</h2>
-    <p>Claude makes a branch, writes the app and the pipeline, and checks the app with curl.</p>
+    <p>Claude makes a branch, writes the app and checks it with curl.</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="06-build-whoami"></pre>
@@ -397,7 +379,6 @@ Status line      model, effort, cost and context</pre>
     <p>A live review can miss a point, so you look too:</p>
     <ul>
       <li>The access log and the headers it writes</li>
-      <li>The PID file and its folder</li>
       <li>The headers that the app echoes back</li>
     </ul>
   </div>
@@ -465,39 +446,10 @@ Status line      model, effort, cost and context</pre>
 <section class="slide">
   <div class="theory">
     <h2>Our merge request</h2>
-    <p>The merge to <code>main</code> deploys to <code>test</code> while the next slides show.</p>
+    <p>The first version goes to <code>main</code>. Nothing deploys yet, because we have no pipeline.</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="10-mr-whoami"></pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>The pipeline we built</h2>
-    <p>Claude wrote this pipeline together with the app, and our merge to <code>main</code> started it.</p>
-    <ul>
-      <li>The deployment to <code>test</code> is automatic.</li>
-      <li>The deployment to <code>prod</code> is manual: a person starts it.</li>
-    </ul>
-  </div>
-  <div class="term" data-title=".gitlab-ci.yml">
-<pre class="out">merge to main
-     │
-     ▼
-┌─ build ─────────────┐
-│  compile the app    │
-└────┬────────────────┘
-     │ automatic
-     ▼
-┌─ deploy-test ───────┐
-│  test server        │
-└────┬────────────────┘
-     │ manual: a person starts the job
-     ▼
-┌─ deploy-prod ───────┐
-│  prod server        │
-└─────────────────────┘</pre>
   </div>
 </section>
 
@@ -545,12 +497,52 @@ CLI   start a manual job, connect with ssh</pre>
 
 <section class="slide">
   <div class="theory">
+    <h2>Add the pipeline</h2>
+    <p>The app works locally. Now it goes to the servers.</p>
+    <p>A pipeline is a new task, so it gets its own branch and its own merge request.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="12-pipeline"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>The pipeline we built</h2>
+    <p>Claude wrote this pipeline, and our merge to <code>main</code> started it.</p>
+    <ul>
+      <li>The deployment to <code>test</code> is automatic.</li>
+      <li>The deployment to <code>prod</code> is manual: a person starts it.</li>
+    </ul>
+  </div>
+  <div class="term" data-title=".gitlab-ci.yml">
+<pre class="out">merge to main
+     │
+     ▼
+┌─ build ─────────────┐
+│  compile the app    │
+└────┬────────────────┘
+     │ automatic
+     ▼
+┌─ deploy-test ───────┐
+│  test server        │
+└────┬────────────────┘
+     │ manual: a person starts the job
+     ▼
+┌─ deploy-prod ───────┐
+│  prod server        │
+└─────────────────────┘</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
     <h2>Deploy to production</h2>
     <p>Claude starts the manual job with <code>glab ci trigger</code>.</p>
     <p>It asks first. Read the request aloud.</p>
   </div>
   <div class="term">
-    <pre class="prompt" data-id="12-deploy-prod"></pre>
+    <pre class="prompt" data-id="13-deploy-prod"></pre>
   </div>
 </section>
 
