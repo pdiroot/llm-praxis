@@ -27,7 +27,7 @@ task playground:start
   playgrounds share this CA, and no script replaces it.
 - If macOS does not trust the CA yet, macOS asks once for your admin
   password (`sudo security add-trusted-cert`). Later runs ask nothing.
-- GitLab needs about 5 minutes to start.
+- GitLab needs about 2 minutes to start.
 - `task playground:start` ends when GitLab, the runner, the `demo/whoami` project and
   the two servers are ready.
 

@@ -11,9 +11,9 @@ cd "$PG_ROOT"
 wait_gitlab() {
   local start=$SECONDS
 
-  section "⏳" "GitLab: wait until it answers (about 5 minutes on a first start)"
+  section "⏳" "GitLab: wait until it answers (about 2 minutes)"
   until wait_http https://gitlab.playground.localhost/users/sign_in 200 30; do
-    ((SECONDS - start < 900)) || die "GitLab did not answer in 900 s"
+    ((SECONDS - start < 300)) || die "GitLab did not answer in 300 s"
     log "still waiting: $((SECONDS - start)) s"
   done
   log "GitLab answers after $((SECONDS - start)) s"
