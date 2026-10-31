@@ -345,7 +345,7 @@ Status line      model, effort, cost and context</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="05-plan-whoami"></pre>
-    <p class="note">When the plan is ready, tell Claude what to change</p>
+    <p class="note">When the plan is ready but you are not happy with it, tell Claude what to change</p>
     <pre class="prompt" data-id="05-plan-change"></pre>
     <p class="note">Then approve: Yes, and use auto mode</p>
   </div>
@@ -355,7 +355,7 @@ Status line      model, effort, cost and context</pre>
   <div class="theory">
     <h2>Review the change</h2>
     <p>Read the diff as you read a colleague's change, then ask for a review.</p>
-    <p>A review can miss a point, so you look too.</p>
+    <p>A review can miss a point, so you look too. Your own comments go into the next prompt.</p>
     <p class="muted"><code>/security-review</code> looks only for security problems.</p>
   </div>
   <div class="term">
@@ -363,18 +363,24 @@ Status line      model, effort, cost and context</pre>
     <pre class="cmd">/diff</pre>
     <p class="note">Review the change</p>
     <pre class="cmd">/review</pre>
-    <p class="note">See what that cost</p>
-    <pre class="cmd">/usage</pre>
   </div>
 </section>
 
 <section class="slide">
   <div class="theory">
-    <h2>The decision</h2>
-    <p>A decision from the review goes into <code>CLAUDE.md</code>.</p>
+    <h2>Close the iteration</h2>
+    <p>Fix what matters and write the decision into <code>CLAUDE.md</code>.</p>
+    <p>The app goes straight to <code>main</code>. It deploys nothing yet, so we need no merge request.</p>
+    <p>Then see what the iteration cost, and free the context for the next one.</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="07-review-decision"></pre>
+    <p class="note">See what this iteration cost</p>
+    <pre class="cmd">/usage</pre>
+    <p class="note">Keep a summary of the chat</p>
+    <pre class="cmd">/compact</pre>
+    <p class="note">Or start with an empty chat</p>
+    <pre class="cmd">/clear</pre>
   </div>
 </section>
 
@@ -420,16 +426,6 @@ Status line      model, effort, cost and context</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="09-mcp-sample-mr"></pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>Our merge request</h2>
-    <p>The first version goes to <code>main</code>. Nothing deploys yet, because we have no pipeline.</p>
-  </div>
-  <div class="term">
-    <pre class="prompt" data-id="10-mr-whoami"></pre>
   </div>
 </section>
 
