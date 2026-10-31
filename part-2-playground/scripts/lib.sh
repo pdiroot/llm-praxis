@@ -26,6 +26,15 @@ die() {
   exit 1
 }
 
+# section <emoji> <title>: print a banner for a new category of work.
+section() {
+  local line="── $1 $2 "
+
+  while ((${#line} < 72)); do line+="─"; done
+  log ""
+  log "$line"
+}
+
 # HTTP.
 
 # wait_http <url> <code> <timeout_s>: 0 when the URL answers <code>, 1 on timeout.

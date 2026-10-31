@@ -59,21 +59,22 @@ remove_project() {
 
 admin_token
 
-log "1/5 cancel the pipelines"
+section "🛑" "GitLab: cancel the pipelines"
 cancel_pipelines "${projects[@]}"
 
-log "2/5 demo Claude Code profile"
+section "🤖" "Claude Code: delete the demo profile"
 demo_profile
 
-log "3/5 revoke the tokens of demo"
+section "🔒" "GitLab: revoke the tokens of demo"
 revoke_tokens
 
-log "4/5 recreate the projects"
+section "🦊" "GitLab: recreate the projects"
 for path in "${projects[@]}"; do remove_project "$path"; done
 "$PG_ROOT/scripts/bootstrap.sh"
 
-log "5/5 clean the VMs"
+section "🖥️" "Servers: empty test and prod"
 "$PG_ROOT/scripts/vm-clean.sh"
 
 env -u CLAUDE_CONFIG_DIR claude auth status >/dev/null || die "the owner's own Claude Code profile does not work"
+section "✅" "Reset done in ${SECONDS} s"
 log "reset done"

@@ -59,6 +59,7 @@ run_round() {
   done
 }
 
+section "🦊" "GitLab: the smoke project"
 admin_token
 smoke_project
 
@@ -67,8 +68,14 @@ mkdir -p "$PG_RUNTIME/smoke"
 cp -R "$PG_ROOT/smoke/." "$PG_RUNTIME/smoke/"
 mapfile -t files < <(cd "$PG_ROOT/smoke" && find . -type f | sed 's|^\./||' | sort)
 
+section "🚀" "Pipeline: round 1 of 2, deploy to test and prod"
 run_round 1 "${files[@]}"
+
+section "🚀" "Pipeline: round 2 of 2, deploy to test and prod"
 run_round 2
 
+section "🖥️" "Servers: empty test and prod"
 "$(dirname "${BASH_SOURCE[0]}")/vm-clean.sh"
+
+section "✅" "Smoke done in ${SECONDS} s"
 log "smoke: four green deploys, VMs empty"

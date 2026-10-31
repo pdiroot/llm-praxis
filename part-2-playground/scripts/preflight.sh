@@ -52,21 +52,24 @@ demo_isolated() {
   }
 }
 
+section "🌐" "HTTPS: GitLab and the two servers"
 step "GitLab answers 200 over HTTPS" gitlab_up
 step "test answers over HTTPS" answers https://test.playground.localhost/
 step "prod answers over HTTPS" answers https://prod.playground.localhost/
+section "🔑" "SSH: the two servers"
 step "ssh to test" vm_ssh test
 step "ssh to prod" vm_ssh prod
 
+section "🦊" "GitLab: the API"
 admin_token
 step "the API answers" api GET /user -o /dev/null
 
+section "🤖" "Claude Code: version and isolation"
 step "claude is 2.1.312 or later" claude_new_enough
 step "the demo session loads nothing from the workspace" demo_isolated
 
+section "📝" "Manual checks, in the demo session"
 cat <<'TEXT'
-
-Manual checks, in the demo session:
   [ ] /mcp lists no claude.ai connector.
   [ ] Claude in Chrome opens a page and reads it.
   [ ] /plugin shows the name of the frontend-design plugin.

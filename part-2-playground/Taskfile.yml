@@ -1,6 +1,8 @@
 ---
 version: "3"
 
+silent: true
+
 tasks:
   # ---- Playground: the local GitLab and the two servers -----------------
 
@@ -30,9 +32,7 @@ tasks:
   playground:terminate:
     desc: Delete at once the containers, the volumes, the demo folder and runtime/ (never the root CA)
     cmds:
-      - bash -c 'source scripts/lib.sh; demo_logout; demo_home_rm'
-      - docker compose down -v --timeout 0
-      - rm -rf runtime
+      - scripts/terminate.sh
 
   playground:smoke:
     desc: Prove the playground with four deploys of the smoke app, then empty the VMs

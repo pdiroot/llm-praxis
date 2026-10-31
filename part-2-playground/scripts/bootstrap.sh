@@ -33,13 +33,14 @@ demo_user() {
 }
 
 # project <name> [curl args]: create demo/<name> unless it exists.
+# Turn Auto DevOps off here too, because a new GitLab can still use the old instance setting.
 project() {
   local name=$1
   shift
 
   API_SUDO=demo api GET "/projects/demo%2F$name" >/dev/null 2>&1 && return 0
   log "project demo/$name"
-  API_SUDO=demo api POST /projects -d "name=$name" "$@" >/dev/null
+  API_SUDO=demo api POST /projects -d "name=$name" -d auto_devops_enabled=false "$@" >/dev/null
 }
 
 # file_var <project> <key> <file>: set a file variable unless it exists.
@@ -162,10 +163,16 @@ runner() {
     --docker-extra-hosts "test-ssh:$test_ip" --docker-extra-hosts "prod-ssh:$prod_ip" >/dev/null
 }
 
+log "admin token"
 admin_token
+log "settings: Auto DevOps off"
 no_auto_devops
+log "user demo: check"
 demo_user
+log "project demo/whoami: check"
 whoami_project
+log "project demo/sample-service: commits, issues and merge request"
 sample_project
+log "runner: check"
 runner
 log "bootstrap done"
