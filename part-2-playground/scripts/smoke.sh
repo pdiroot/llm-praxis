@@ -7,7 +7,7 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 p=playground%2Fsmoke
-timeout_s=${SMOKE_TIMEOUT:-600} # used by wait_job in lib.sh
+timeout_s=${SMOKE_TIMEOUT:-300} # used by wait_job in lib.sh
 
 # smoke_project: the smoke project lives in its own group, apart from the
 # demo projects. A deleted project leaves a redirect, which answers 301 with no id.

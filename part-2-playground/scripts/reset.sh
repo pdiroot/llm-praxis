@@ -40,7 +40,7 @@ purge_marked() {
 
 # remove_project <path>: delete it for good and wait until its path answers 404.
 remove_project() {
-  local path=$1 id deadline=$((SECONDS + 300))
+  local path=$1 id deadline=$((SECONDS + 120))
 
   id=$(api GET "/projects/$(uri "$path")" 2>/dev/null | jq -r '.id // empty' || true)
   if [[ -n $id ]]; then
@@ -54,7 +54,7 @@ remove_project() {
     sleep 2
   done
 
-  die "$path still answers after 300 s"
+  die "$path still answers after 120 s"
 }
 
 admin_token

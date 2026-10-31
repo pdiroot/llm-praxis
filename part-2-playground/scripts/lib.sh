@@ -176,7 +176,7 @@ cancel_active() {
 # cancel_pipelines <path>...: cancel again each round, because a pipeline
 # that is still being created answers 403 to a cancel.
 cancel_pipelines() {
-  local path n left deadline=$((SECONDS + 180))
+  local path n left deadline=$((SECONDS + 60))
 
   while ((SECONDS < deadline)); do
     left=0
@@ -188,10 +188,10 @@ cancel_pipelines() {
     sleep 2
   done
 
-  die "pipelines still run after 180 s"
+  die "pipelines still run after 60 s"
 }
 
-# These use $p (the project path, URL-encoded) and $timeout_s (default 600).
+# These use $p (the project path, URL-encoded) and $timeout_s (default 300).
 # job_status <pipeline> <name>: the status of a job, empty when it is missing.
 # shellcheck disable=SC2154
 job_status() { api GET "/projects/$p/pipelines/$1/jobs" | jq -r --arg n "$2" '.[] | select(.name == $n) | .status'; }
@@ -208,7 +208,7 @@ fail_job() {
 # wait_job <pipeline> <name> <status>
 # shellcheck disable=SC2154
 wait_job() {
-  local start=$SECONDS deadline=$((SECONDS + ${timeout_s:-600})) got next=$((SECONDS + 30))
+  local start=$SECONDS deadline=$((SECONDS + ${timeout_s:-300})) got next=$((SECONDS + 30))
 
   while ((SECONDS < deadline)); do
     got=$(job_status "$1" "$2")
@@ -228,7 +228,7 @@ wait_job() {
 # wait_pipeline <sha>: print the id of the pipeline of a commit.
 # shellcheck disable=SC2154
 wait_pipeline() {
-  local deadline=$((SECONDS + 60)) id
+  local deadline=$((SECONDS + 30)) id
 
   while ((SECONDS < deadline)); do
     id=$(api GET "/projects/$p/pipelines?sha=$1" | jq -r '.[0].id // empty')
