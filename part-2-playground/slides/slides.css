@@ -70,6 +70,8 @@ code, kbd { font-family: var(--mono); font-size: .8em; }
 
 .note { margin: 1em 0 .25em; color: var(--dim); }
 .note::before { content: "# "; }
+.term-rule { border: 0; border-top: 1px dashed var(--dim); margin: 1.4em 0 1em; }
+.term-rule + .note { margin-top: 0; }
 .note:first-child { margin-top: 0; }
 
 /* A line to type: the sigil stays out of a selection and out of the copy. */
