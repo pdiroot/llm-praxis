@@ -540,7 +540,7 @@ CLI   start a manual job, connect with ssh</pre>
     </ul>
   </div>
   <div class="term" data-title="shell: copy the token first">
-    <pre class="cmd" data-sh>(umask 077; printf 'GITLAB_TOKEN=%s\nGITLAB_HOST=gitlab.playground.localhost\n' "$(pbpaste)" > ~/llm-praxis-demo/whoami/.env)</pre>
+    <pre class="cmd" data-sh>echo "GITLAB_TOKEN=$(pbpaste)" > ~/llm-praxis-demo/whoami/.env</pre>
   </div>
 </section>
 

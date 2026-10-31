@@ -296,6 +296,9 @@ clone_demo() {
 
   # An empty clone has no origin/HEAD, and the review needs it to find main.
   git -C "$PG_DEMO_HOME/whoami" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main
+
+  # The token command on the slide overwrites this file and keeps its mode.
+  (umask 077 && : >"$PG_DEMO_HOME/whoami/.env")
 }
 
 # Isolation of the demo session.

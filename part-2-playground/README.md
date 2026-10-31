@@ -84,13 +84,13 @@ browser. Your own Claude Code setup stays untouched.
    `.env` of the clone:
 
    ```shell
-   (umask 077; printf 'GITLAB_TOKEN=%s\nGITLAB_HOST=gitlab.playground.localhost\n' "$(pbpaste)" > ~/llm-praxis-demo/whoami/.env)
+   echo "GITLAB_TOKEN=$(pbpaste)" > ~/llm-praxis-demo/whoami/.env
    ```
 
 8. Check the token. This command prints `demo`:
 
    ```shell
-   (set -a; . ~/llm-praxis-demo/whoami/.env; glab api user | jq -r .username)
+   (set -a; . ~/llm-praxis-demo/whoami/.env; GITLAB_HOST=gitlab.playground.localhost glab api user | jq -r .username)
    ```
 
 The clone ignores `.env` in git, and the demo session cannot read it. A

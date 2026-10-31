@@ -17,6 +17,7 @@ export CLAUDE_CONFIG_DIR="$config"
 export ENABLE_CLAUDEAI_MCP_SERVERS=false
 export NODE_EXTRA_CA_CERTS="$PG_RUNTIME/tls/ca.crt"
 export EDITOR=nano
+export GITLAB_HOST=gitlab.playground.localhost
 
 demo_ssh_config
 hits=$(isolation_scan "$clone") || die "Claude Code would load these files from a parent folder of the clone:
