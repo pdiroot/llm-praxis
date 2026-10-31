@@ -208,23 +208,6 @@ home_ok() { PG_DEMO_HOME="$1" bash -c "source '$ROOT/scripts/lib.sh'; $2"; }
   [ "$status" -ne 0 ]
 }
 
-@test "the checkpoint clone step marks a fresh home" {
-  # sync_demo_clone with git stubbed: the stub makes the .git folder of the clone.
-  export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
-  export PG_DEMO_HOME="$BATS_TEST_TMPDIR/fresh"
-  mkdir -p "$PG_RUNTIME/ssh" "$BATS_TEST_TMPDIR/bin"
-  echo "Host x" >"$PG_RUNTIME/ssh/config"
-  printf '#!/usr/bin/env bash\nmkdir -p "${@: -1}/.git"\n' >"$BATS_TEST_TMPDIR/bin/git"
-  chmod +x "$BATS_TEST_TMPDIR/bin/git"
-
-  PATH="$BATS_TEST_TMPDIR/bin:$PATH" run bash -c "set -euo pipefail; source '$ROOT/scripts/lib.sh'; sync_demo_clone main"
-
-  echo "$output"
-  [ "$status" -eq 0 ]
-  [ -f "$PG_DEMO_HOME/.llm-praxis-demo" ]
-  [ -d "$PG_DEMO_HOME/whoami/.git" ]
-}
-
 # mcp_check <list-file> <rc> [mcp.json content]: run mcp_foreign with a claude stub.
 mcp_check() {
   export PG_DEMO_HOME="$BATS_TEST_TMPDIR/demo"

@@ -23,7 +23,7 @@ keepers() { find "$PG_RUNTIME/ssh" "$PG_RUNTIME/tls" -type f -exec shasum {} + |
 
 @test "reset during a pipeline" {
   before=$(keepers)
-  dir="$ROOT/checkpoints/1-end/main"
+  dir="$ROOT/smoke"
   mapfile -t files < <(cd "$dir" && find . -type f | sed 's|^\./||')
   API_SUDO=demo push_dir demo%2Fwhoami main "feat: whoami" "$dir" "${files[@]}"
   for _ in $(seq 30); do

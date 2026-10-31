@@ -48,14 +48,11 @@ file_var() {
   api POST "/projects/$1/variables" -d "key=$2" -d variable_type=file --data-urlencode "value@$3" >/dev/null
 }
 
-# main is protected before it exists, with force pushes allowed for task checkpoint.
+# main is protected before it exists.
 protect_main() {
   local p=demo%2Fwhoami
-  if api GET "/projects/$p/protected_branches/main" >/dev/null 2>&1; then
-    api PATCH "/projects/$p/protected_branches/main" -d allow_force_push=true >/dev/null
-  else
-    api POST "/projects/$p/protected_branches" -d name=main -d allow_force_push=true >/dev/null
-  fi
+  api GET "/projects/$p/protected_branches/main" >/dev/null 2>&1 ||
+    api POST "/projects/$p/protected_branches" -d name=main >/dev/null
 }
 
 whoami_project() {

@@ -11,11 +11,6 @@ tasks:
         bash -c 'diff -u slides/prompts.js <(slides/build.sh /dev/stdout)
         || { echo "slides/prompts.js is stale: run task slides"; exit 1; }'
       - yamllint .
-      - diff -r checkpoints/1-end/main checkpoints/2a-json-written/main
-      - diff -r checkpoints/2-end/main checkpoints/3a-ui-written/main
-      - >-
-        bash -c 'for f in checkpoints/*/*/.gitlab-ci.yml; do
-        cmp "$f" smoke/.gitlab-ci.yml || exit 1; done'
 
   slides:
     desc: Generate slides/prompts.js from prompts/*.md
@@ -68,11 +63,6 @@ tasks:
     desc: Bring GitLab, the VMs and the demo Claude Code profile back to the start state
     cmds:
       - scripts/reset.sh
-
-  checkpoint:
-    desc: "Jump to a checkpoint of the session: task checkpoint -- 2-end"
-    cmds:
-      - scripts/checkpoint.sh {{.CLI_ARGS}}
 
   preflight:
     desc: Check the playground before a rehearsal or the session

@@ -268,33 +268,13 @@ demo_ssh_config() {
   chmod 600 "$PG_DEMO_HOME/ssh/config"
 }
 
-# clone_demo [branch]: clone demo/whoami to $PG_DEMO_HOME/whoami, on <branch> when given.
+# clone_demo: clone demo/whoami to $PG_DEMO_HOME/whoami.
 clone_demo() {
   demo_home_init
   demo_ssh_config
 
-  local args=(-c "core.sshCommand=ssh -F '$PG_DEMO_HOME/ssh/config'")
-  [[ -z ${1:-} ]] || args+=(-b "$1")
-  git clone "${args[@]}" ssh://git@gitlab.playground.localhost:2222/demo/whoami.git "$PG_DEMO_HOME/whoami"
-}
-
-# sync_demo_clone <branch>: put $PG_DEMO_HOME/whoami on <branch> as GitLab has
-# it, with no other local branch. Clones when the clone is missing.
-sync_demo_clone() {
-  local target=$1 clone="$PG_DEMO_HOME/whoami" name
-
-  demo_home_init
-  if [[ ! -d $clone/.git ]]; then
-    clone_demo "$target"
-    return
-  fi
-
-  git -C "$clone" fetch -q --prune origin
-  git -C "$clone" switch -q -f -C "$target" "origin/$target"
-  git -C "$clone" reset -q --hard "origin/$target"
-  for name in $(git -C "$clone" for-each-ref --format='%(refname:short)' refs/heads); do
-    [[ $name == "$target" ]] || git -C "$clone" branch -q -D "$name"
-  done
+  git clone -c "core.sshCommand=ssh -F '$PG_DEMO_HOME/ssh/config'" \
+    ssh://git@gitlab.playground.localhost:2222/demo/whoami.git "$PG_DEMO_HOME/whoami"
 }
 
 # Isolation of the demo session.

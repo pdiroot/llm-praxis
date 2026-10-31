@@ -102,13 +102,9 @@ can use `glab` at once. Never put the token in a prompt or a commit.
 | Command | What it does |
 |---------|--------------|
 | `task reset` | Brings GitLab, the servers and the demo profile back to the start |
-| `task checkpoint -- <id>` | Jumps to a cut point of the session |
 | `task status` | Shows the containers and the answers of GitLab |
 | `task stop` | Stops the containers and keeps the data |
 | `task terminate` | Deletes the containers, the volumes, the demo folder and `runtime/`. The root CA stays |
-
-The checkpoint ids, in session order: `1a-app-written`, `1-end`,
-`2a-json-written`, `2-end`, `3a-ui-written`, `3-end`.
 
 ## Prompts and slides
 
