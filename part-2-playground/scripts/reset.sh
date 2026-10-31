@@ -12,7 +12,7 @@ projects=(demo/whoami demo/hello-world)
 demo_profile() {
   demo_logout
   demo_home_check
-  rm -rf "$PG_DEMO_HOME/claude-config" "$PG_DEMO_HOME/whoami" "$PG_DEMO_HOME/hello-world"
+  rm -rf "$PG_DEMO_HOME/claude-config" "$PG_DEMO_HOME/whoami"
 }
 
 revoke_tokens() {

@@ -81,8 +81,8 @@ seed_commits() {
   done
 }
 
-# mr_field <index> <key>: one field of a merge request of seed/issues.json.
-mr_field() { jq -r ".merge_requests[$1].$2 // empty" "$seed/issues.json"; }
+# mr_field <index> <key>: one field of a merge request of seed/merge-requests.json.
+mr_field() { jq -r ".merge_requests[$1].$2 // empty" "$seed/merge-requests.json"; }
 
 # seed_branch <index>: push the branch of a merge request from its overlay folder.
 # shellcheck disable=SC2154
@@ -95,24 +95,6 @@ seed_branch() {
 
   mapfile -t files < <(cd "$overlay" && ls)
   START=main push_dir "$p" "$branch" "$(mr_field "$1" commit_message)" "$overlay" "${files[@]}"
-}
-
-# seed_issues: create each issue of seed/issues.json unless its title exists.
-# shellcheck disable=SC2154
-seed_issues() {
-  local n i title found
-
-  n=$(jq '.issues | length' "$seed/issues.json")
-  for ((i = 0; i < n; i++)); do
-    title=$(jq -r ".issues[$i].title" "$seed/issues.json")
-    found=$(api GET "/projects/$p/issues?search=$(uri "$title")&in=title" |
-      jq --arg t "$title" '[.[] | select(.title == $t)] | length')
-    [[ $found -gt 0 ]] && continue
-
-    api POST "/projects/$p/issues" --data-urlencode "title=$title" \
-      --data-urlencode "description=$(jq -r ".issues[$i].description" "$seed/issues.json")" \
-      --data-urlencode "labels=$(jq -r ".issues[$i].labels | join(\",\")" "$seed/issues.json")" >/dev/null
-  done
 }
 
 # merge_when_ready <iid>: merge, and retry while GitLab checks the merge request.
@@ -163,7 +145,7 @@ seed_merge_request() {
 seed_merge_requests() {
   local n i
 
-  n=$(jq '.merge_requests | length' "$seed/issues.json")
+  n=$(jq '.merge_requests | length' "$seed/merge-requests.json")
   for ((i = 0; i < n; i++)); do
     seed_branch "$i"
     seed_merge_request "$i"
@@ -176,7 +158,6 @@ hello_project() {
 
   export API_SUDO=demo
   seed_commits
-  seed_issues
   seed_merge_requests
   unset API_SUDO
 }
@@ -212,7 +193,7 @@ log "user demo: check"
 demo_user
 log "project demo/whoami: check"
 whoami_project
-log "project demo/hello-world: commits, issue and merge requests"
+log "project demo/hello-world: commits and merge requests"
 hello_project
 log "runner: check"
 runner

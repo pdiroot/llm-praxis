@@ -37,8 +37,7 @@ teardown() {
   [ "$(api GET '/users?username=root' | jq length)" -eq 1 ]
 }
 
-@test "the hello-world repository has its issue and merge requests" {
-  [ "$(api GET /projects/demo%2Fhello-world/issues | jq length)" -eq 1 ]
+@test "the hello-world repository has its merge requests" {
   [ "$(api GET '/projects/demo%2Fhello-world/merge_requests?state=opened' | jq length)" -eq 1 ]
   [ "$(api GET '/projects/demo%2Fhello-world/merge_requests?state=merged' | jq length)" -eq 1 ]
   [ "$(api GET '/projects/demo%2Fhello-world/merge_requests?state=closed' | jq length)" -eq 1 ]

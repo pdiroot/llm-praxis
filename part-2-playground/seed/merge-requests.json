@@ -1,11 +1,4 @@
 {
-  "issues": [
-    {
-      "title": "Fix a typo in the README",
-      "description": "The README says \"wrold\". The right word is \"world\".",
-      "labels": ["documentation"]
-    }
-  ],
   "merge_requests": [
     {
       "source_branch": "feat/greet-by-name",

@@ -1,6 +1,6 @@
 # hello-world
 
-A small Go app for the LLM Praxis demo. It says hello to the wrold over HTTP.
+A small Go app for the LLM Praxis demo. It says hello to the world over HTTP.
 
 ## Run
 
