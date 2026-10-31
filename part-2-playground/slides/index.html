@@ -270,42 +270,13 @@ Status line      model and context at a glance</pre>
   <div class="term" data-title="claude">
     <p class="note">Change the common settings in a menu</p>
     <pre class="cmd">/config</pre>
-    <p class="note">See which settings files loaded</p>
-    <pre class="cmd">/status</pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>Useful first settings</h2>
-    <p><strong>For you, in all projects:</strong></p>
-    <ul>
-      <li>A default model and effort</li>
-      <li>Auto mode as the default permission mode</li>
-      <li>Keep the conversation history for 90 days</li>
-    </ul>
-    <p><strong>For the team, in the project:</strong></p>
-    <ul>
-      <li>Backup models for an overloaded model</li>
-      <li>No Claude line in commits and pull requests</li>
-      <li>Claude cannot read or edit <code>.env</code></li>
-    </ul>
-  </div>
-  <div class="term" data-title="settings.json">
-    <p class="note">~/.claude/settings.json</p>
+    <p class="note">The settings you touch first, in the JSON file</p>
     <pre class="cmd" data-sigil="">{
   "model": "opus",
-  "effortLevel": "medium",
-  "permissions": { "defaultMode": "auto" },
-  "cleanupPeriodDays": 90
-}</pre>
-    <hr class="term-rule">
-    <p class="note">.claude/settings.json</p>
-    <pre class="cmd" data-sigil="">{
-  "fallbackModel": ["opus", "sonnet"],
-  "attribution": { "commit": "", "pr": "" },
+  "effortLevel": "high",
   "permissions": {
-    "deny": ["Read(./.env)", "Edit(./.env)"]
+    "allow": ["Bash(task dev:test)"],
+    "deny": ["Read(**/.env)"]
   }
 }</pre>
   </div>
