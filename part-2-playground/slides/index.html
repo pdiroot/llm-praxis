@@ -551,7 +551,7 @@ CLI   start a manual job, connect with ssh</pre>
     <ul>
       <li>A hook loads <code>.env</code> before each command.</li>
       <li>A deny rule: Claude cannot read <code>.env</code>.</li>
-      <li>Ask rules: Claude Code asks before each way to start the <code>prod</code> job.</li>
+      <li>Allow rules: <code>glab</code> and <code>git push</code> run with no question. This is a playground.</li>
     </ul>
     <p class="muted">The deny rule and the <code>CLAUDE.md</code> line are a guard, not a wall.</p>
   </div>
@@ -619,31 +619,9 @@ CLI   start a manual job, connect with ssh</pre>
   <div class="theory">
     <h2>Deploy to production</h2>
     <p>Claude starts the manual job with <code>glab ci trigger</code>.</p>
-    <p>It asks first. Read the request aloud.</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="13-deploy-prod"></pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>A rule matches what is written</h2>
-    <ul>
-      <li>The ask rule matches the command as typed, not the effect.</li>
-      <li>Claude can take another path to the same job.</li>
-      <li>So we list each way to start a job.</li>
-    </ul>
-    <p class="muted">Give freedom only where a mistake is cheap.</p>
-  </div>
-  <div class="term" data-title="settings.json">
-<pre class="out">"ask": [
-  "Bash(glab ci trigger *)",
-  "Bash(glab ci run *)",
-  "Bash(glab api *play*)",
-  "Bash(glab ci retry *)",
-  ...
-]</pre>
   </div>
 </section>
 

@@ -18,20 +18,9 @@
     "deny": [
       "Read(**/.env)"
     ],
-    "ask": [
-      "Bash(glab ci trigger *)",
-      "Bash(glab ci run *)",
-      "Bash(glab api *play*)",
-      "Bash(glab ci retry *)",
-      "Bash(glab api *retry*)",
-      "Bash(glab api *graphql*)",
-      "Bash(glab api -X POST *pipeline*)",
-      "Bash(glab api *pipeline* -X POST*)",
-      "Bash(glab api *-f*pipeline*)",
-      "Bash(glab api *pipeline*-f*)",
-      "Bash(glab api *-F*pipeline*)",
-      "Bash(glab api *pipeline*-F*)",
-      "Bash(glab ci run-trig *)"
+    "allow": [
+      "Bash(glab *)",
+      "Bash(git push *)"
     ]
   },
   "autoMode": {

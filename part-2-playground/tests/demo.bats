@@ -6,45 +6,10 @@ setup() {
   SETTINGS="$ROOT/demo/settings.json"
 }
 
-# asks <command>: 0 when a Bash(...) ask rule matches; * is a glob.
-asks() {
-  local rule pattern
-  while IFS= read -r rule; do
-    pattern=${rule#Bash(}
-    pattern=${pattern%)}
-    # shellcheck disable=SC2053
-    [[ $1 == $pattern ]] && return 0
-  done < <(jq -r '.permissions.ask[]' "$SETTINGS")
-  return 1
-}
-
-@test "every job start asks" {
-  asks 'glab ci trigger deploy-prod -b main'
-  asks 'glab ci run -b main'
-  asks 'glab api -X POST projects/:id/jobs/49/play'
-  asks 'glab api projects/:id/jobs/49/play -X POST'
-  asks 'glab ci retry 49'
-  asks 'glab api -X POST projects/:id/jobs/49/retry'
-  asks 'glab ci run-trig -t x -b main'
-  asks 'glab api graphql -f query=mutation{jobPlay(input:{id:"gid://gitlab/Ci::Build/49"}){job{id}}}'
-  asks 'glab api -X POST projects/:id/pipelines -f ref=main'
-  asks 'glab api projects/:id/pipelines -X POST -f ref=main'
-  asks 'glab api graphql -f query=mutation{jobRetry(input:{id:"gid://gitlab/Ci::Build/49"}){job{id}}}'
-  asks 'glab api projects/:id/pipelines -f ref=main'
-  asks 'glab api projects/:id/pipeline --field ref=main'
-  asks "glab api -H 'X: y' graphql -f query=mutation{jobPlay(input:{id:\"gid://gitlab/Ci::Build/49\"}){job{id}}}"
-  asks 'glab api -f ref=main projects/:id/pipeline'
-  asks 'glab api --field=ref=main projects/:id/pipeline'
-  asks 'glab api projects/:id/pipeline -fref=main'
-}
-
-@test "a read does not ask" {
-  run ! asks 'glab api user'
-  run ! asks 'glab ci list'
-  run ! asks 'glab api projects/:id/pipelines'
-  run ! asks 'glab api projects/:id/pipelines/12/jobs'
-  run ! asks 'glab api projects/:id/jobs'
-  run ! asks 'glab api projects/:id/pipelines?per_page=5'
+@test "glab and git push need no approval, and .env stays denied" {
+  jq -e '.permissions.allow | index("Bash(glab *)") and index("Bash(git push *)")' "$SETTINGS"
+  jq -e '.permissions.deny | index("Read(**/.env)")' "$SETTINGS"
+  jq -e '.permissions.ask == null' "$SETTINGS"
 }
 
 @test "the settings deny .env, run the hook and extend the auto mode" {
