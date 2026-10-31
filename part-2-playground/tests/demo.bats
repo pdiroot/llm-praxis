@@ -84,6 +84,12 @@ STUB
   [ "${lines[5]}" = "--chrome --resume" ]
 }
 
+@test "the demo settings keep the account's plugins, skills and connectors out" {
+  [ "$(jq .syncClaudeAiPlugins "$SETTINGS")" = false ]
+  [ "$(jq .syncClaudeAiSkills "$SETTINGS")" = false ]
+  [ "$(jq .disableClaudeAiConnectors "$SETTINGS")" = true ]
+}
+
 @test "the settings are copied once and never overwritten" {
   export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
   export PG_DEMO_HOME="$BATS_TEST_TMPDIR/demo"

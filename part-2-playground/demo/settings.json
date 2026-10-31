@@ -1,5 +1,7 @@
 {
   "disableClaudeAiConnectors": true,
+  "syncClaudeAiPlugins": false,
+  "syncClaudeAiSkills": false,
   "hooks": {
     "SessionStart": [
       {
@@ -13,7 +15,9 @@
     ]
   },
   "permissions": {
-    "deny": ["Read(**/.env)"],
+    "deny": [
+      "Read(**/.env)"
+    ],
     "ask": [
       "Bash(glab ci trigger *)",
       "Bash(glab ci run *)",
