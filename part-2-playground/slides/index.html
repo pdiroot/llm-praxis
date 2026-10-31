@@ -564,6 +564,9 @@ CLI   start a manual job, connect with ssh</pre>
     <h2>Add the pipeline</h2>
     <p>The app works locally. Now it goes to the servers.</p>
     <p>A pipeline is a new task, so it gets its own branch and its own merge request, through MCP.</p>
+    <p class="muted">The deploys use SSH. To connect to a server yourself, from the shell:</p>
+    <p class="muted"><code>ssh -F ~/llm-praxis-demo/ssh/config test.playground.localhost</code></p>
+    <p class="muted">The same works for <code>prod.playground.localhost</code>.</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="12-pipeline"></pre>
