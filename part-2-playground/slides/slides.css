@@ -145,18 +145,11 @@ nav button {
 
 .slide[data-cut]:not([data-cut=""])::after { content: attr(data-cut); }
 
-/* A quiet label that says which iteration of the demo this slide belongs to. */
-.slide[data-iter]::before {
-  content: attr(data-iter); position: fixed; left: 4vw; bottom: 6.5vh;
-  font: .62em var(--mono); color: var(--ink-soft);
-}
-
 @media (max-width: 760px) {
   html, body { overflow: auto; }
   .slide.on, .slide.opening { display: block; position: static; padding-bottom: 56px; }
   .term { margin: 0 16px 16px; }
   .term pre.out { overflow-x: auto; }
   .theory { padding: 24px 16px; }
-  .slide[data-iter]::before { position: static; display: inline-block; margin: 16px 16px 0; }
   nav { left: 16px; background: var(--paper); }
 }
