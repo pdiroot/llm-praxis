@@ -146,7 +146,7 @@ MCP             a way to connect outside
     </ul>
     <p class="muted">Each part is a container in one Docker Compose project.</p>
   </div>
-  <div class="term" data-title="docker compose">
+  <div class="term" data-title="Docker Compose">
 <pre class="out">┌─ your computer ────────────────────────────┐
 │                                            │
 │  Claude Code: git, glab, browser           │
@@ -198,10 +198,12 @@ MCP             a way to connect outside
   <div class="theory">
     <h2>What we build</h2>
     <p>A small web app that tells you who called it: the host name, the IP addresses and the request headers.</p>
+    <p>We develop its CI/CD pipeline too:</p>
     <ul>
       <li>A merge to <code>main</code> deploys to <code>test</code>.</li>
       <li>A deployment to <code>prod</code> is a manual job.</li>
     </ul>
+    <p>We start in Go. Install the environment you need on the <code>test</code> and <code>prod</code> containers, and you can continue in any language.</p>
   </div>
   <div class="term" data-title="what we set up in Claude Code">
 <pre class="out">project/

@@ -64,7 +64,8 @@
     const bar = document.createElement("div");
     bar.className = "term-bar";
     bar.innerHTML = "<i></i><i></i><i></i><span></span>";
-    bar.querySelector("span").textContent = term.dataset.title || "claude";
+    const title = term.dataset.title || "claude";
+    bar.querySelector("span").textContent = title[0].toUpperCase() + title.slice(1);
 
     term.append(bar, body);
   }
