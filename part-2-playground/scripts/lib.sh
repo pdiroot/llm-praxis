@@ -299,6 +299,9 @@ clone_demo() {
 
   # The token command on the slide overwrites this file and keeps its mode.
   (umask 077 && : >"$PG_DEMO_HOME/whoami/.env")
+
+  # Claude Code watches only the folders that exist when the session starts.
+  mkdir -p "$PG_DEMO_HOME/whoami/.claude/skills" "$PG_DEMO_HOME/whoami/.claude/agents"
 }
 
 # Isolation of the demo session.

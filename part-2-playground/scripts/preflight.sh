@@ -71,7 +71,8 @@ step "the demo session loads nothing from the workspace" demo_isolated
 section "📝" "Manual checks, in the demo session"
 cat <<'TEXT'
   [ ] /mcp lists no claude.ai connector.
-  [ ] Claude in Chrome opens a page and reads it.
+  [ ] Claude in Chrome opens a page and reads it, in a Chrome profile with no personal tabs.
+  [ ] /voice hears the microphone.
   [ ] /plugin shows the name of the frontend-design plugin.
   [ ] Ctrl+O shows the summary after /compact; if not, the slide shows /context only.
 TEXT
