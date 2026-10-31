@@ -353,39 +353,18 @@ Status line      model, effort, cost and context</pre>
 
 <section class="slide">
   <div class="theory">
-    <h2>Build it</h2>
-    <p>Claude makes a branch, writes the app and checks it with curl.</p>
+    <h2>Review the change</h2>
+    <p>Read the diff as you read a colleague's change, then ask for a review.</p>
+    <p>A review can miss a point, so you look too.</p>
+    <p class="muted"><code>/security-review</code> looks only for security problems.</p>
   </div>
   <div class="term">
-    <pre class="prompt" data-id="06-build-whoami"></pre>
-    <p class="note">Then see what that cost</p>
-    <pre class="cmd">/usage</pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>See what changed</h2>
-    <p>Read the diff as you read a colleague's change.</p>
-    <p>Commit on the branch, so the review has new files to read.</p>
-  </div>
-  <div class="term">
+    <p class="note">See what changed</p>
     <pre class="cmd">/diff</pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>A review before the merge</h2>
-    <p>A live review can miss a point, so you look too:</p>
-    <ul>
-      <li>The access log and the headers it writes</li>
-      <li>The headers that the app echoes back</li>
-    </ul>
-  </div>
-  <div class="term">
-    <p class="note">Review the branch against main for security problems</p>
-    <pre class="cmd">/security-review</pre>
+    <p class="note">Review the change</p>
+    <pre class="cmd">/review</pre>
+    <p class="note">See what that cost</p>
+    <pre class="cmd">/usage</pre>
   </div>
 </section>
 
@@ -826,7 +805,7 @@ CLI   start a manual job, connect with ssh</pre>
 /context /compact /clear    manage the window
 /usage                      the cost and the limits
 /plan  Shift+Tab  Ctrl+G    plan, edit the plan
-/diff /security-review      check the change
+/diff /review               check the change
 /mcp /plugin                add tools
 /rewind ! /btw              undo, run, ask aside
 /memory /permissions        notes and rules</pre>
