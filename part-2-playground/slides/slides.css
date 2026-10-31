@@ -139,7 +139,7 @@ nav button {
 }
 
 .slide[data-cut]::after {
-  content: "Cut point"; position: fixed; left: 17vw; bottom: 3vh;
+  content: "Cut point"; position: fixed; left: 24vw; bottom: 3vh;
   font: .62em var(--mono); color: var(--ink-soft);
 }
 
