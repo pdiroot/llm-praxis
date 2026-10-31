@@ -187,7 +187,7 @@ MCP             a way to connect outside
     <pre class="cmd" data-sh>task playground:start</pre>
     <p class="note">Prove it with real deployments</p>
     <pre class="cmd" data-sh>task playground:smoke</pre>
-    <p class="note">Start Claude Code in the project</p>
+    <p class="note">Start an isolated Claude Code session in the project</p>
     <pre class="cmd" data-sh>task claude:start</pre>
     <p class="note">Delete everything</p>
     <pre class="cmd" data-sh>task playground:terminate</pre>
@@ -240,7 +240,6 @@ Status line      model, effort, cost and context</pre>
   <div class="theory">
     <h2>Four ways to start</h2>
     <p>Start Claude Code inside the folder it should work on.</p>
-    <p>For this playground we start an isolated session: it has its own empty profile and loads none of your personal setup.</p>
   </div>
   <div class="term" data-title="shell: your project">
     <p class="note">A new session</p>
@@ -251,9 +250,6 @@ Status line      model, effort, cost and context</pre>
     <pre class="cmd" data-sh>claude -r</pre>
     <p class="note">One answer for a script</p>
     <pre class="cmd" data-sh>claude -p "Explain this repository in three lines"</pre>
-    <hr class="term-rule">
-    <p class="note">This playground: an isolated session</p>
-    <pre class="cmd" data-sh>task claude:start</pre>
   </div>
 </section>
 
