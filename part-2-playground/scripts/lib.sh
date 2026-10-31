@@ -12,6 +12,11 @@ PG_CA_DIR="${PG_CA_DIR:-$HOME/.config/playgrounds/tls}"
 PG_DEMO_HOME="${PG_DEMO_HOME-$HOME/llm-praxis-demo}"
 while [[ $PG_DEMO_HOME == */ && $PG_DEMO_HOME != / ]]; do PG_DEMO_HOME=${PG_DEMO_HOME%/}; done
 
+# provisioned: 0 when a finished provisioning left its marker and the containers exist.
+provisioned() {
+  [[ -f $PG_RUNTIME/.provisioned && -n $(cd "$PG_ROOT" && docker compose ps -aq 2>/dev/null) ]]
+}
+
 # Logging.
 
 log() { printf '%s\n' "$*" >&2; }
@@ -85,8 +90,8 @@ admin_token() {
   if [[ -s $PG_RUNTIME/tokens/admin ]] && api GET /user >/dev/null 2>&1; then return; fi
 
   log "admin token"
-  new_admin_token || die "cannot renew the admin token; is the playground up? Run task start"
-  api GET /user >/dev/null || die "the admin token does not work; run task start"
+  new_admin_token || die "cannot renew the admin token; is the playground up? Run task playground:start"
+  api GET /user >/dev/null || die "the admin token does not work; run task playground:start"
 }
 
 # uri <text>: percent-encode.

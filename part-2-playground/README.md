@@ -20,7 +20,7 @@ The names `*.playground.localhost` need no change in `/etc/hosts`.
 Run every command in this directory.
 
 ```shell
-task start
+task playground:start
 ```
 
 - The first run makes the root CA in `~/.config/playgrounds/tls`. All
@@ -28,17 +28,17 @@ task start
 - If macOS does not trust the CA yet, macOS asks once for your admin
   password (`sudo security add-trusted-cert`). Later runs ask nothing.
 - GitLab needs about 5 minutes to start.
-- `task start` ends when GitLab, the runner, the `demo/whoami` project and
+- `task playground:start` ends when GitLab, the runner, the `demo/whoami` project and
   the two servers are ready.
 
 Then prove the playground:
 
 ```shell
-task smoke
+task playground:smoke
 ```
 
-`task smoke` deploys a small smoke app four times and empties the servers
-afterwards. Run `task preflight` before each rehearsal and before the
+`task playground:smoke` deploys a small smoke app four times and empties the servers
+afterwards. Run `task playground:preflight` before each rehearsal and before the
 session. It also lists the checks that need you.
 
 ## Accounts
@@ -55,15 +55,16 @@ SSH ports on `127.0.0.1`: GitLab `2222`, `test` `2201`, `prod` `2202`.
 ## Run the session
 
 ```shell
-task demo
+task claude:start
 ```
 
-`task demo` clones `demo/whoami` when it is missing and starts Claude Code
-there. The demo lives in `~/llm-praxis-demo` (`PG_DEMO_HOME` changes the
+`task claude:start` clones `demo/whoami` when it is missing and starts Claude
+Code there. `task claude:continue` continues the last conversation. Pass other
+flags after `--`: `task claude:start -- -r` picks an older conversation. The demo lives in `~/llm-praxis-demo` (`PG_DEMO_HOME` changes the
 folder): the clone `whoami/`, the config folder `claude-config/` and a copy
 of the SSH config in `ssh/`. It lives outside this repository on purpose, so
-that Claude Code loads no parent `CLAUDE.md` or `.mcp.json`. `task demo` and
-`task preflight` refuse to run when a parent folder has one. Log in in the
+that Claude Code loads no parent `CLAUDE.md` or `.mcp.json`. `task claude:start`
+and `task playground:preflight` refuse to run when a parent folder has one. Log in in the
 browser. Your own Claude Code setup stays untouched.
 
 ### Make the GitLab token
@@ -95,26 +96,26 @@ browser. Your own Claude Code setup stays untouched.
 The clone ignores `.env` in git, and the demo session cannot read it. A
 hook of the session loads it before each command, so a running session
 can use `glab` at once. Never put the token in a prompt or a commit.
-`task reset` revokes the token.
+`task playground:reset` revokes the token.
 
 ## Move around
 
 | Command | What it does |
 |---------|--------------|
-| `task reset` | Brings GitLab, the servers and the demo profile back to the start |
-| `task status` | Shows the containers and the answers of GitLab |
-| `task stop` | Stops the containers and keeps the data |
-| `task terminate` | Deletes the containers, the volumes, the demo folder and `runtime/`. The root CA stays |
+| `task playground:reset` | Brings GitLab, the servers and the demo profile back to the start |
+| `task playground:status` | Shows the containers and the answers of GitLab |
+| `task playground:stop` | Stops the containers and keeps the data. `task playground:start` resumes them |
+| `task playground:terminate` | Deletes at once the containers, the volumes, the demo folder and `runtime/`. The root CA stays |
 
 ## Prompts and slides
 
 - `prompts/` has the prompts of the session, one file each.
-- Open `slides/index.html` in a browser. `task slides` rebuilds
-  `slides/prompts.js` from `prompts/`.
+- `task slides:open` builds the deck and opens it in the browser.
+- `task slides:build` rebuilds `slides/prompts.js` from `prompts/`.
 
 ## Develop
 
-- `task check` runs `shellcheck`, `shfmt` and `yamllint`.
-- `task test` runs the tests that need no playground.
-- `task test:live` resets the playground, runs the tests that need it, then
-  runs `task reset`.
+- `task dev:check` runs `shellcheck`, `shfmt` and `yamllint`.
+- `task dev:test` runs the tests that need no playground.
+- `task dev:test-live` resets the playground, runs the tests that need it, then
+  runs `task playground:reset`.

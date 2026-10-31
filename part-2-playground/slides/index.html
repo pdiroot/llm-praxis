@@ -11,7 +11,7 @@
 <section class="slide opening">
   <div class="theory">
     <h1>Claude Code 101</h1>
-    <p>From an empty folder to production, in one repository.</p>
+    <p>One small project: build an app, deploy it, and connect Claude Code to the services around it.</p>
   </div>
   <div class="term" data-title="claude">
 <pre class="out">Claude Code
@@ -34,28 +34,32 @@ What should we build?
   </div>
   <div class="term" data-title="today.md">
     <p class="note">We cover</p>
-<pre class="out">install and settings
-CLAUDE.md
-plan mode
-review of a change
-MCP and the command line
-permission rules
-the context window and the cost
-plugins</pre>
+    <ul class="diff">
+      <li>Install and settings</li>
+      <li>CLAUDE.md</li>
+      <li>Plan mode</li>
+      <li>Review of a change</li>
+      <li>MCP and the command line</li>
+      <li>Permission rules</li>
+      <li>The context window and the cost</li>
+      <li>Plugins and skills</li>
+      <li>Subagents</li>
+    </ul>
     <p class="note">We skip</p>
-<pre class="out">workspace mode with many repositories
-subagents and custom skills
-parallel sessions
-long-running workflows</pre>
+    <ul class="diff skip">
+      <li>Workspace mode with many repositories</li>
+      <li>Parallel sessions</li>
+      <li>Long-running workflows</li>
+    </ul>
   </div>
 </section>
 
 <section class="slide">
   <div class="theory">
     <h2>Model and harness</h2>
-    <p><strong>A model</strong> reads text and writes text. It has no hands.</p>
-    <p><strong>A harness</strong> is the program around the model. It holds the tools, the loop, the permissions and the context.</p>
-    <p><strong>An agent</strong> is a model and a harness together.</p>
+    <p><strong>A model</strong> is the brain. It reads text and writes text.</p>
+    <p><strong>A harness</strong> is the hands for the brain: the program around the model, with the tools, the loop, the permissions and the context.</p>
+    <p><strong>An agent</strong> is the two working together.</p>
     <p class="muted">Claude is a model. Claude Code is a harness.</p>
   </div>
   <div class="term" data-title="one turn of the loop">
@@ -80,21 +84,25 @@ result and asks the model again.</pre>
   <div class="theory">
     <h2>What you can choose</h2>
     <p>The harness and the model are two choices.</p>
-    <p>The same model acts differently in a different harness, because each harness gives it other tools and instructions.</p>
+    <p>The same model acts differently in a different harness, because each harness has its own system prompt and tools.</p>
     <p class="muted">Today: Claude Code with Claude models.</p>
   </div>
   <div class="term" data-title="choices.md">
     <p class="note">Harnesses</p>
-<pre class="out">Claude Code
-Codex CLI
-Gemini CLI
-OpenCode
-Cursor</pre>
+    <ul class="diff plain">
+      <li>Claude Code</li>
+      <li>Codex CLI</li>
+      <li>Gemini CLI</li>
+      <li>OpenCode</li>
+      <li>Cursor</li>
+    </ul>
     <p class="note">Models</p>
-<pre class="out">Claude: Haiku, Sonnet, Opus, Fable
-OpenAI: GPT
-Google: Gemini
-Local models, through Ollama and other servers</pre>
+    <ul class="diff plain">
+      <li>Claude: Haiku, Sonnet, Opus, Fable</li>
+      <li>OpenAI: Luna, Terra, Sol, Astra</li>
+      <li>Google: Gemini</li>
+      <li>Local models, through Ollama and other servers</li>
+    </ul>
   </div>
 </section>
 
@@ -102,6 +110,7 @@ Local models, through Ollama and other servers</pre>
   <div class="theory">
     <h2>Words we use today</h2>
     <p>You see these words in the interface of Claude Code.</p>
+    <p>The context grows with each turn. Each prompt, answer and tool result stays in the window and goes out again with the next request.</p>
     <p>The bigger the context, the higher the cost of each request.</p>
   </div>
   <div class="term" data-title="words.md">
@@ -128,52 +137,60 @@ MCP             a way to connect outside
 <section class="slide">
   <div class="theory">
     <h2>The playground</h2>
-    <p>It looks like a company, and it runs on this Mac.</p>
+    <p>It simulates the environment of a company or a startup, and it runs on your own computer.</p>
     <ul>
-      <li>A GitLab with pipelines and one runner</li>
+      <li>GitLab, with a runner for the pipelines</li>
+      <li>Docker, where the runner starts its jobs</li>
       <li>Two servers: <code>test</code> and <code>prod</code></li>
-      <li>Company TLS and SSH</li>
+      <li>Its own HTTPS certificates and SSH keys</li>
     </ul>
     <p class="muted">Each part is a container in one Docker Compose project.</p>
   </div>
   <div class="term" data-title="docker compose">
-<pre class="out">┌─ this Mac ──────────────────────────────┐
-│                                         │
-│  Claude Code ── git, MCP, glab ──┐      │
-│                                  ▼      │
-│  ┌─ Docker Compose ──────────────────┐  │
-│  │                                   │  │
-│  │  GitLab ──▶ runner                │  │
-│  │               │  deploy           │  │
-│  │        ┌──────┴──────┐            │  │
-│  │        ▼             ▼            │  │
-│  │      test          prod           │  │
-│  │     automatic     manual          │  │
-│  └───────────────────────────────────┘  │
-└─────────────────────────────────────────┘</pre>
+<pre class="out">┌─ your computer ────────────────────────────┐
+│                                            │
+│  Claude Code: git, glab, browser           │
+│        │                                   │
+│        │ HTTPS and SSH                     │
+│        ▼                                   │
+│  ┌─ Docker Compose ─────────────────────┐  │
+│  │                                      │  │
+│  │  HTTPS proxy                         │  │
+│  │                                      │  │
+│  │  GitLab  ──▶  GitLab Runner          │  │
+│  │                    │ starts jobs     │  │
+│  │                    ▼                 │  │
+│  │               Docker for jobs        │  │
+│  │                                      │  │
+│  │  test server        prod server      │  │
+│  └──────────────────────────────────────┘  │
+└────────────────────────────────────────────┘</pre>
   </div>
 </section>
 
 <section class="slide">
   <div class="theory">
     <h2>Run it yourself</h2>
-    <p>You can run the same playground at home.</p>
     <ul>
-      <li>A Mac on Apple silicon with Docker Desktop</li>
-      <li><code>task</code>, <code>jq</code> and <code>glab</code></li>
-      <li>Claude Code and a Claude plan</li>
+      <li><strong>Mac:</strong> it works as it is, on Apple silicon with Docker Desktop.</li>
+      <li><strong>Linux:</strong> it can need some extra work.</li>
+      <li><strong>Windows:</strong> it needs more work.</li>
     </ul>
-    <p class="muted">GitLab needs about 5 minutes to start.</p>
+    <p>Any AI harness can help you with these changes.</p>
+    <p class="muted">The first start takes a few minutes. <code>playground:stop</code> keeps the data, and <code>playground:start</code> resumes it.</p>
   </div>
-  <div class="term" data-title="zsh: part-2-playground">
-    <p class="note">Start GitLab, the runner and the two servers</p>
-    <pre class="cmd" data-sh>task start</pre>
-    <p class="note">Prove the playground with a small deployment</p>
-    <pre class="cmd" data-sh>task smoke</pre>
-    <p class="note">Clone the project and start Claude Code in it</p>
-    <pre class="cmd" data-sh>task demo</pre>
-    <p class="note">Go back to the start</p>
-    <pre class="cmd" data-sh>task reset</pre>
+  <div class="term" data-title="zsh">
+    <p class="note">Get the playground</p>
+    <pre class="cmd" data-sh>git clone git@github.com:pdiroot/llm-praxis.git</pre>
+    <pre class="cmd" data-sh>cd llm-praxis/part-2-playground</pre>
+    <p class="note">Provision everything with one command</p>
+    <pre class="cmd" data-sh>task playground:start</pre>
+    <p class="note">Prove it with real deployments</p>
+    <pre class="cmd" data-sh>task playground:smoke</pre>
+    <p class="note">Start Claude Code in the project</p>
+    <pre class="cmd" data-sh>task claude:start</pre>
+    <p class="note">Delete everything</p>
+    <pre class="cmd" data-sh>task playground:terminate</pre>
   </div>
 </section>
 
@@ -221,7 +238,7 @@ Status line      model and context at a glance</pre>
   <div class="theory">
     <h2>Four ways to start</h2>
     <p>Start Claude Code inside the folder it should work on.</p>
-    <p class="muted">On this stage, <code>task demo</code> does this with an empty profile, so you see no personal setup.</p>
+    <p class="muted">On this stage, <code>task claude:start</code> does this with an empty profile, so you see no personal setup.</p>
   </div>
   <div class="term" data-title="zsh: your project">
     <p class="note">A new session</p>
@@ -253,7 +270,7 @@ Status line      model and context at a glance</pre>
   "model": "opus",
   "effortLevel": "high",
   "permissions": {
-    "allow": ["Bash(task test)"],
+    "allow": ["Bash(task dev:test)"],
     "deny": ["Read(**/.env)"]
   }
 }</pre>
@@ -432,7 +449,7 @@ Status line      model and context at a glance</pre>
   </div>
   <div class="term" data-title="zsh, then claude">
     <p class="note">Exit Claude Code, then restart the demo profile</p>
-    <pre class="cmd" data-sh>scripts/demo-claude.sh --continue</pre>
+    <pre class="cmd" data-sh>task claude:continue</pre>
     <p class="note">Approve the server, then log in in the browser</p>
     <pre class="cmd">/mcp</pre>
   </div>
@@ -465,6 +482,35 @@ Status line      model and context at a glance</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="10-mr-whoami"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>The pipeline we built</h2>
+    <p>Claude wrote this pipeline together with the app, and our merge to <code>main</code> started it.</p>
+    <ul>
+      <li>The deployment to <code>test</code> is automatic.</li>
+      <li>The deployment to <code>prod</code> is manual: a person starts it.</li>
+    </ul>
+  </div>
+  <div class="term" data-title=".gitlab-ci.yml">
+<pre class="out">merge to main
+     │
+     ▼
+┌─ build ─────────────┐
+│  compile the app    │
+└────┬────────────────┘
+     │ automatic
+     ▼
+┌─ deploy-test ───────┐
+│  test server        │
+└────┬────────────────┘
+     │ manual: a person starts the job
+     ▼
+┌─ deploy-prod ───────┐
+│  prod server        │
+└─────────────────────┘</pre>
   </div>
 </section>
 
@@ -813,10 +859,11 @@ CLI   start a manual job, connect with ssh</pre>
     <p>You have the basics in one repository. The next step is more than one.</p>
   </div>
   <div class="term" data-title="next.md">
-<pre class="out">subagents and custom skills
-workspace mode with many repositories
-parallel sessions
-long-running workflows</pre>
+    <ul class="diff skip">
+      <li>Workspace mode with many repositories</li>
+      <li>Parallel sessions</li>
+      <li>Long-running workflows</li>
+    </ul>
   </div>
 </section>
 

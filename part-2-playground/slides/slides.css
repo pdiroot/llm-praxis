@@ -103,6 +103,14 @@ kbd {
 
 .keys { margin: .4em 0; }
 
+/* A list that reads like a diff: what is in, and what is out. */
+.diff { list-style: none; margin: 0; padding: 0; }
+.diff li { margin: .12em 0; color: var(--mist); }
+.diff li::before { content: "+ "; color: var(--amber); font-weight: 600; }
+.diff.skip li { color: var(--dim); }
+.diff.skip li::before { content: "- "; color: var(--dim); }
+.diff.plain li::before { content: "* "; }
+
 /* The one moving thing in the deck. */
 .cursor {
   display: inline-block; width: .6em; height: 1.1em; vertical-align: text-bottom;

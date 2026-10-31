@@ -2,79 +2,19 @@
 version: "3"
 
 tasks:
-  check:
-    desc: Lint the shell scripts and the YAML files
-    cmds:
-      - shellcheck -x scripts/*.sh vm/*.sh slides/*.sh
-      - shfmt -i 2 -d scripts vm slides
-      - >-
-        bash -c 'diff -u slides/prompts.js <(slides/build.sh /dev/stdout)
-        || { echo "slides/prompts.js is stale: run task slides"; exit 1; }'
-      - yamllint .
+  # ---- Playground: the local GitLab and the two servers -----------------
 
-  slides:
-    desc: Generate slides/prompts.js from prompts/*.md
+  playground:start:
+    desc: Provision a new playground, or resume a stopped one
     cmds:
-      - slides/build.sh
+      - scripts/start.sh
 
-  test:
-    desc: Run the bats tests that need no running playground
-    cmds:
-      - bats --filter-tags '!live' tests
-
-  test:live:
-    desc: Reset the playground, run the bats tests that need it, then reset it again
-    cmds:
-      - task reset
-      - bats --filter-tags live tests || { task reset; exit 1; }
-      - task reset
-
-  start:
-    desc: Make the certificate and keys, start the playground and wait for GitLab
-    cmds:
-      - scripts/ca.sh ensure
-      - scripts/ca.sh trust
-      - scripts/certs.sh
-      - scripts/ssh.sh keys
-      - mkdir -p runtime/gitlab-trusted runtime/runner
-      - cp runtime/tls/ca.crt runtime/gitlab-trusted/playground-ca.crt
-      - docker compose up -d --build
-      - >-
-        bash -c 'source scripts/lib.sh;
-        wait_http https://gitlab.playground.localhost/users/sign_in 200 900 || die "GitLab did not answer in 900 s"'
-      - scripts/ssh.sh pin
-      - scripts/bootstrap.sh
-
-  smoke:
-    desc: Prove the playground with four deploys of the smoke app, then empty the VMs
-    cmds:
-      - scripts/smoke.sh
-
-  demo:
-    interactive: true
-    desc: Clone demo/whoami when missing, then start the demo Claude Code session
-    cmds:
-      - >-
-        bash -c 'source scripts/lib.sh;
-        [[ -d "$PG_DEMO_HOME/whoami" ]] || clone_demo'
-      - scripts/demo-claude.sh
-
-  reset:
-    desc: Bring GitLab, the VMs and the demo Claude Code profile back to the start state
-    cmds:
-      - scripts/reset.sh
-
-  preflight:
-    desc: Check the playground before a rehearsal or the session
-    cmds:
-      - scripts/preflight.sh
-
-  stop:
+  playground:stop:
     desc: Stop the containers and keep the data
     cmds:
       - docker compose stop
 
-  status:
+  playground:status:
     desc: Show the containers and the answers of GitLab and Traefik
     cmds:
       - docker compose ps
@@ -82,9 +22,78 @@ tasks:
         bash -c 'source scripts/lib.sh;
         wait_http https://gitlab.playground.localhost/users/sign_in 200 5 && echo "gitlab: up" || echo "gitlab: down"'
 
-  terminate:
-    desc: Delete the containers, the volumes, the demo folder and runtime/ (never the root CA)
+  playground:reset:
+    desc: Bring GitLab, the VMs and the demo Claude Code profile back to the start state
+    cmds:
+      - scripts/reset.sh
+
+  playground:terminate:
+    desc: Delete at once the containers, the volumes, the demo folder and runtime/ (never the root CA)
     cmds:
       - bash -c 'source scripts/lib.sh; demo_logout; demo_home_rm'
-      - docker compose down -v
+      - docker compose down -v --timeout 0
       - rm -rf runtime
+
+  playground:smoke:
+    desc: Prove the playground with four deploys of the smoke app, then empty the VMs
+    cmds:
+      - scripts/smoke.sh
+
+  playground:preflight:
+    desc: Check the playground before a rehearsal or the session
+    cmds:
+      - scripts/preflight.sh
+
+  # ---- Claude: the demo Claude Code session -----------------------------
+
+  claude:start:
+    interactive: true
+    desc: "Clone demo/whoami when missing, then start a new demo session. Pass flags after --"
+    cmds:
+      - >-
+        bash -c 'source scripts/lib.sh;
+        [[ -d "$PG_DEMO_HOME/whoami" ]] || clone_demo'
+      - scripts/demo-claude.sh {{.CLI_ARGS}}
+
+  claude:continue:
+    interactive: true
+    desc: Continue the last conversation of the demo session
+    cmds:
+      - scripts/demo-claude.sh --continue
+
+  # ---- Slides -----------------------------------------------------------
+
+  slides:build:
+    desc: Generate slides/prompts.js from prompts/*.md
+    cmds:
+      - slides/build.sh
+
+  slides:open:
+    desc: Build the slides and open them in the browser
+    cmds:
+      - slides/build.sh
+      - open slides/index.html
+
+  # ---- Dev: checks for this repository ----------------------------------
+
+  dev:check:
+    desc: Lint the shell scripts and the YAML files
+    cmds:
+      - shellcheck -x scripts/*.sh vm/*.sh slides/*.sh
+      - shfmt -i 2 -d scripts vm slides
+      - >-
+        bash -c 'diff -u slides/prompts.js <(slides/build.sh /dev/stdout)
+        || { echo "slides/prompts.js is stale: run task slides:build"; exit 1; }'
+      - yamllint .
+
+  dev:test:
+    desc: Run the bats tests that need no running playground
+    cmds:
+      - bats --filter-tags '!live' tests
+
+  dev:test-live:
+    desc: Reset the playground, run the bats tests that need it, then reset it again
+    cmds:
+      - task playground:reset
+      - bats --filter-tags live tests || { task playground:reset; exit 1; }
+      - task playground:reset
