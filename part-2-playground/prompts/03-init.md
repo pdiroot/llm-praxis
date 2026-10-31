@@ -4,4 +4,4 @@ The code lives in "demo/whoami" on "https://gitlab.playground.localhost". It is 
 
 Before each push, run `go fmt ./...`, `go vet ./...` and `go test ./...`.
 
-Commit CLAUDE.md to main, push it and run `git remote set-head origin --auto`.
+Commit these instructions to the main branch and push them.

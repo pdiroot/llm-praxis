@@ -293,6 +293,9 @@ clone_demo() {
 
   git clone -c "core.sshCommand=ssh -F '$PG_DEMO_HOME/ssh/config'" \
     ssh://git@gitlab.playground.localhost:2222/demo/whoami.git "$PG_DEMO_HOME/whoami"
+
+  # An empty clone has no origin/HEAD, and the review needs it to find main.
+  git -C "$PG_DEMO_HOME/whoami" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main
 }
 
 # Isolation of the demo session.
