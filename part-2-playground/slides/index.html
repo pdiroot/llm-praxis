@@ -352,8 +352,9 @@ Status line      model, effort, cost and context</pre>
     </ul>
     <hr class="term-rule">
     <ul class="diff skip">
-      <li>A deployment</li>
+      <li>A merge request</li>
       <li>A pipeline</li>
+      <li>A deployment</li>
     </ul>
   </div>
 </section>
@@ -466,6 +467,7 @@ Status line      model, effort, cost and context</pre>
     <hr class="term-rule">
     <ul class="diff skip">
       <li>New features in the app</li>
+      <li>`/code-review` and `/security-review`, for time</li>
     </ul>
   </div>
 </section>
@@ -661,12 +663,16 @@ CLI   start a manual job, connect with ssh</pre>
   </div>
   <div class="term" data-title="iteration 3">
     <ul class="diff">
-      <li>Plan JSON output, test first</li>
-      <li>Review and merge it yourself</li>
-      <li>Deploy to `test` and `prod`</li>
+      <li>Add JSON output, test first</li>
+      <li>Ship it in one prompt</li>
       <li>Find the cause of an outage on `prod`</li>
-      <li>Plan the fix and ship it</li>
+      <li>Fix it and ship it</li>
       <li>Update `CLAUDE.md`</li>
+    </ul>
+    <hr class="term-rule">
+    <ul class="diff skip">
+      <li>Plan mode: the failing test is enough here</li>
+      <li>Human review, for time</li>
     </ul>
   </div>
 </section>
@@ -678,21 +684,17 @@ CLI   start a manual job, connect with ssh</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="15-json-red-green"></pre>
-    <p class="note">Read the plan, then approve: Yes, and use auto mode</p>
   </div>
 </section>
 
 <section class="slide">
   <div class="theory">
     <h2>Ship the JSON</h2>
-    <p>The same flow as iteration 2: you review and merge, Claude checks <code>test</code> and deploys.</p>
+    <p>You saw each step in iteration 2, so now it is one prompt. Claude merges and deploys.</p>
+    <p class="muted">We skip the human review today for time. Keep it in real work.</p>
   </div>
   <div class="term">
-    <pre class="prompt" data-id="16-open-mr"></pre>
-    <p class="note">Review and merge it in GitLab, then check test</p>
-    <pre class="prompt" data-id="12-check-test"></pre>
-    <p class="note">Test the app, then deploy</p>
-    <pre class="prompt" data-id="13-deploy-prod"></pre>
+    <pre class="prompt" data-id="16-ship"></pre>
   </div>
 </section>
 
@@ -714,12 +716,7 @@ CLI   start a manual job, connect with ssh</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="18-fix-restart"></pre>
-    <p class="note">Read the plan, then approve: Yes, and use auto mode</p>
-    <pre class="prompt" data-id="16-open-mr"></pre>
-    <p class="note">Review and merge it in GitLab, then check test</p>
-    <pre class="prompt" data-id="12-check-test"></pre>
-    <p class="note">Test the app, then deploy</p>
-    <pre class="prompt" data-id="13-deploy-prod"></pre>
+    <pre class="prompt" data-id="16-ship"></pre>
     <p class="note">Then kill the app on `prod` again: it comes back</p>
   </div>
 </section>
@@ -733,11 +730,15 @@ CLI   start a manual job, connect with ssh</pre>
     <ul class="diff">
       <li>Start clean</li>
       <li>Add a plugin</li>
-      <li>Plan and build the web UI</li>
+      <li>Build the web UI</li>
       <li>Update `CLAUDE.md`</li>
       <li>Check it in the browser</li>
-      <li>Review and merge it yourself</li>
-      <li>Deploy to `test` and `prod`</li>
+      <li>Ship it in one prompt</li>
+    </ul>
+    <hr class="term-rule">
+    <ul class="diff skip">
+      <li>Plan mode: a page is easier to judge on screen</li>
+      <li>Reviews and human review, for time</li>
     </ul>
   </div>
 </section>
@@ -794,7 +795,6 @@ CLI   start a manual job, connect with ssh</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="20-ui"></pre>
-    <p class="note">Read the plan, then approve: Yes, and use auto mode</p>
   </div>
 </section>
 
@@ -813,14 +813,10 @@ CLI   start a manual job, connect with ssh</pre>
 <section class="slide" data-cut="Cut point: the prod deploy">
   <div class="theory">
     <h2>Ship the UI</h2>
-    <p>The same flow again. Then Claude checks <code>test</code> and <code>prod</code> in the browser.</p>
+    <p>One prompt again. Then Claude checks <code>test</code> and <code>prod</code> in the browser.</p>
   </div>
   <div class="term">
-    <pre class="prompt" data-id="16-open-mr"></pre>
-    <p class="note">Review and merge it in GitLab, then check test</p>
-    <pre class="prompt" data-id="12-check-test"></pre>
-    <p class="note">Test the app, then deploy</p>
-    <pre class="prompt" data-id="13-deploy-prod"></pre>
+    <pre class="prompt" data-id="16-ship"></pre>
     <p class="note">Check both pages in the browser</p>
     <pre class="prompt" data-id="21-check-ui"></pre>
   </div>
@@ -853,12 +849,34 @@ CLI   start a manual job, connect with ssh</pre>
 
 <section class="slide">
   <div class="theory">
+    <h2>The full workflow</h2>
+    <p>You saw every step today, but not all of them each time.</p>
+    <p>For real work, walk the whole path. Shorten it only when a mistake is cheap.</p>
+  </div>
+  <div class="term" data-title="plan to production">
+<pre class="out">plan                  iteration 1
+change the plan       iteration 1
+build                 iteration 1
+/code-review          iteration 1
+/security-review      iteration 1
+test it yourself      iteration 1
+merge request         iteration 2
+human review, merge   iteration 2
+pipeline              iteration 2
+check test            iteration 2
+deploy to prod        iteration 2
+check prod            iteration 2</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
     <h2>Recap</h2>
     <ul>
       <li><code>CLAUDE.md</code> grew by a few lines, each with a reason.</li>
       <li>Plan, build, review, merge, deploy.</li>
       <li>MCP for typed tools. The CLI for the rest.</li>
-      <li>Rules guard the risky step.</li>
+      <li>The token stays out of the chat.</li>
       <li>One task, one context.</li>
     </ul>
   </div>
