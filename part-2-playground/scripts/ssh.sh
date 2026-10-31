@@ -8,11 +8,12 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 dir="$PG_RUNTIME/ssh"
 
 keys() {
-  mkdir -p "$dir"
   local name
+  mkdir -p "$dir"
   for name in ci mac; do
     [[ -e $dir/$name ]] || ssh-keygen -q -t ed25519 -N '' -C "playground-$name" -f "$dir/$name"
   done
+
   cat >"$dir/config" <<CONF
 Host test.playground.localhost
   HostName test.playground.localhost
@@ -51,11 +52,13 @@ pin() {
   prod=$(hostkey prod /etc/ssh/ssh_host_ed25519_key.pub)
   gitlab=$(hostkey gitlab /etc/gitlab/ssh_host_ed25519_key.pub)
   [[ -n $test && -n $prod && -n $gitlab ]] || die "a host key is empty"
+
   cat >"$dir/known_hosts" <<KH
 [test.playground.localhost]:2201 $test
 [prod.playground.localhost]:2202 $prod
 [gitlab.playground.localhost]:2222 $gitlab
 KH
+
   cat >"$dir/known_hosts_ci" <<KH
 test-ssh $test
 prod-ssh $prod

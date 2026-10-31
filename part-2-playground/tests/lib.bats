@@ -31,6 +31,7 @@ teardown() {
   nc -l 127.0.0.1 "$port" <"$BATS_TEST_TMPDIR/hold" >/dev/null &
   NC_PID=$!
   sleep 1
+
   run bash -c "source '$ROOT/scripts/lib.sh'; start=\$SECONDS; wait_http http://127.0.0.1:$port/ 200 2; rc=\$?; [ \$((SECONDS - start)) -le 4 ] || exit 99; exit \$rc"
   [ "$status" -eq 1 ]
 }

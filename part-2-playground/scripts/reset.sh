@@ -7,7 +7,6 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 cd "$PG_ROOT"
-admin_token
 projects=(demo/whoami demo/sample-service)
 
 demo_profile() {
@@ -25,37 +24,54 @@ Doorkeeper::AccessGrant.where(resource_owner_id: user.id).delete_all
 RUBY
 }
 
+# project_gone <path> <id>: 0 when the path, and the id when it is set, answer 404.
+project_gone() {
+  [[ $(http_code "/projects/$(uri "$1")") == 404 ]] || return 1
+  [[ -z $2 || $(http_code "/projects/$2") == 404 ]]
+}
+
+# purge_marked <id>: the soft delete is asynchronous. Once the project is
+# marked, remove it for good under its renamed path.
+purge_marked() {
+  local marked
+  marked=$(api GET "/projects/$1" 2>/dev/null | jq -r 'select(.marked_for_deletion_on != null) | .path_with_namespace' || true)
+  [[ -z $marked ]] || api DELETE "/projects/$1?permanently_remove=true&full_path=$(uri "$marked")" >/dev/null 2>&1 || true
+}
+
 # remove_project <path>: delete it for good and wait until its path answers 404.
 remove_project() {
-  local path=$1 id marked deadline=$((SECONDS + 300))
+  local path=$1 id deadline=$((SECONDS + 300))
+
   id=$(api GET "/projects/$(uri "$path")" 2>/dev/null | jq -r '.id // empty' || true)
   if [[ -n $id ]]; then
     log "delete $path"
     api DELETE "/projects/$id" >/dev/null
   fi
+
   while ((SECONDS < deadline)); do
-    if [[ $(http_code "/projects/$(uri "$path")") == 404 && (-z $id || $(http_code "/projects/$id") == 404) ]]; then return 0; fi
-    # The soft delete is asynchronous: once the project is marked, remove it for good under its renamed path.
-    if [[ -n $id ]]; then
-      marked=$(api GET "/projects/$id" 2>/dev/null | jq -r 'select(.marked_for_deletion_on != null) | .path_with_namespace' || true)
-      if [[ -n $marked ]]; then
-        api DELETE "/projects/$id?permanently_remove=true&full_path=$(uri "$marked")" >/dev/null 2>&1 || true
-      fi
-    fi
+    project_gone "$path" "$id" && return 0
+    [[ -z $id ]] || purge_marked "$id"
     sleep 2
   done
+
   die "$path still answers after 300 s"
 }
 
+admin_token
+
 log "1/5 cancel the pipelines"
 cancel_pipelines "${projects[@]}"
+
 log "2/5 demo Claude Code profile"
 demo_profile
+
 log "3/5 revoke the tokens of demo"
 revoke_tokens
+
 log "4/5 recreate the projects"
 for path in "${projects[@]}"; do remove_project "$path"; done
 "$PG_ROOT/scripts/bootstrap.sh"
+
 log "5/5 clean the VMs"
 "$PG_ROOT/scripts/vm-clean.sh"
 

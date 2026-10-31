@@ -71,7 +71,9 @@ echo "$PWD"
 echo "$*"
 STUB
   chmod +x "$BATS_TEST_TMPDIR/bin/claude"
+
   PATH="$BATS_TEST_TMPDIR/bin:$PATH" run "$ROOT/scripts/demo-claude.sh" --resume
+
   [ "$status" -eq 0 ]
   # Absolute paths: macOS may resolve the temp dir through a symlink, so compare the pwd by suffix.
   [ "${lines[0]}" = "$PG_DEMO_HOME/claude-config" ]
@@ -91,8 +93,10 @@ STUB
   mkdir -p "$BATS_TEST_TMPDIR/bin"
   printf '#!/usr/bin/env bash\n' >"$BATS_TEST_TMPDIR/bin/claude"
   chmod +x "$BATS_TEST_TMPDIR/bin/claude"
+
   PATH="$BATS_TEST_TMPDIR/bin:$PATH" "$ROOT/scripts/demo-claude.sh"
   cmp "$SETTINGS" "$PG_DEMO_HOME/claude-config/settings.json"
+
   echo '{"mine":1}' >"$PG_DEMO_HOME/claude-config/settings.json"
   PATH="$BATS_TEST_TMPDIR/bin:$PATH" "$ROOT/scripts/demo-claude.sh"
   [ "$(cat "$PG_DEMO_HOME/claude-config/settings.json")" = '{"mine":1}' ]
@@ -106,7 +110,9 @@ STUB
   echo "Host x" >"$PG_RUNTIME/ssh/config"
   printf '#!/usr/bin/env bash\n' >"$BATS_TEST_TMPDIR/bin/claude"
   chmod +x "$BATS_TEST_TMPDIR/bin/claude"
+
   PATH="$BATS_TEST_TMPDIR/bin:$PATH" "$ROOT/scripts/demo-claude.sh"
+
   cmp "$PG_RUNTIME/ssh/config" "$PG_DEMO_HOME/ssh/config"
   [ "$(stat -f %Lp "$PG_DEMO_HOME/ssh/config")" = 600 ]
 }
@@ -120,7 +126,9 @@ STUB
   touch "$BATS_TEST_TMPDIR/up/CLAUDE.md"
   printf '#!/usr/bin/env bash\necho started\n' >"$BATS_TEST_TMPDIR/bin/claude"
   chmod +x "$BATS_TEST_TMPDIR/bin/claude"
+
   PATH="$BATS_TEST_TMPDIR/bin:$PATH" run "$ROOT/scripts/demo-claude.sh"
+
   [ "$status" -ne 0 ]
   [[ $output == *"$(cd "$BATS_TEST_TMPDIR" && pwd -P)/up/CLAUDE.md"* ]]
   [[ $output != *started* ]]
@@ -201,17 +209,16 @@ home_ok() { PG_DEMO_HOME="$1" bash -c "source '$ROOT/scripts/lib.sh'; $2"; }
 }
 
 @test "the checkpoint clone step marks a fresh home" {
-  # Run only the clone step of checkpoint.sh, with git stubbed.
+  # sync_demo_clone with git stubbed: the stub makes the .git folder of the clone.
   export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
   export PG_DEMO_HOME="$BATS_TEST_TMPDIR/fresh"
   mkdir -p "$PG_RUNTIME/ssh" "$BATS_TEST_TMPDIR/bin"
   echo "Host x" >"$PG_RUNTIME/ssh/config"
   printf '#!/usr/bin/env bash\nmkdir -p "${@: -1}/.git"\n' >"$BATS_TEST_TMPDIR/bin/git"
   chmod +x "$BATS_TEST_TMPDIR/bin/git"
-  start=$(grep -n 'log "4/5 demo clone"' "$ROOT/scripts/checkpoint.sh" | cut -d: -f1)
-  end=$(grep -n 'log "5/5 check"' "$ROOT/scripts/checkpoint.sh" | cut -d: -f1)
-  { echo "source '$ROOT/scripts/lib.sh'; set -euo pipefail; branch=''"; sed -n "${start},$((end - 1))p" "$ROOT/scripts/checkpoint.sh"; } >"$BATS_TEST_TMPDIR/step.sh"
-  PATH="$BATS_TEST_TMPDIR/bin:$PATH" run bash "$BATS_TEST_TMPDIR/step.sh"
+
+  PATH="$BATS_TEST_TMPDIR/bin:$PATH" run bash -c "set -euo pipefail; source '$ROOT/scripts/lib.sh'; sync_demo_clone main"
+
   echo "$output"
   [ "$status" -eq 0 ]
   [ -f "$PG_DEMO_HOME/.llm-praxis-demo" ]

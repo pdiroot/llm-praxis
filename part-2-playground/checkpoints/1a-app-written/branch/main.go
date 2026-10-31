@@ -35,6 +35,7 @@ type info struct {
 
 func collect(r *http.Request) info {
 	host, _ := os.Hostname()
+
 	var ips []string
 	addrs, _ := net.InterfaceAddrs()
 	for _, a := range addrs {
@@ -42,6 +43,7 @@ func collect(r *http.Request) info {
 			ips = append(ips, n.IP.String())
 		}
 	}
+
 	h := r.Header.Clone()
 	h.Set("Host", r.Host) // net/http moves Host out of r.Header
 	return info{Hostname: host, IPs: ips, Headers: h, Commit: commit}
@@ -52,6 +54,7 @@ func writeText(w io.Writer, in info) {
 	for _, ip := range in.IPs {
 		fmt.Fprintf(w, "IP: %s\n", ip)
 	}
+
 	keys := make([]string, 0, len(in.Headers))
 	for k := range in.Headers {
 		keys = append(keys, k)
@@ -60,6 +63,7 @@ func writeText(w io.Writer, in info) {
 	for _, k := range keys {
 		fmt.Fprintf(w, "%s: %s\n", k, strings.Join(in.Headers[k], ", "))
 	}
+
 	fmt.Fprintf(w, "Commit: %s\n", in.Commit)
 }
 
@@ -82,6 +86,7 @@ func logged(out io.Writer, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sw := &statusWriter{ResponseWriter: w, status: http.StatusOK}
 		next.ServeHTTP(sw, r)
+
 		l.Printf("%s %s %s %d", r.RemoteAddr, r.Method, strconv.Quote(r.URL.Path), sw.status)
 	})
 }
@@ -96,20 +101,24 @@ func handler() http.Handler {
 func main() {
 	addr := flag.String("addr", ":80", "listen address")
 	flag.Parse()
+
 	logDir, runDir := dir("LOGS_DIRECTORY"), dir("RUNTIME_DIRECTORY")
 	for _, d := range []string{logDir, runDir} {
 		if err := os.MkdirAll(d, 0o755); err != nil {
 			log.Fatal(err)
 		}
 	}
+
 	f, err := os.OpenFile(filepath.Join(logDir, "access.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o640)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
+
 	pid := []byte(strconv.Itoa(os.Getpid()) + "\n")
 	if err := os.WriteFile(filepath.Join(runDir, "whoami.pid"), pid, 0o644); err != nil {
 		log.Fatal(err)
 	}
+
 	log.Fatal(http.ListenAndServe(*addr, logged(f, handler())))
 }

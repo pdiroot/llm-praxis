@@ -6,24 +6,52 @@ set -euo pipefail
 # shellcheck source-path=SCRIPTDIR
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-admin_token
 p=playground%2Fsmoke
 timeout_s=${SMOKE_TIMEOUT:-600} # used by wait_job in lib.sh
 
+# smoke_project: the smoke project lives in its own group, apart from the
+# demo projects. A deleted project leaves a redirect, which answers 301 with no id.
+smoke_project() {
+  local group v
+
+  if ! api GET "/projects/$p" 2>/dev/null | jq -e .id >/dev/null 2>&1; then
+    group=$(api GET /groups/playground 2>/dev/null | jq -r '.id // empty' || true)
+    [[ -n $group ]] || group=$(api POST /groups -d name=playground -d path=playground -d visibility=private | jq -r .id)
+    api POST /projects -d name=smoke -d "namespace_id=$group" -d visibility=private >/dev/null
+  fi
+
+  for v in "SSH_PRIVATE_KEY:ci" "SSH_KNOWN_HOSTS:known_hosts_ci"; do
+    api GET "/projects/$p/variables/${v%%:*}" >/dev/null 2>&1 && continue
+    api POST "/projects/$p/variables" -d "key=${v%%:*}" -d variable_type=file \
+      --data-urlencode "value@$PG_RUNTIME/ssh/${v##*:}" >/dev/null
+  done
+}
+
+# deploy_both <round> <sha>: wait for deploy-test, then start deploy-prod and wait for it.
+deploy_both() {
+  local pipeline
+  pipeline=$(wait_pipeline "$2")
+  log "round $1: commit ${2:0:8}, pipeline $pipeline"
+
+  wait_job "$pipeline" deploy-test success
+  wait_job "$pipeline" deploy-prod manual
+  api POST "/projects/$p/jobs/$(job_id "$pipeline" deploy-prod)/play" >/dev/null
+  wait_job "$pipeline" deploy-prod success
+}
+
+# run_round <n> [file]...: push one commit with STAMP and the files, deploy it
+# to both VMs and check that both sites show it.
 run_round() {
-  local n=$1 sha pipeline site body jid
+  local n=$1 sha site body
   shift
+
   # The API cannot make an empty commit; a new STAMP makes each commit differ.
   printf 'round %s at %s\n' "$n" "$(date +%s)" >"$PG_RUNTIME/smoke/STAMP"
   push_dir "$p" main "chore: smoke round $n" "$PG_RUNTIME/smoke" STAMP "$@"
   sha=$(api GET "/projects/$p/repository/commits/main" | jq -r .id)
-  pipeline=$(wait_pipeline "$sha")
-  log "round $n: commit ${sha:0:8}, pipeline $pipeline"
-  wait_job "$pipeline" deploy-test success
-  wait_job "$pipeline" deploy-prod manual
-  jid=$(job_id "$pipeline" deploy-prod)
-  api POST "/projects/$p/jobs/$jid/play" >/dev/null
-  wait_job "$pipeline" deploy-prod success
+
+  deploy_both "$n" "$sha"
+
   for site in test prod; do
     body=$(curl -fsS --cacert "$PG_CA_DIR/ca.crt" "https://$site.playground.localhost/")
     grep -q "Commit: ${sha:0:8}" <<<"$body" || die "$site does not show commit ${sha:0:8}"
@@ -31,24 +59,16 @@ run_round() {
   done
 }
 
-# The smoke project lives in its own group, apart from the demo projects.
-# A deleted project leaves a redirect, which answers 301 with no id.
-if ! api GET "/projects/$p" 2>/dev/null | jq -e .id >/dev/null 2>&1; then
-  group=$(api GET /groups/playground 2>/dev/null | jq -r '.id // empty' || true)
-  [[ -n $group ]] || group=$(api POST /groups -d name=playground -d path=playground -d visibility=private | jq -r .id)
-  api POST /projects -d name=smoke -d "namespace_id=$group" -d visibility=private >/dev/null
-fi
-for v in "SSH_PRIVATE_KEY:ci" "SSH_KNOWN_HOSTS:known_hosts_ci"; do
-  if ! api GET "/projects/$p/variables/${v%%:*}" >/dev/null 2>&1; then
-    api POST "/projects/$p/variables" -d "key=${v%%:*}" -d variable_type=file \
-      --data-urlencode "value@$PG_RUNTIME/ssh/${v##*:}" >/dev/null
-  fi
-done
+admin_token
+smoke_project
+
 rm -rf "$PG_RUNTIME/smoke"
 mkdir -p "$PG_RUNTIME/smoke"
 cp -R "$PG_ROOT/smoke/." "$PG_RUNTIME/smoke/"
 mapfile -t files < <(cd "$PG_ROOT/smoke" && find . -type f | sed 's|^\./||' | sort)
+
 run_round 1 "${files[@]}"
 run_round 2
+
 "$(dirname "${BASH_SOURCE[0]}")/vm-clean.sh"
 log "smoke: four green deploys, VMs empty"

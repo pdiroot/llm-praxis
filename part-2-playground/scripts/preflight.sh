@@ -10,7 +10,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 # an HTTP status comes back. test and prod answer 502 or 404 while no app runs.
 answers() {
   local url=$1 code
-  code=$(curl -s --max-time 10 -o /dev/null -w '%{http_code}' --cacert "$PG_CA_DIR/ca.crt" "$url" 2>/dev/null || true)
+  code=$(curl -s --max-time 10 -o /dev/null -w '%{http_code}' \
+    --cacert "$PG_CA_DIR/ca.crt" "$url" 2>/dev/null || true)
   [[ $code =~ ^[1-5][0-9][0-9]$ ]]
 }
 
@@ -22,6 +23,7 @@ step() {
 
 gitlab_up() { wait_http https://gitlab.playground.localhost/users/sign_in 200 30; }
 vm_ssh() { ssh -F "$PG_RUNTIME/ssh/config" -o BatchMode=yes -o ConnectTimeout=10 "$1.playground.localhost" true; }
+
 claude_new_enough() {
   local v
   v=$(claude --version | awk '{print $1}')
@@ -33,14 +35,17 @@ claude_new_enough() {
 demo_isolated() {
   local clone="$PG_DEMO_HOME/whoami" hits extra
   [[ -d $clone ]] || return 0
+
   hits=$(isolation_scan "$clone") || {
     log "a parent folder of the clone has: $hits"
     return 1
   }
+
   extra=$(mcp_foreign "$clone") || {
     log "claude mcp list failed"
     return 1
   }
+
   [[ -z $extra ]] || {
     log "the demo session lists MCP servers that are not its own: $extra"
     return 1
@@ -52,8 +57,10 @@ step "test answers over HTTPS" answers https://test.playground.localhost/
 step "prod answers over HTTPS" answers https://prod.playground.localhost/
 step "ssh to test" vm_ssh test
 step "ssh to prod" vm_ssh prod
+
 admin_token
 step "the API answers" api GET /user -o /dev/null
+
 step "claude is 2.1.312 or later" claude_new_enough
 step "the demo session loads nothing from the workspace" demo_isolated
 

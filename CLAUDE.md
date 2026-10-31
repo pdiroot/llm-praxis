@@ -20,6 +20,18 @@ each part. `README.md` lists the parts.
 - Make no drive-by changes.
 - Add no new dependency without the owner's approval.
 
+## Code layout
+
+- Put one blank line between the logical groups of statements: the setup,
+  the work and the result of a function, the steps of a script, and the
+  arrange, act and assert parts of a test.
+- Split a function of more than 20 lines into named step functions, so that
+  it reads as a list of steps. A heredoc or a data literal does not count.
+- Define the functions of a script first. Run its steps at the bottom.
+- Break a command of more than about 100 columns at its options, with `\`.
+- Put a blank line between two entries at the top level of a YAML file,
+  such as two tasks or two services.
+
 ## Prohibitions
 
 - Do not post a comment on a PR or an issue.
