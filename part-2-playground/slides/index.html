@@ -324,6 +324,18 @@ Status line      model, effort, cost and context</pre>
 
 <section class="slide">
   <div class="theory">
+    <h2>You should know</h2>
+    <p>A built-in plugin. A second agent reads Claude's output and flags what you might miss.</p>
+    <p class="muted">That second agent also uses tokens.</p>
+  </div>
+  <div class="term">
+    <p class="note">Turn it on once</p>
+    <pre class="cmd">/plugin enable cc-plugin-you-should-know@builtin</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
     <h2>/init writes CLAUDE.md</h2>
     <p>Claude writes the notes it loads in each session.</p>
     <p>The folder is empty, so we tell Claude what a new colleague needs to know: what the project is for, where the code lives, how it is built and how we test it.</p>
