@@ -460,6 +460,7 @@ Status line      model, effort, cost and context</pre>
       <li>Connect GitLab with MCP</li>
       <li>Keep the token out of the chat</li>
       <li>Build the pipeline</li>
+      <li>Review and merge it yourself</li>
       <li>Deploy to `test` and `prod`</li>
     </ul>
     <hr class="term-rule">
@@ -561,23 +562,8 @@ CLI   start a manual job, connect with ssh</pre>
 
 <section class="slide">
   <div class="theory">
-    <h2>Add the pipeline</h2>
-    <p>The app works locally. Now it goes to the servers.</p>
-    <p>A pipeline is a new task, so it gets its own branch and its own merge request, through MCP.</p>
-    <p class="muted">The deploys use SSH. To connect to a server yourself, from the shell:</p>
-    <p class="muted"><code>ssh -F ~/llm-praxis-demo/ssh/config test.playground.localhost</code></p>
-    <p class="muted">The same works for <code>prod.playground.localhost</code>.</p>
-  </div>
-  <div class="term">
-    <pre class="prompt" data-id="12-pipeline"></pre>
-    <p class="note">Read the plan, then approve: Yes, and use auto mode</p>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>The pipeline we built</h2>
-    <p>Claude wrote this pipeline, and our merge to <code>main</code> started it.</p>
+    <h2>The pipeline we want</h2>
+    <p>A merge to <code>main</code> starts it.</p>
     <ul>
       <li>The deployment to <code>test</code> is automatic.</li>
       <li>The deployment to <code>prod</code> is manual: a person starts it.</li>
@@ -600,6 +586,32 @@ CLI   start a manual job, connect with ssh</pre>
 ┌─ deploy-prod ───────┐
 │  prod server        │
 └─────────────────────┘</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Add the pipeline</h2>
+    <p>The app works locally. Now it goes to the servers.</p>
+    <p>A pipeline is a new task, so it gets its own branch and its own merge request, through MCP.</p>
+    <p class="muted">The deploys use SSH. To connect to a server yourself, from the shell:</p>
+    <p class="muted"><code>ssh -F ~/llm-praxis-demo/ssh/config test.playground.localhost</code></p>
+    <p class="muted">The same works for <code>prod.playground.localhost</code>.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="12-pipeline"></pre>
+    <p class="note">Read the plan, then approve: Yes, and use auto mode</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Review and merge</h2>
+    <p>Open the link and read the change in GitLab. You merge it, not Claude.</p>
+    <p>The merge starts the pipeline, and the deployment to <code>test</code> runs by itself.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="12-check-test"></pre>
   </div>
 </section>
 
