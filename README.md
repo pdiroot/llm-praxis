@@ -12,6 +12,8 @@ projects. Each part builds on the part before it.
 
 Part 1 has the text of the slides. The interactive slides follow.
 
+To try Claude Code yourself, start with `part-2-playground/README.md`.
+
 ## License
 
 MIT. See `LICENSE`.
