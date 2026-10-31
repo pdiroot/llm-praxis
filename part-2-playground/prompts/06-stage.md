@@ -1,1 +1,1 @@
-Stage the new files with `git add`.
+Stage the changes with `git add`.
