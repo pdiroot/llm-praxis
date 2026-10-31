@@ -22,5 +22,10 @@ demo_ssh_config
 hits=$(isolation_scan "$clone") || die "Claude Code would load these files from a parent folder of the clone:
 $hits"
 
+section "🤖" "Claude Code: isolated session"
+log "Profile:    $config"
+log "Project:    $clone"
+log "Connectors: off"
+
 cd "$clone"
 exec claude --chrome "$@"

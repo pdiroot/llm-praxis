@@ -72,7 +72,7 @@ echo "$*"
 STUB
   chmod +x "$BATS_TEST_TMPDIR/bin/claude"
 
-  PATH="$BATS_TEST_TMPDIR/bin:$PATH" run "$ROOT/scripts/demo-claude.sh" --resume
+  PATH="$BATS_TEST_TMPDIR/bin:$PATH" run --separate-stderr "$ROOT/scripts/demo-claude.sh" --resume
 
   [ "$status" -eq 0 ]
   # Absolute paths: macOS may resolve the temp dir through a symlink, so compare the pwd by suffix.
