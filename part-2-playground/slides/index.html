@@ -336,23 +336,12 @@ Status line      model, effort, cost and context</pre>
 
 <section class="slide">
   <div class="theory">
-    <h2>/init writes CLAUDE.md</h2>
-    <p>Claude writes the notes it loads in each session.</p>
-    <p>The folder is empty, so we tell Claude what a new colleague needs to know: what the project is for, where the code lives, how it is built and how we test it.</p>
-    <p class="muted">No secrets.</p>
-  </div>
-  <div class="term">
-    <pre class="prompt" data-id="03-init"></pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
     <h2>Iteration 1: the app</h2>
     <p>We build the first version and try it on this machine.</p>
   </div>
   <div class="term" data-title="iteration 1">
     <ul class="diff">
+      <li>Write CLAUDE.md with /init</li>
       <li>Plan the app, and change the plan</li>
       <li>Build it on a branch</li>
       <li>Review the change</li>
@@ -364,6 +353,18 @@ Status line      model, effort, cost and context</pre>
       <li>A deployment</li>
       <li>A pipeline</li>
     </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>/init writes CLAUDE.md</h2>
+    <p>Claude writes the notes it loads in each session.</p>
+    <p>The folder is empty, so we tell Claude what a new colleague needs to know: what the project is for, where the code lives, how it is built and how we test it.</p>
+    <p class="muted">No secrets.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="03-init"></pre>
   </div>
 </section>
 
@@ -452,6 +453,7 @@ Status line      model, effort, cost and context</pre>
   </div>
   <div class="term" data-title="iteration 2">
     <ul class="diff">
+      <li>Update CLAUDE.md</li>
       <li>Connect GitLab with MCP</li>
       <li>Keep the token out of the chat</li>
       <li>Build the pipeline</li>
@@ -657,6 +659,7 @@ CLI   start a manual job, connect with ssh</pre>
   </div>
   <div class="term" data-title="iteration 3">
     <ul class="diff">
+      <li>Update CLAUDE.md</li>
       <li>Add JSON output, test first</li>
       <li>Ship it through the pipeline</li>
       <li>Find the cause of an outage on prod</li>
@@ -713,6 +716,7 @@ CLI   start a manual job, connect with ssh</pre>
   </div>
   <div class="term" data-title="iteration 4">
     <ul class="diff">
+      <li>Update CLAUDE.md</li>
       <li>Start clean</li>
       <li>Add a plugin</li>
       <li>Build the web UI</li>
