@@ -1,4 +1,4 @@
-Fix the findings of the review that you agree with, and tell me why you reject the others. Also look at the access log and the headers it writes, and at the headers echoed back.
+Fix the findings of the reviews that you agree with, and tell me why you reject the others. Also look at the access log and the headers it writes, and at the headers echoed back.
 
 Write the decision about the access log into CLAUDE.md in at most 3 lines, so the next session keeps it.
 

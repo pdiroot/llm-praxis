@@ -356,13 +356,16 @@ Status line      model, effort, cost and context</pre>
     <h2>Review the change</h2>
     <p>Read the diff as you read a colleague's change, then ask for a review.</p>
     <p>A review can miss a point, so you look too. Your own comments go into the next prompt.</p>
-    <p class="muted"><code>/security-review</code> looks only for security problems.</p>
   </div>
   <div class="term">
+    <p class="note">/diff skips files that are not staged, so stage them first</p>
+    <pre class="prompt" data-id="06-stage"></pre>
     <p class="note">See what changed</p>
     <pre class="cmd">/diff</pre>
-    <p class="note">Review the change</p>
-    <pre class="cmd">/review</pre>
+    <p class="note">Review the change for bugs</p>
+    <pre class="cmd">/code-review</pre>
+    <p class="note">Review the change for security problems</p>
+    <pre class="cmd">/security-review</pre>
   </div>
 </section>
 
@@ -801,7 +804,7 @@ CLI   start a manual job, connect with ssh</pre>
 /context /compact /clear    manage the window
 /usage                      the cost and the limits
 /plan  Shift+Tab  Ctrl+G    plan, edit the plan
-/diff /review               check the change
+/diff /code-review          check the change
 /mcp /plugin                add tools
 /rewind ! /btw              undo, run, ask aside
 /memory /permissions        notes and rules</pre>
