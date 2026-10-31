@@ -1,5 +1,1 @@
-Fix the findings of the reviews that you agree with, and tell me why you reject the others. Also look at the access log and the headers it writes, and at the headers echoed back.
-
-Write the decision about the access log into CLAUDE.md in at most 3 lines, so the next session keeps it.
-
-When the checks pass, commit, merge "feat/whoami" into main and push main.
+Fix the findings of the code review and the security review that you agree with. Update CLAUDE.md if you see any changes worth keeping. Commit to the feature branch, merge it locally, and push the default branch to origin.
