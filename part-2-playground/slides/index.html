@@ -36,7 +36,7 @@ What should we build?
     <p class="note">We cover</p>
     <ul class="diff">
       <li>Install and settings</li>
-      <li>CLAUDE.md</li>
+      <li>`CLAUDE.md`</li>
       <li>Plan mode</li>
       <li>Review of a change</li>
       <li>MCP and the command line</li>
@@ -343,12 +343,12 @@ Status line      model, effort, cost and context</pre>
   </div>
   <div class="term" data-title="iteration 1">
     <ul class="diff">
-      <li>Write CLAUDE.md with /init</li>
+      <li>Write `CLAUDE.md` with `/init`</li>
       <li>Plan the app, and change the plan</li>
       <li>Build it on a branch</li>
       <li>Review the change</li>
       <li>Test it yourself</li>
-      <li>Merge it to main</li>
+      <li>Merge it to `main`</li>
     </ul>
     <hr class="term-rule">
     <ul class="diff skip">
@@ -394,11 +394,11 @@ Status line      model, effort, cost and context</pre>
     <p>A review can miss a point, so you look too. Your own comments go into the next prompt.</p>
   </div>
   <div class="term">
-    <p class="note">/diff skips files that are not staged, so stage them first</p>
+    <p class="note">`/diff` skips files that are not staged, so stage them first</p>
     <pre class="prompt" data-id="06-stage"></pre>
     <p class="note">See what changed</p>
     <pre class="cmd">/diff</pre>
-    <p class="note">/security-review reads commits, so commit on the branch first</p>
+    <p class="note">`/security-review` reads commits, so commit on the branch first</p>
     <pre class="prompt" data-id="06-commit-branch"></pre>
     <p class="note">Review the change for bugs</p>
     <pre class="cmd">/code-review</pre>
@@ -426,7 +426,7 @@ Status line      model, effort, cost and context</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="07-run-local"></pre>
-    <p class="note">Run the command in your own shell, then try /health too</p>
+    <p class="note">Run the command in your own shell, then try `/health` too</p>
   </div>
 </section>
 
@@ -451,16 +451,16 @@ Status line      model, effort, cost and context</pre>
 <section class="slide">
   <div class="theory">
     <h2>Iteration 2: the pipeline</h2>
-    <p>We put the app on the test and prod servers.</p>
+    <p>We put the app on the <code>test</code> and <code>prod</code> servers.</p>
     <p><a href="https://gitlab.playground.localhost" target="_blank" rel="noopener">Open GitLab</a></p>
   </div>
   <div class="term" data-title="iteration 2">
     <ul class="diff">
-      <li>Update CLAUDE.md</li>
+      <li>Update `CLAUDE.md`</li>
       <li>Connect GitLab with MCP</li>
       <li>Keep the token out of the chat</li>
       <li>Build the pipeline</li>
-      <li>Deploy to test and prod</li>
+      <li>Deploy to `test` and `prod`</li>
     </ul>
     <hr class="term-rule">
     <ul class="diff skip">
@@ -550,9 +550,9 @@ CLI   start a manual job, connect with ssh</pre>
     <ul>
       <li>A hook loads <code>.env</code> before each command.</li>
       <li>A deny rule: Claude cannot read <code>.env</code>.</li>
-      <li>Ask rules: Claude Code asks before each way to start the prod job.</li>
+      <li>Ask rules: Claude Code asks before each way to start the <code>prod</code> job.</li>
     </ul>
-    <p class="muted">The deny rule and the CLAUDE.md line are a guard, not a wall.</p>
+    <p class="muted">The deny rule and the <code>CLAUDE.md</code> line are a guard, not a wall.</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="11-explain-settings"></pre>
@@ -667,9 +667,9 @@ CLI   start a manual job, connect with ssh</pre>
     <ul class="diff">
       <li>Add JSON output, test first</li>
       <li>Ship it through the pipeline</li>
-      <li>Find the cause of an outage on prod</li>
+      <li>Find the cause of an outage on `prod`</li>
       <li>Fix it for good</li>
-      <li>Update CLAUDE.md</li>
+      <li>Update `CLAUDE.md`</li>
     </ul>
   </div>
 </section>
@@ -697,8 +697,8 @@ CLI   start a manual job, connect with ssh</pre>
 <section class="slide">
   <div class="theory">
     <h2>The outage</h2>
-    <p>I kill the app on prod by hand: <code>kill -9</code>.</p>
-    <p>The browser shows that prod is down.</p>
+    <p>I kill the app on <code>prod</code> by hand: <code>kill -9</code>.</p>
+    <p>The browser shows that <code>prod</code> is down.</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="17-outage"></pre>
@@ -725,7 +725,7 @@ CLI   start a manual job, connect with ssh</pre>
       <li>Start clean</li>
       <li>Add a plugin</li>
       <li>Build the web UI</li>
-      <li>Update CLAUDE.md</li>
+      <li>Update `CLAUDE.md`</li>
       <li>Check it in the browser</li>
       <li>Ship it</li>
     </ul>
@@ -802,7 +802,7 @@ CLI   start a manual job, connect with ssh</pre>
 <section class="slide" data-cut="Cut point: the prod deploy">
   <div class="theory">
     <h2>Ship the UI</h2>
-    <p>Then check test and prod in the browser.</p>
+    <p>Then check <code>test</code> and <code>prod</code> in the browser.</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="21-ship-ui"></pre>

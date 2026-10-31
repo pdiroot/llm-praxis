@@ -1,4 +1,4 @@
-Add a GitLab pipeline on a new branch: build, deploy-test on a merge to main, then a manual deploy-prod. Both deploys go over SSH to "test.playground.localhost" and "prod.playground.localhost", user "deploy", systemd service "whoami".
+Add a GitLab pipeline on a new branch: "build", "deploy-test" on a merge to "main", then a manual "deploy-prod". Both deploys go over SSH to "test.playground.localhost" and "prod.playground.localhost", user "deploy", systemd service "whoami".
 
 The app should now also show the commit it was built from. The access log should go to "/var/log/whoami/access.log" and the PID file to "/run/whoami/whoami.pid".
 
