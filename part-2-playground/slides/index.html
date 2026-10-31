@@ -661,10 +661,11 @@ CLI   start a manual job, connect with ssh</pre>
   </div>
   <div class="term" data-title="iteration 3">
     <ul class="diff">
-      <li>Add JSON output, test first</li>
-      <li>Ship it through the pipeline</li>
+      <li>Plan JSON output, test first</li>
+      <li>Review and merge it yourself</li>
+      <li>Deploy to `test` and `prod`</li>
       <li>Find the cause of an outage on `prod`</li>
-      <li>Fix it for good</li>
+      <li>Plan the fix and ship it</li>
       <li>Update `CLAUDE.md`</li>
     </ul>
   </div>
@@ -677,16 +678,21 @@ CLI   start a manual job, connect with ssh</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="15-json-red-green"></pre>
+    <p class="note">Read the plan, then approve: Yes, and use auto mode</p>
   </div>
 </section>
 
 <section class="slide">
   <div class="theory">
     <h2>Ship the JSON</h2>
-    <p>The same flow as before. Nothing new to explain.</p>
+    <p>The same flow as iteration 2: you review and merge, Claude checks <code>test</code> and deploys.</p>
   </div>
   <div class="term">
-    <pre class="prompt" data-id="16-ship-json"></pre>
+    <pre class="prompt" data-id="16-open-mr"></pre>
+    <p class="note">Review and merge it in GitLab, then check test</p>
+    <pre class="prompt" data-id="12-check-test"></pre>
+    <p class="note">Test the app, then deploy</p>
+    <pre class="prompt" data-id="13-deploy-prod"></pre>
   </div>
 </section>
 
@@ -708,6 +714,13 @@ CLI   start a manual job, connect with ssh</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="18-fix-restart"></pre>
+    <p class="note">Read the plan, then approve: Yes, and use auto mode</p>
+    <pre class="prompt" data-id="16-open-mr"></pre>
+    <p class="note">Review and merge it in GitLab, then check test</p>
+    <pre class="prompt" data-id="12-check-test"></pre>
+    <p class="note">Test the app, then deploy</p>
+    <pre class="prompt" data-id="13-deploy-prod"></pre>
+    <p class="note">Then kill the app on `prod` again: it comes back</p>
   </div>
 </section>
 
@@ -720,10 +733,11 @@ CLI   start a manual job, connect with ssh</pre>
     <ul class="diff">
       <li>Start clean</li>
       <li>Add a plugin</li>
-      <li>Build the web UI</li>
+      <li>Plan and build the web UI</li>
       <li>Update `CLAUDE.md`</li>
       <li>Check it in the browser</li>
-      <li>Ship it</li>
+      <li>Review and merge it yourself</li>
+      <li>Deploy to `test` and `prod`</li>
     </ul>
   </div>
 </section>
@@ -780,6 +794,7 @@ CLI   start a manual job, connect with ssh</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="20-ui"></pre>
+    <p class="note">Read the plan, then approve: Yes, and use auto mode</p>
   </div>
 </section>
 
@@ -798,10 +813,16 @@ CLI   start a manual job, connect with ssh</pre>
 <section class="slide" data-cut="Cut point: the prod deploy">
   <div class="theory">
     <h2>Ship the UI</h2>
-    <p>Then check <code>test</code> and <code>prod</code> in the browser.</p>
+    <p>The same flow again. Then Claude checks <code>test</code> and <code>prod</code> in the browser.</p>
   </div>
   <div class="term">
-    <pre class="prompt" data-id="21-ship-ui"></pre>
+    <pre class="prompt" data-id="16-open-mr"></pre>
+    <p class="note">Review and merge it in GitLab, then check test</p>
+    <pre class="prompt" data-id="12-check-test"></pre>
+    <p class="note">Test the app, then deploy</p>
+    <pre class="prompt" data-id="13-deploy-prod"></pre>
+    <p class="note">Check both pages in the browser</p>
+    <pre class="prompt" data-id="21-check-ui"></pre>
   </div>
 </section>
 
