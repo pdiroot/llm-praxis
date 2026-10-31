@@ -63,7 +63,7 @@ whoami_project() {
   file_var demo%2Fwhoami SSH_KNOWN_HOSTS "$PG_RUNTIME/ssh/known_hosts_ci"
 }
 
-# The steps of sample_project. Each runs as demo, with $p set by sample_project.
+# The steps of hello_project. Each runs as demo, with $p set by hello_project.
 
 # seed_commits: push the commits of seed/commits.json to main.
 # The commit count on main resumes a run that stopped part way.
@@ -77,23 +77,24 @@ seed_commits() {
   for ((i = have; i < n; i++)); do
     msg=$(jq -r ".[$i].message" "$seed/commits.json")
     mapfile -t files < <(jq -r ".[$i].files[]" "$seed/commits.json")
-    push_dir "$p" main "$msg" "$seed/sample-service" "${files[@]}"
+    push_dir "$p" main "$msg" "$seed/hello-world" "${files[@]}"
   done
 }
 
-# seed_branch: push the branch of the merge request from its overlay folder.
+# mr_field <index> <key>: one field of a merge request of seed/issues.json.
+mr_field() { jq -r ".merge_requests[$1].$2 // empty" "$seed/issues.json"; }
+
+# seed_branch <index>: push the branch of a merge request from its overlay folder.
 # shellcheck disable=SC2154
 seed_branch() {
-  local overlay branch msg files
+  local overlay branch files
 
-  overlay=$seed/$(jq -r .merge_request.overlay "$seed/issues.json")
-  branch=$(jq -r .merge_request.source_branch "$seed/issues.json")
+  overlay=$seed/$(mr_field "$1" overlay)
+  branch=$(mr_field "$1" source_branch)
   api GET "/projects/$p/repository/branches/$(uri "$branch")" >/dev/null 2>&1 && return 0
 
   mapfile -t files < <(cd "$overlay" && ls)
-  msg=$(jq -r .merge_request.commit_message "$seed/issues.json")
-  # The overlay holds files of the main branch; they are updates there.
-  START=main push_dir "$p" "$branch" "$msg" "$overlay" "${files[@]}"
+  START=main push_dir "$p" "$branch" "$(mr_field "$1" commit_message)" "$overlay" "${files[@]}"
 }
 
 # seed_issues: create each issue of seed/issues.json unless its title exists.
@@ -114,29 +115,69 @@ seed_issues() {
   done
 }
 
-# seed_merge_request: open the merge request unless one exists for its branch.
+# merge_when_ready <iid>: merge, and retry while GitLab checks the merge request.
 # shellcheck disable=SC2154
-seed_merge_request() {
-  local branch mrs
+merge_when_ready() {
+  local i
 
-  branch=$(jq -r .merge_request.source_branch "$seed/issues.json")
-  mrs=$(api GET "/projects/$p/merge_requests?source_branch=$(uri "$branch")" | jq length)
-  [[ $mrs -eq 0 ]] || return 0
-
-  api POST "/projects/$p/merge_requests" -d "source_branch=$branch" -d target_branch=main \
-    --data-urlencode "title=$(jq -r .merge_request.title "$seed/issues.json")" \
-    --data-urlencode "description=$(jq -r .merge_request.description "$seed/issues.json")" >/dev/null
+  for ((i = 0; i < 30; i++)); do
+    api PUT "/projects/$p/merge_requests/$1/merge" >/dev/null 2>&1 && return 0
+    sleep 1
+  done
+  die "merge request $1 did not merge"
 }
 
-sample_project() {
-  local p=demo%2Fsample-service
-  project sample-service
+# settle_merge_request <iid> <state>: bring a merge request to its state.
+# shellcheck disable=SC2154
+settle_merge_request() {
+  [[ $(api GET "/projects/$p/merge_requests/$1" | jq -r .state) == "$2" ]] && return 0
+
+  case $2 in
+  merged) merge_when_ready "$1" ;;
+  closed) api PUT "/projects/$p/merge_requests/$1" -d state_event=close >/dev/null ;;
+  esac
+}
+
+# seed_merge_request <index>: open a merge request unless one exists for its
+# branch, add its note, and bring it to its state.
+# shellcheck disable=SC2154
+seed_merge_request() {
+  local branch note iid
+
+  branch=$(mr_field "$1" source_branch)
+  note=$(mr_field "$1" note)
+  iid=$(api GET "/projects/$p/merge_requests?source_branch=$(uri "$branch")" | jq -r '.[0].iid // empty')
+
+  if [[ -z $iid ]]; then
+    iid=$(api POST "/projects/$p/merge_requests" -d "source_branch=$branch" -d target_branch=main \
+      --data-urlencode "title=$(mr_field "$1" title)" \
+      --data-urlencode "description=$(mr_field "$1" description)" | jq -r .iid)
+    [[ -z $note ]] || api POST "/projects/$p/merge_requests/$iid/notes" \
+      --data-urlencode "body=$note" >/dev/null
+  fi
+
+  settle_merge_request "$iid" "$(mr_field "$1" state)"
+}
+
+# seed_merge_requests: one merged, one closed and one open, in the order of the file.
+seed_merge_requests() {
+  local n i
+
+  n=$(jq '.merge_requests | length' "$seed/issues.json")
+  for ((i = 0; i < n; i++)); do
+    seed_branch "$i"
+    seed_merge_request "$i"
+  done
+}
+
+hello_project() {
+  local p=demo%2Fhello-world
+  project hello-world
 
   export API_SUDO=demo
   seed_commits
-  seed_branch
   seed_issues
-  seed_merge_request
+  seed_merge_requests
   unset API_SUDO
 }
 
@@ -171,8 +212,8 @@ log "user demo: check"
 demo_user
 log "project demo/whoami: check"
 whoami_project
-log "project demo/sample-service: commits, issues and merge request"
-sample_project
+log "project demo/hello-world: commits, issue and merge requests"
+hello_project
 log "runner: check"
 runner
 log "bootstrap done"

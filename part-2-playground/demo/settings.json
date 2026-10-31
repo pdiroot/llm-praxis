@@ -37,8 +37,8 @@
   "autoMode": {
     "environment": [
       "$defaults",
-      "Source control: the local GitLab at gitlab.playground.localhost (gitlab.playground.internal inside the containers), a training playground on this Mac, with the projects demo/whoami and demo/sample-service",
-      "Trusted internal domains: *.playground.localhost and *.playground.internal are local training containers on this Mac. test and prod are Debian containers that act as the team's test and production servers. SSH to them, deploys to them and merges in demo/whoami and demo/sample-service are the purpose of the training"
+      "Source control: the local GitLab at gitlab.playground.localhost (gitlab.playground.internal inside the containers), a training playground on this Mac, with the projects demo/whoami and demo/hello-world",
+      "Trusted internal domains: *.playground.localhost and *.playground.internal are local training containers on this Mac. test and prod are Debian containers that act as the team's test and production servers. SSH to them, deploys to them and merges in demo/whoami and demo/hello-world are the purpose of the training"
     ]
   }
 }

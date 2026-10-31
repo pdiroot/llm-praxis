@@ -1,0 +1,3 @@
+Use the GitLab MCP server to answer these questions about "demo/hello-world" on "https://gitlab.playground.localhost". Which merge requests are merged, closed and still open? Why was the closed one closed? What does the open one change, and is it ready?
+
+This is read only, so change nothing. Name the tool behind each answer.

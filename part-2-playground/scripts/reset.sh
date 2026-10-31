@@ -7,12 +7,12 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 cd "$PG_ROOT"
-projects=(demo/whoami demo/sample-service)
+projects=(demo/whoami demo/hello-world)
 
 demo_profile() {
   demo_logout
   demo_home_check
-  rm -rf "$PG_DEMO_HOME/claude-config" "$PG_DEMO_HOME/whoami" "$PG_DEMO_HOME/sample-service"
+  rm -rf "$PG_DEMO_HOME/claude-config" "$PG_DEMO_HOME/whoami" "$PG_DEMO_HOME/hello-world"
 }
 
 revoke_tokens() {
