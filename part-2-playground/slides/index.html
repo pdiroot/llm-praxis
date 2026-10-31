@@ -532,6 +532,21 @@ CLI   start a manual job, connect with ssh</pre>
 
 <section class="slide">
   <div class="theory">
+    <h2>The token goes into .env</h2>
+    <ul>
+      <li>You <a href="https://gitlab.playground.localhost/-/user_settings/personal_access_tokens?name=claude&amp;scopes=api" target="_blank" rel="noopener">make the token in GitLab</a>: the <code>api</code> scope, one day.</li>
+      <li>You put it into <code>.env</code>. Git ignores that file.</li>
+      <li>Claude never sees the value in the chat.</li>
+    </ul>
+    <p class="muted">The deny rule and the CLAUDE.md line are a guard, not a wall.</p>
+  </div>
+  <div class="term" data-title="shell: copy the token first">
+    <pre class="cmd" data-sh>(umask 077; printf 'GITLAB_TOKEN=%s\nGITLAB_HOST=gitlab.playground.localhost\n' "$(pbpaste)" > ~/llm-praxis-demo/whoami/.env)</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
     <h2>The settings, explained</h2>
     <ul>
       <li>A hook loads <code>.env</code> before each command.</li>
@@ -541,21 +556,6 @@ CLI   start a manual job, connect with ssh</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="11-explain-settings"></pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>The token goes into .env</h2>
-    <ul>
-      <li>You make the token in GitLab: the <code>api</code> scope, one day.</li>
-      <li>You put it into <code>.env</code>. Git ignores that file.</li>
-      <li>Claude never sees the value in the chat.</li>
-    </ul>
-    <p class="muted">The deny rule and the CLAUDE.md line are a guard, not a wall.</p>
-  </div>
-  <div class="term" data-title="shell: copy the token first">
-    <pre class="cmd" data-sh>(umask 077; printf 'GITLAB_TOKEN=%s\nGITLAB_HOST=gitlab.playground.localhost\n' "$(pbpaste)" > ~/llm-praxis-demo/whoami/.env)</pre>
   </div>
 </section>
 
