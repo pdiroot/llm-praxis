@@ -538,7 +538,6 @@ CLI   start a manual job, connect with ssh</pre>
       <li>You put it into <code>.env</code>. Git ignores that file.</li>
       <li>Claude never sees the value in the chat.</li>
     </ul>
-    <p class="muted">The deny rule and the CLAUDE.md line are a guard, not a wall.</p>
   </div>
   <div class="term" data-title="shell: copy the token first">
     <pre class="cmd" data-sh>(umask 077; printf 'GITLAB_TOKEN=%s\nGITLAB_HOST=gitlab.playground.localhost\n' "$(pbpaste)" > ~/llm-praxis-demo/whoami/.env)</pre>
@@ -553,6 +552,7 @@ CLI   start a manual job, connect with ssh</pre>
       <li>A deny rule: Claude cannot read <code>.env</code>.</li>
       <li>Ask rules: Claude Code asks before each way to start the prod job.</li>
     </ul>
+    <p class="muted">The deny rule and the CLAUDE.md line are a guard, not a wall.</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="11-explain-settings"></pre>
