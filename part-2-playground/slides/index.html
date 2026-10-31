@@ -240,7 +240,7 @@ Status line      model and context at a glance</pre>
   <div class="theory">
     <h2>Four ways to start</h2>
     <p>Start Claude Code inside the folder it should work on.</p>
-    <p class="muted">On this stage, <code>task claude:start</code> does this with an empty profile, so you see no personal setup.</p>
+    <p>For this playground we start an isolated session: it has its own empty profile and loads none of your personal setup.</p>
   </div>
   <div class="term" data-title="zsh: your project">
     <p class="note">A new session</p>
@@ -251,6 +251,8 @@ Status line      model and context at a glance</pre>
     <pre class="cmd" data-sh>claude -r</pre>
     <p class="note">One answer for a script</p>
     <pre class="cmd" data-sh>claude -p "Explain this repository in three lines"</pre>
+    <p class="note">This playground: an isolated session</p>
+    <pre class="cmd" data-sh>task claude:start</pre>
   </div>
 </section>
 
