@@ -208,12 +208,16 @@ fail_job() {
 # wait_job <pipeline> <name> <status>
 # shellcheck disable=SC2154
 wait_job() {
-  local deadline=$((SECONDS + ${timeout_s:-600})) got
+  local start=$SECONDS deadline=$((SECONDS + ${timeout_s:-600})) got next=$((SECONDS + 30))
 
   while ((SECONDS < deadline)); do
     got=$(job_status "$1" "$2")
     [[ $got == "$3" ]] && return 0
     [[ $got == failed || $got == canceled ]] && fail_job "$1" "$2"
+    if ((SECONDS >= next)); then
+      log "job $2 is '$got' after $((SECONDS - start)) s"
+      next=$((SECONDS + 30))
+    fi
     sleep 3
   done
 
