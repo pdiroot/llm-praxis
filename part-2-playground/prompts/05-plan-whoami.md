@@ -1,1 +1,1 @@
-/plan The first version of the app. It answers each request in plain text with the host name, the IP addresses and the request headers, and it writes an access log to a file. We build it and try it locally with `curl`.
+/plan The first version of the app. It answers each request in plain text with the host name, the IP addresses and the request headers, and it writes an access log to a file. In this iteration we check it locally with `curl`, so no deployment and no pipeline yet.
