@@ -2,4 +2,4 @@ Fix the findings of the reviews that you agree with, and tell me why you reject 
 
 Write the decision about the access log into CLAUDE.md in at most 3 lines, so the next session keeps it.
 
-When the checks pass, commit to the main branch and push.
+When the checks pass, commit, merge "feat/whoami" into main and push main.
