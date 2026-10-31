@@ -179,7 +179,7 @@ MCP             a way to connect outside
     <p>Any AI harness can help you with these changes.</p>
     <p class="muted">The first start takes a few minutes. <code>playground:stop</code> keeps the data, and <code>playground:start</code> resumes it.</p>
   </div>
-  <div class="term" data-title="zsh">
+  <div class="term" data-title="shell">
     <p class="note">Get the playground</p>
     <pre class="cmd" data-sh>git clone git@github.com:pdiroot/llm-praxis.git</pre>
     <pre class="cmd" data-sh>cd llm-praxis/part-2-playground</pre>
@@ -226,7 +226,7 @@ Status line      model and context at a glance</pre>
     <p>The native install updates itself. A Homebrew install does not.</p>
     <p class="muted">The first start asks you to log in in the browser.</p>
   </div>
-  <div class="term" data-title="zsh">
+  <div class="term" data-title="shell">
     <p class="note">macOS, Linux, WSL</p>
     <pre class="cmd" data-sh>curl -fsSL https://claude.ai/install.sh | bash</pre>
     <p class="note">Or with Homebrew</p>
@@ -242,7 +242,7 @@ Status line      model and context at a glance</pre>
     <p>Start Claude Code inside the folder it should work on.</p>
     <p>For this playground we start an isolated session: it has its own empty profile and loads none of your personal setup.</p>
   </div>
-  <div class="term" data-title="zsh: your project">
+  <div class="term" data-title="shell: your project">
     <p class="note">A new session</p>
     <pre class="cmd" data-sh>claude</pre>
     <p class="note">Continue the last conversation</p>
@@ -451,7 +451,7 @@ Status line      model and context at a glance</pre>
     <p>Claude Code asks you to approve a project server at startup.</p>
     <p>A server added now loads after a restart. The chat and the context stay.</p>
   </div>
-  <div class="term" data-title="zsh, then claude">
+  <div class="term" data-title="shell, then claude">
     <p class="note">Exit Claude Code, then restart the demo profile</p>
     <pre class="cmd" data-sh>task claude:continue</pre>
     <p class="note">Approve the server, then log in in the browser</p>
@@ -525,7 +525,7 @@ Status line      model and context at a glance</pre>
     <p><strong>CLI:</strong> all that a terminal can do, with your credentials. Good for <code>glab</code> and <code>ssh</code>.</p>
     <p class="muted">The MCP server cannot start a manual job. <code>glab</code> can.</p>
   </div>
-  <div class="term" data-title="zsh">
+  <div class="term" data-title="shell">
 <pre class="out">MCP   open a merge request, read an issue
 CLI   start a manual job, connect with ssh</pre>
   </div>
@@ -555,7 +555,7 @@ CLI   start a manual job, connect with ssh</pre>
     </ul>
     <p class="muted">The deny rule and the CLAUDE.md line are a guard, not a wall.</p>
   </div>
-  <div class="term" data-title="zsh: copy the token first">
+  <div class="term" data-title="shell: copy the token first">
     <pre class="cmd" data-sh>(umask 077; printf 'GITLAB_TOKEN=%s\nGITLAB_HOST=gitlab.playground.localhost\n' "$(pbpaste)" > ~/llm-praxis-demo/whoami/.env)</pre>
   </div>
 </section>
