@@ -569,15 +569,14 @@ your own API    a small CLI that Claude writes</pre>
 
 <section class="slide">
   <div class="theory">
-    <h2>Iteration 3: JSON and the deployment</h2>
-    <p>We add a feature with tests first, then the two last pipeline stages.</p>
+    <h2>Iteration 3: the deployment</h2>
+    <p>We add the two last pipeline stages.</p>
     <p>This change goes to servers, so it gets a merge request, and you merge it.</p>
     <p><a href="https://gitlab.playground.localhost/demo/whoami/-/merge_requests" target="_blank" rel="noopener">Open the merge requests</a></p>
   </div>
   <div class="term" data-title="iteration 3">
     <ul class="diff">
       <li>Update `CLAUDE.md`</li>
-      <li>Add JSON output, test first</li>
       <li>Plan the deployment</li>
       <li>Review and merge it yourself</li>
       <li>Deploy to `test` and `prod`</li>
@@ -597,16 +596,6 @@ your own API    a small CLI that Claude writes</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="07-update-claude-md"></pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>JSON: red, then green</h2>
-    <p>The test fails first. Then the code makes it pass.</p>
-  </div>
-  <div class="term">
-    <pre class="prompt" data-id="15-json-red-green"></pre>
   </div>
 </section>
 
@@ -712,7 +701,6 @@ your own API    a small CLI that Claude writes</pre>
   <div class="term" data-title="plan to production">
 <pre class="out">plan                  iteration 1
 change the plan       iteration 1
-tests first           iteration 3
 build                 iteration 1
 /code-review          iteration 1
 /security-review      iteration 1

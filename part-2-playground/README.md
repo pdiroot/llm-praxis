@@ -11,8 +11,8 @@ the right the prompts and commands to copy.
 |-----------|--------|--------|-----------|
 | 1 | 13 to 22 | The app runs locally, and a pipeline tests and builds it | `CLAUDE.md`, permission modes, plan mode, reviews, `/voice`, the context window |
 | 2 | 23 to 28 | Claude reads GitLab | Claude in Chrome, MCP, `glab`, computer use |
-| 3 | 29 to 34 | The app has JSON and runs on `test` and `prod` | Tests first, a merge request, a deployment pipeline |
-| 4 | 35 to 37 | An outage on `prod` is found and fixed | Troubleshooting with Claude Code |
+| 3 | 29 to 33 | The app runs on `test` and `prod` | A merge request, a deployment pipeline |
+| 4 | 34 to 36 | An outage on `prod` is found and fixed | Troubleshooting with Claude Code |
 
 The live talk takes 45 minutes. Alone, plan for two hours.
 
@@ -165,7 +165,7 @@ rm -rf ~/.config/playgrounds/tls
 | The network does not start, or a VPN breaks | Turn off the VPN. It can use `172.30.42.0/24` |
 | GitLab does not answer | Run `task playground:status`, then `docker compose logs gitlab`. Check the memory of Docker Desktop |
 | The browser does not trust a page | Run `task playground:start` again, and let macOS trust the root CA |
-| Auto mode blocks a step | Read the reason. Slide 34 has a second prompt that states your intent |
+| Auto mode blocks a step | Read the reason. Slide 33 has a second prompt that states your intent |
 | `/chrome` says "Not enabled" | Exit Claude Code and run `task claude:start`. A new profile needs one restart, then a confirmation |
 | A dialog recommends an LSP plugin | Press `Esc`. The session does not need the plugin |
 | Claude repeats a command and does not stop | Press `Esc` and ask for one check with `glab` |
