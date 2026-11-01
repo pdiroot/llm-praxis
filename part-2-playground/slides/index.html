@@ -139,17 +139,17 @@ MCP             a way to connect outside
       <li><strong>GitLab Runner</strong> runs each job in Docker-in-Docker.</li>
       <li><strong><code>test</code></strong> and <strong><code>prod</code></strong> are the two servers.</li>
     </ul>
-    <p class="muted">Each box is a container in one Docker Compose project.</p>
+    <p class="muted">Each name is a container in one Docker Compose project. SSH skips Traefik.</p>
   </div>
   <div class="term" data-title="Docker Compose">
 <pre class="out">┌─ your computer ─────────────────────────┐
 │  browser, Claude Code, git, ssh         │
-└───┬───────────────────────────┬─────────┘
-    │ HTTPS                     │ SSH
-┌───▼─ Docker Compose ──────────┼─────────┐
-│  Traefik: HTTP load balancer  │         │
-│    │          │         │     │         │
-│    ▼          ▼         ▼     ▼         │
+└───┬─────────────────────────────────────┘
+    │ HTTPS
+┌───▼─ Docker Compose ────────────────────┐
+│  Traefik: HTTP load balancer            │
+│    │          │         │               │
+│    ▼          ▼         ▼               │
 │  GitLab      test      prod             │
 │    │          ▲         ▲               │
 │    ▼          │ deploy  │ over SSH      │
@@ -201,8 +201,8 @@ deploy-prod   manual: a person starts it</pre>
       <tr><td><a href="https://gitlab.playground.localhost/admin/runners" target="_blank" rel="noopener">Runner</a></td><td>one runner, online</td></tr>
       <tr><td><a href="https://gitlab.playground.localhost/demo/hello-world/-/merge_requests" target="_blank" rel="noopener">hello-world</a></td><td>a sample project with merge requests</td></tr>
       <tr><td><a href="https://gitlab.playground.localhost/demo/whoami" target="_blank" rel="noopener">whoami</a></td><td>empty: we build this today</td></tr>
-      <tr><td><a href="https://test.playground.localhost" target="_blank" rel="noopener">test</a></td><td>STATUS: nothing is deployed</td></tr>
-      <tr><td><a href="https://prod.playground.localhost" target="_blank" rel="noopener">prod</a></td><td>STATUS: nothing is deployed</td></tr>
+      <tr><td><a href="https://test.playground.localhost" target="_blank" rel="noopener">test</a></td><td>502 Bad Gateway: no app runs here yet</td></tr>
+      <tr><td><a href="https://prod.playground.localhost" target="_blank" rel="noopener">prod</a></td><td>502 Bad Gateway: no app runs here yet</td></tr>
     </table>
   </div>
 </section>
