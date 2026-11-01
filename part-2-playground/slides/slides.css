@@ -50,11 +50,8 @@ code, kbd { font-family: var(--mono); font-size: .8em; }
   margin: 3vh 3vh 3vh 0; min-height: 0; display: flex; flex-direction: column;
   background: var(--pine); color: var(--mist); border-radius: 12px;
   border: 1px solid var(--pine-line); overflow: hidden;
-  font: clamp(13px, 2.15vh, 25px)/1.45 var(--mono);
+  font: clamp(13px, 2.3vh, 27px)/1.45 var(--mono);
 }
-
-/* A slide with no long prompt has room for text that reads from the back row. */
-.term:not(:has(.prompt)) { font-size: clamp(15px, 2.7vh, 31px); }
 
 .term-bar {
   flex: none; display: flex; align-items: center; gap: .45em;
@@ -128,7 +125,6 @@ kbd {
 
 /* The title slide gives the terminal more room. */
 .slide.opening { grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); }
-.opening .term { font-size: clamp(16px, 2.9vh, 34px); }
 
 /* The strip under the theory pane. */
 nav {
