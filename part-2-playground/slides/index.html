@@ -280,7 +280,7 @@ deploy-prod   manual: a person starts it</pre>
   <div class="term">
     <pre class="prompt" data-id="02-statusline"></pre>
     <p class="note">The result looks like this</p>
-<pre class="out">Opus | high | $0.42 | context 18%</pre>
+<pre class="out">Opus 5.5 | medium | $1.21 | 14% context</pre>
   </div>
 </section>
 
@@ -318,7 +318,7 @@ deploy-prod   manual: a person starts it</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="03-init"></pre>
-    <p class="note">You push: the `!` runs a command yourself, not Claude</p>
+    <p class="note">You push: the `!` runs a command yourself, and Claude reads the result</p>
     <pre class="cmd">! git push -u origin main</pre>
   </div>
 </section>
@@ -333,6 +333,9 @@ deploy-prod   manual: a person starts it</pre>
   </div>
   <div class="term" data-title="permission modes">
 <pre class="out">Manual   asks you before actions
+
+Accept   edits files with no question,
+edits    asks before commands
 
 Plan     reads and plans,
          changes no source file
@@ -371,9 +374,9 @@ Auto     no routine questions;
     <pre class="cmd">/diff</pre>
     <p class="note">`/security-review` reads commits, so commit on the branch first</p>
     <pre class="prompt" data-id="06-commit-branch"></pre>
-    <p class="note">Review the change for bugs</p>
+    <p class="note">Review the change for bugs, and wait for the summary: about 3 minutes</p>
     <pre class="cmd">/code-review</pre>
-    <p class="note">Review the change for security problems</p>
+    <p class="note">Review the change for security problems: about 1 minute</p>
     <pre class="cmd">/security-review</pre>
   </div>
 </section>
@@ -464,6 +467,8 @@ Auto     no routine questions;
   <div class="term">
     <p class="note">Check the connection</p>
     <pre class="cmd">/chrome</pre>
+    <p class="note">On a new profile it says "Not enabled": exit Claude Code and restart it</p>
+    <pre class="cmd" data-sh>task claude:continue</pre>
     <p class="note">Ask</p>
     <pre class="prompt" data-id="08-chrome"></pre>
   </div>
@@ -481,7 +486,7 @@ Auto     no routine questions;
     <pre class="cmd">! claude mcp add --scope project --transport http GitLab https://gitlab.playground.localhost/api/v4/mcp</pre>
     <p class="note">Exit Claude Code, then restart it in the shell</p>
     <pre class="cmd" data-sh>task claude:continue</pre>
-    <p class="note">Use the new server (the first option), then log in in the browser</p>
+    <p class="note">Choose "Use this MCP server": the default skips it. Then choose GitLab, Authenticate, and approve in the browser. GitLab calls Claude Code an unverified app</p>
     <pre class="cmd">/mcp</pre>
     <p class="note">Ask</p>
     <pre class="prompt" data-id="09-mcp"></pre>
@@ -518,14 +523,14 @@ Auto     no routine questions;
   <div class="term" data-title="four ways to connect">
 <pre class="out">          reach         tokens      time
 
-CLI       most of       5k          10 s
+CLI       most of       11k         15 s
           the API
 
-MCP       what the      8k, plus    15 s
+MCP       what the      11k, plus   15 s
           server has    3k tools
 
-Browser   what the      20k         60 s
-          page shows
+Browser   what the      20k, plus   60 s
+          page shows    3k tools
 
 Computer  any app       the most    the longest
 use
@@ -620,6 +625,7 @@ your own API    a small CLI that Claude writes</pre>
   <div class="term">
     <pre class="prompt" data-id="12-pipeline"></pre>
     <p class="note">Read the plan, then approve: Yes, and use auto mode</p>
+    <p class="note">If Claude asks about a shell script, read it and choose Yes</p>
   </div>
 </section>
 
@@ -729,7 +735,7 @@ troubleshoot          iteration 4</pre>
   <div class="theory">
     <h2>Recap</h2>
     <ul>
-      <li><code>CLAUDE.md</code> grew by a few lines, each with a reason.</li>
+      <li><code>CLAUDE.md</code> grew with the project.</li>
       <li>Plan, build, review, merge, deploy.</li>
       <li>Connect a service: CLI, MCP, the browser, computer use.</li>
       <li>The token stays out of the chat.</li>
@@ -846,7 +852,7 @@ The next session starts with all of it.</pre>
       <li>Long explanations</li>
       <li>What Claude can read from the code</li>
     </ul>
-    <p class="muted">At most about 15 lines.</p>
+    <p class="muted">Keep it short: Claude reads it in each session.</p>
   </div>
   <div class="term" data-title="CLAUDE.md">
 <pre class="out"># Commands Claude cannot guess

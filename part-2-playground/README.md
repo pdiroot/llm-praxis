@@ -166,6 +166,7 @@ rm -rf ~/.config/playgrounds/tls
 | GitLab does not answer | Run `task playground:status`, then `docker compose logs gitlab`. Check the memory of Docker Desktop |
 | The browser does not trust a page | Run `task playground:start` again, and let macOS trust the root CA |
 | Auto mode blocks a step | Read the reason. Slide 34 has a second prompt that states your intent |
+| `/chrome` says "Not enabled" | Exit Claude Code and run `task claude:continue`. A new profile needs one restart, then a confirmation |
 | A dialog recommends an LSP plugin | Press `Esc`. The session does not need the plugin |
 | Claude repeats a command and does not stop | Press `Esc` and ask for one check with `glab` |
 | A session goes wrong | Run `task playground:reset`, then start again from iteration 1 |

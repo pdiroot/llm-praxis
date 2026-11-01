@@ -46,7 +46,7 @@ STUB
   [ "${lines[2]}" = "$PG_RUNTIME/tls/ca.crt" ]
   [ "${lines[3]}" = nano ]
   [[ ${lines[4]} == */demo/whoami ]]
-  [ "${lines[5]}" = "--chrome --resume" ]
+  [ "${lines[5]}" = "--add-dir $PG_DEMO_HOME/ssh --chrome --resume" ]
 }
 
 @test "the demo settings keep the account's plugins, skills and connectors out" {

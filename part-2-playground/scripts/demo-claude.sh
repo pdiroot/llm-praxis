@@ -38,4 +38,4 @@ cd "$clone"
 # Forget the outer direnv state: direnv exec would revert the exports above.
 unset DIRENV_DIFF DIRENV_DIR DIRENV_FILE DIRENV_WATCHES
 export DIRENV_LOG_FORMAT=""
-exec direnv exec . claude --chrome "$@"
+exec direnv exec . claude --add-dir "$PG_DEMO_HOME/ssh" --chrome "$@"
