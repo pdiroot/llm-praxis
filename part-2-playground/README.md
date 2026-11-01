@@ -4,17 +4,21 @@ This playground is a small company on your Mac: a GitLab, a runner, an HTTPS
 proxy and two servers, `test` and `prod`. You use Claude Code to build a small
 web app, `whoami`, and to ship it through a pipeline to production.
 
-The deck "Claude Code 101" is your guide. It has the theory on the left, and on
+The deck "Claude Code 101 and 102" is your guide. It has the theory on the left, and on
 the right the prompts and commands to copy.
 
-| Iteration | Slides | Result | You learn |
-|-----------|--------|--------|-----------|
-| 1 | 13 to 22 | The app runs locally, and a pipeline tests and builds it | `CLAUDE.md`, permission modes, plan mode, reviews, `/voice`, the context window |
-| 2 | 23 to 29 | Claude reads GitLab | Claude in Chrome, MCP, `glab`, computer use |
-| 3 | 30 to 33 | The app runs on `test` and `prod` | A merge request, a deployment pipeline |
-| 4 | 34 to 36 | An outage on `prod` is found and fixed | Troubleshooting with Claude Code |
+| Session | Iteration | Slides | Result | You learn |
+|---------|-----------|--------|--------|-----------|
+| 101 | 1 | 13 to 22 | The app runs locally, and a pipeline tests and builds it | `CLAUDE.md`, permission modes, plan mode, reviews, `/voice`, the context window |
+| 101 | 2 | 23 to 29 | Claude reads GitLab | Claude in Chrome, MCP, `glab`, computer use |
+| 102 | 3 | 32 to 35 | The app runs on `test` and `prod` | A merge request, a deployment pipeline |
+| 102 | 4 | 36 to 38 | An outage on `prod` is found and fixed | Troubleshooting with Claude Code |
 
-The live talk takes 45 minutes. Alone, plan for two hours.
+Claude Code 101 is slides 1 to 30, a live session of 45 minutes with time for
+questions. Claude Code 102 starts at slide 31 and takes approximately 20
+minutes. It continues in the same playground, so run
+`task playground:stop` between the sessions, not `reset` or `terminate`.
+Alone, plan for two hours.
 
 ## What you need
 
@@ -123,6 +127,8 @@ Iteration 2 needs a token for `glab`, on slide 26.
 
 6. Exit Claude Code and run `task claude:start`.
 
+The token expires, so Claude Code 102 can need a new one. Slide 31 shows how.
+
 Never put the token in a prompt or a commit. The demo session starts through
 `direnv exec`, so it reads `.env` at each start. A token that you save later
 needs a restart. In your own projects, add the `direnv` hook to your shell and
@@ -165,7 +171,7 @@ rm -rf ~/.config/playgrounds/tls
 | The network does not start, or a VPN breaks | Turn off the VPN. It can use `172.30.42.0/24` |
 | GitLab does not answer | Run `task playground:status`, then `docker compose logs gitlab`. Check the memory of Docker Desktop |
 | The browser does not trust a page | Run `task playground:start` again, and let macOS trust the root CA |
-| Auto mode blocks a step | Read the reason. Slide 33 has a second prompt that states your intent |
+| Auto mode blocks a step | Read the reason. Slide 35 has a second prompt that states your intent |
 | `/chrome` says "Not enabled" | Exit Claude Code and run `task claude:start`. A new profile needs one restart, then a confirmation |
 | A dialog recommends an LSP plugin | Press `Esc`. The session does not need the plugin |
 | Claude repeats a command and does not stop | Press `Esc` and ask for one check with `glab` |
