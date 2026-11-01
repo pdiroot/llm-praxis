@@ -10,8 +10,8 @@ the right the prompts and commands to copy.
 | Iteration | Slides | Result | You learn |
 |-----------|--------|--------|-----------|
 | 1 | 13 to 22 | The app runs locally, and a pipeline tests and builds it | `CLAUDE.md`, permission modes, plan mode, reviews, `/voice`, the context window |
-| 2 | 23 to 28 | Claude reads GitLab | Claude in Chrome, MCP, `glab`, computer use |
-| 3 | 29 to 33 | The app runs on `test` and `prod` | A merge request, a deployment pipeline |
+| 2 | 23 to 29 | Claude reads GitLab | Claude in Chrome, MCP, `glab`, computer use |
+| 3 | 30 to 33 | The app runs on `test` and `prod` | A merge request, a deployment pipeline |
 | 4 | 34 to 36 | An outage on `prod` is found and fixed | Troubleshooting with Claude Code |
 
 The live talk takes 45 minutes. Alone, plan for two hours.

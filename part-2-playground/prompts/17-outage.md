@@ -1,1 +1,1 @@
-The app on "prod" is down. Find out what happened from the unit status, the journal and the access log. Do not restart or edit anything yet. Report the cause, the evidence and what would stop this from happening again.
+The app on "prod" is down. Connect with `ssh -F ../ssh/config prod.playground.localhost`. Find out what happened from the unit status, the journal and the access log. Do not restart or edit anything yet. Report the cause, the evidence and what would stop this from happening again.

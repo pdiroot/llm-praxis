@@ -465,6 +465,7 @@ Auto     no routine questions;
       <li>MCP: the GitLab server</li>
       <li>The CLI: `glab`</li>
       <li>Compare the three, and a fourth way</li>
+      <li>Write the choice in `CLAUDE.md`</li>
     </ul>
     <hr class="term-rule">
     <ul class="diff skip">
@@ -569,6 +570,17 @@ your own API    a small CLI that Claude writes</pre>
 
 <section class="slide">
   <div class="theory">
+    <h2>Update CLAUDE.md</h2>
+    <p>We compared the ways, so we write down what we chose.</p>
+    <p>Each new conversation then knows which tool to use, and that the token stays out of git.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="07-update-claude-md"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
     <h2>Iteration 3: the deployment</h2>
     <p>We add the two last pipeline stages.</p>
     <p>This change goes to servers, so it gets a merge request, and you merge it.</p>
@@ -576,7 +588,6 @@ your own API    a small CLI that Claude writes</pre>
   </div>
   <div class="term" data-title="iteration 3">
     <ul class="diff">
-      <li>Update `CLAUDE.md`</li>
       <li>Plan the deployment</li>
       <li>Review and merge it yourself</li>
       <li>Deploy to `test` and `prod`</li>
@@ -586,16 +597,6 @@ your own API    a small CLI that Claude writes</pre>
       <li>`/code-review` and `/security-review`, for time</li>
       <li>A test by hand: the deploy jobs check the app</li>
     </ul>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>Update CLAUDE.md</h2>
-    <p>New work needs new notes, so they go in first. The server details live here, and the plan stays short.</p>
-  </div>
-  <div class="term">
-    <pre class="prompt" data-id="07-update-claude-md"></pre>
   </div>
 </section>
 

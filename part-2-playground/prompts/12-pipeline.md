@@ -1,5 +1,5 @@
-/plan Add the deployment to ".gitlab-ci.yml" on the new branch "feat/deploy": "deploy-test" on a merge to "main", then a manual "deploy-prod". "CLAUDE.md" has the server details.
+/plan Add the deployment to ".gitlab-ci.yml" on the new branch "feat/deploy": "deploy-test" on a merge to "main", then a manual "deploy-prod". Use SSH as "deploy@test-ssh" and "deploy@prod-ssh", with CI variables "SSH_PRIVATE_KEY" and "SSH_KNOWN_HOSTS".
 
-The app should show its commit. Each deploy ships the binary and a minimal systemd unit with no restart policy, then checks that commit with `curl` on the server.
+The app shows its commit and listens on port 80. Ship it as the service "whoami" with no restart policy, then `curl` the commit there.
 
-Push the branch without asking me, open a merge request and give me the link.
+Push without asking, open a merge request and give me the link.
