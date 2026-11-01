@@ -20,6 +20,9 @@ export ENABLE_CLAUDEAI_MCP_SERVERS=false
 export NODE_EXTRA_CA_CERTS="$PG_RUNTIME/tls/ca.crt"
 export EDITOR=nano
 export GITLAB_HOST=gitlab.playground.localhost
+# Keep the survey and the grey suggestions off the projector.
+export CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY=1
+export CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false
 
 demo_ssh_config
 hits=$(isolation_scan "$clone") || die "Claude Code would load these files from a parent folder of the clone:

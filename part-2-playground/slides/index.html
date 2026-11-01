@@ -320,6 +320,8 @@ deploy-prod   manual: a person starts it</pre>
   </div>
   <div class="term">
     <pre class="prompt" data-id="03-init"></pre>
+    <p class="note">You push: the `!` runs a command yourself, not Claude</p>
+    <pre class="cmd">! git push -u origin main</pre>
   </div>
 </section>
 
@@ -367,7 +369,7 @@ Auto     no routine questions;
   <div class="term">
     <p class="note">`/diff` skips files that are not staged, so stage them first</p>
     <pre class="prompt" data-id="06-stage"></pre>
-    <p class="note">See what changed</p>
+    <p class="note">See what changed; the same command closes the panel</p>
     <pre class="cmd">/diff</pre>
     <p class="note">`/security-review` reads commits, so commit on the branch first</p>
     <pre class="prompt" data-id="06-commit-branch"></pre>
@@ -420,7 +422,7 @@ Auto     no routine questions;
   <div class="theory">
     <h2>Watch the pipeline</h2>
     <p>The push started the pipeline. Claude cannot see GitLab yet, so you look yourself.</p>
-    <p><a href="https://gitlab.playground.localhost/demo/whoami/-/pipelines" target="_blank" rel="noopener">Open the pipelines</a></p>
+    <p><a href="https://gitlab.playground.localhost/demo/whoami/-/pipelines/latest" target="_blank" rel="noopener">Open the pipeline</a></p>
     <p>Then see what the iteration cost, and empty the chat for the next one.</p>
   </div>
   <div class="term">
@@ -473,7 +475,6 @@ Auto     no routine questions;
   <div class="theory">
     <h2>Way 2: MCP</h2>
     <p><strong>You need:</strong> one command and a login. Nothing to install.</p>
-    <p>The <code>!</code> runs the command yourself, not Claude.</p>
     <p>Project scope writes <code>.mcp.json</code>. It holds no secret, so the team can commit it.</p>
     <p>A new server needs a restart. The chat stays.</p>
   </div>
@@ -482,7 +483,7 @@ Auto     no routine questions;
     <pre class="cmd">! claude mcp add --scope project --transport http GitLab https://gitlab.playground.localhost/api/v4/mcp</pre>
     <p class="note">Exit Claude Code, then restart it in the shell</p>
     <pre class="cmd" data-sh>task claude:continue</pre>
-    <p class="note">Approve the server, then log in in the browser</p>
+    <p class="note">Use the new server (the first option), then log in in the browser</p>
     <pre class="cmd">/mcp</pre>
     <p class="note">Ask</p>
     <pre class="prompt" data-id="09-mcp"></pre>
@@ -493,16 +494,15 @@ Auto     no routine questions;
   <div class="theory">
     <h2>Way 3: the CLI</h2>
     <p><strong>You need:</strong> <code>glab</code>, a token and a place for the token.</p>
-    <p>You <a href="https://gitlab.playground.localhost/-/user_settings/personal_access_tokens?name=claude&amp;scopes=api" target="_blank" rel="noopener">make the token in GitLab</a>: the <code>api</code> scope, one day.</p>
+    <p>You <a href="https://gitlab.playground.localhost/-/user_settings/personal_access_tokens?name=claude&amp;scopes=api" target="_blank" rel="noopener">make the token in GitLab</a>: the <code>api</code> scope, with tomorrow as the date.</p>
     <p><code>direnv</code> loads <code>.env</code> into the session. A deny rule stops Claude from reading the file.</p>
     <p class="muted">A guard, not a wall.</p>
   </div>
   <div class="term" data-title="shell, then claude">
     <p class="note">Copy the token, then, in the shell</p>
-    <pre class="cmd" data-sh>cd ~/llm-praxis-demo/whoami</pre>
-    <pre class="cmd" data-sh>echo "GITLAB_TOKEN=$(pbpaste)" > .env</pre>
-    <pre class="cmd" data-sh>echo dotenv > .envrc</pre>
-    <pre class="cmd" data-sh>direnv allow</pre>
+    <pre class="cmd" data-sh>echo "GITLAB_TOKEN=$(pbpaste)" > ~/llm-praxis-demo/whoami/.env</pre>
+    <pre class="cmd" data-sh>echo dotenv > ~/llm-praxis-demo/whoami/.envrc</pre>
+    <pre class="cmd" data-sh>direnv allow ~/llm-praxis-demo/whoami</pre>
     <p class="note">Exit Claude Code, then restart it</p>
     <pre class="cmd" data-sh>task claude:continue</pre>
     <p class="note">Ask</p>
@@ -518,19 +518,21 @@ Auto     no routine questions;
     <p class="muted">Research preview, on macOS. Turn it on in <code>/mcp</code>.</p>
   </div>
   <div class="term" data-title="four ways to connect">
-<pre class="out">          reach         tokens    speed
+<pre class="out">          reach         tokens      time
 
-CLI       the most      few       fast
+CLI       the most      5k          10 s
           API calls
 
-MCP       what the      few, plus good
-          server has    its tools
+MCP       what the      8k, plus    15 s
+          server has    3k tools
 
-Browser   what the      many      slow
+Browser   what the      20k         60 s
           page shows
 
-Computer  any app       the most  slowest
-use</pre>
+Computer  any app       the most    the longest
+use
+
+Measured on one question in this playground.</pre>
   </div>
 </section>
 
@@ -555,7 +557,7 @@ a desktop app   computer use</pre>
 <section class="slide">
   <div class="theory">
     <h2>Watch the window</h2>
-    <p>The context window fills with the chat, the tools and <code>CLAUDE.md</code>. The browser pages are large, and an MCP server adds its tools.</p>
+    <p>The context window fills with the chat, the tools and <code>CLAUDE.md</code>. </p>
     <p>A compact replaces the chat with a summary. Your words say what to keep.</p>
     <p class="muted"><kbd>Ctrl</kbd><kbd>O</kbd> shows the transcript and the summary.</p>
   </div>
@@ -658,7 +660,7 @@ a desktop app   computer use</pre>
       <li>Break `prod`</li>
       <li>Find the cause, change nothing</li>
       <li>Fix it and prove the fix</li>
-      <li>See the total cost</li>
+      <li>See the cost</li>
     </ul>
     <hr class="term-rule">
     <ul class="diff skip">
@@ -689,14 +691,13 @@ a desktop app   computer use</pre>
     <h2>The fix</h2>
     <p>The unit has no restart policy. The fix is one line, and you ship it with what you already know.</p>
     <p>Kill the app again: this time it comes back.</p>
-    <p class="muted">The last <code>/usage</code> shows the total.</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="18-fix-restart"></pre>
     <pre class="prompt" data-id="16-ship"></pre>
     <p class="note">In your own shell: it comes back</p>
     <pre class="cmd" data-sh>ssh -F ~/llm-praxis-demo/ssh/config prod.playground.localhost sudo systemctl kill -s KILL whoami</pre>
-    <p class="note">The total</p>
+    <p class="note">The cost since the last restart</p>
     <pre class="cmd">/usage</pre>
   </div>
 </section>

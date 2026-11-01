@@ -60,13 +60,15 @@ task claude:start
 4. `task slides:open` opens the deck. Start at slide 1 and go through it in
    order.
 5. `task claude:start` starts Claude Code in an isolated session. Log in in the
-   browser when it asks.
+   browser when it asks. Choose "Yes, I trust this folder": the default answer
+   exits Claude Code.
 
 Use the deck for the rest. Use the **Copy** button on each prompt. Claude can
 give a different result each time, so read what it does before you continue.
 
 Run `task playground:preflight` before a talk. It tests the playground, then
-lists the checks that need your eyes.
+lists the checks that need your eyes. Sign in to GitLab as `demo` in Chrome
+before the talk, and make that Chrome your default browser.
 
 ## Accounts and addresses
 
@@ -108,15 +110,15 @@ Iteration 2 needs a token for `glab`, on slide 25.
 1. Sign in to <https://gitlab.playground.localhost> as `demo`.
 2. Use the link on the slide, or open
    <https://gitlab.playground.localhost/-/user_settings/personal_access_tokens>.
-3. Make a token with the `api` scope. Set the expiration date to tomorrow.
+3. Make a token with the `api` scope. Set the expiration date to tomorrow: the
+   page suggests 30 days.
 4. Copy the token. GitLab shows it only one time.
 5. Write it from the clipboard to `.env`, and let `direnv` load that file:
 
    ```shell
-   cd ~/llm-praxis-demo/whoami
-   echo "GITLAB_TOKEN=$(pbpaste)" > .env
-   echo dotenv > .envrc
-   direnv allow
+   echo "GITLAB_TOKEN=$(pbpaste)" > ~/llm-praxis-demo/whoami/.env
+   echo dotenv > ~/llm-praxis-demo/whoami/.envrc
+   direnv allow ~/llm-praxis-demo/whoami
    ```
 
 6. Exit Claude Code and run `task claude:continue`.
@@ -164,6 +166,8 @@ rm -rf ~/.config/playgrounds/tls
 | GitLab does not answer | Run `task playground:status`, then `docker compose logs gitlab`. Check the memory of Docker Desktop |
 | The browser does not trust a page | Run `task playground:start` again, and let macOS trust the root CA |
 | Auto mode blocks a step | Read the reason. Slide 34 has a second prompt that states your intent |
+| A dialog recommends an LSP plugin | Press `Esc`. The session does not need the plugin |
+| Claude repeats a command and does not stop | Press `Esc` and ask for one check with `glab` |
 | A session goes wrong | Run `task playground:reset`, then start again from iteration 1 |
 
 ## Develop

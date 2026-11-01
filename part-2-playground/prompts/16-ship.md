@@ -1,1 +1,1 @@
-Commit, push, open a merge request with the GitLab MCP server and merge it. When the deployment to "test" succeeds, start "deploy-prod" with `glab ci trigger`. Give me the link to test the app myself.
+Commit, push, open a merge request with the GitLab MCP server and merge it. Follow the deployment with `glab ci trace deploy-test -b main`. When it succeeds, start "deploy-prod" with `glab ci trigger deploy-prod -b main`, and follow it with `glab ci trace`.
