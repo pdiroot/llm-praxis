@@ -9,8 +9,8 @@ the right the prompts and commands to copy.
 
 | Iteration | Slides | Result | You learn |
 |-----------|--------|--------|-----------|
-| 1 | 13 to 21 | The app runs locally, and a pipeline tests and builds it | `CLAUDE.md`, permission modes, plan mode, reviews, `/voice` |
-| 2 | 22 to 28 | Claude reads GitLab | Claude in Chrome, MCP, `glab`, computer use, the context window |
+| 1 | 13 to 22 | The app runs locally, and a pipeline tests and builds it | `CLAUDE.md`, permission modes, plan mode, reviews, `/voice`, the context window |
+| 2 | 23 to 28 | Claude reads GitLab | Claude in Chrome, MCP, `glab`, computer use |
 | 3 | 29 to 34 | The app has JSON and runs on `test` and `prod` | Tests first, a merge request, a deployment pipeline |
 | 4 | 35 to 37 | An outage on `prod` is found and fixed | Troubleshooting with Claude Code |
 
@@ -105,7 +105,7 @@ session can read `~/.ssh` and `~/.claude`. The allow rules for `glab` and
 
 ## Make the GitLab token
 
-Iteration 2 needs a token for `glab`, on slide 25.
+Iteration 2 needs a token for `glab`, on slide 26.
 
 1. Sign in to <https://gitlab.playground.localhost> as `demo`.
 2. Use the link on the slide, or open
@@ -121,7 +121,7 @@ Iteration 2 needs a token for `glab`, on slide 25.
    direnv allow ~/llm-praxis-demo/whoami
    ```
 
-6. Exit Claude Code and run `task claude:continue`.
+6. Exit Claude Code and run `task claude:start`.
 
 Never put the token in a prompt or a commit. The demo session starts through
 `direnv exec`, so it reads `.env` at each start. A token that you save later
@@ -166,7 +166,7 @@ rm -rf ~/.config/playgrounds/tls
 | GitLab does not answer | Run `task playground:status`, then `docker compose logs gitlab`. Check the memory of Docker Desktop |
 | The browser does not trust a page | Run `task playground:start` again, and let macOS trust the root CA |
 | Auto mode blocks a step | Read the reason. Slide 34 has a second prompt that states your intent |
-| `/chrome` says "Not enabled" | Exit Claude Code and run `task claude:continue`. A new profile needs one restart, then a confirmation |
+| `/chrome` says "Not enabled" | Exit Claude Code and run `task claude:start`. A new profile needs one restart, then a confirmation |
 | A dialog recommends an LSP plugin | Press `Esc`. The session does not need the plugin |
 | Claude repeats a command and does not stop | Press `Esc` and ask for one check with `glab` |
 | A session goes wrong | Run `task playground:reset`, then start again from iteration 1 |

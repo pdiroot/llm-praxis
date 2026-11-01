@@ -137,7 +137,7 @@ MCP             a way to connect outside
       <li><strong>GitLab Runner</strong> runs each job in Docker-in-Docker.</li>
       <li><strong><code>test</code></strong> and <strong><code>prod</code></strong> are the two servers.</li>
     </ul>
-    <p class="muted">Each name is a container in one Docker Compose project. SSH skips Traefik.</p>
+    <p class="muted">Each name is a container in one Docker Compose project. Traefik carries only the web traffic: git and the deploys connect to their containers directly, over SSH.</p>
   </div>
   <div class="term" data-title="Docker Compose">
 <pre class="out">┌─ your computer ─────────────────────────┐
@@ -190,13 +190,13 @@ deploy-prod   manual: a person starts it</pre>
   <div class="theory">
     <h2>A tour of the playground</h2>
     <p>Open each link and look around before we start.</p>
-    <p>Sign in as <code>demo</code> with the password <code>P@ssw0rd</code>.</p>
-    <p class="muted">The runner page needs <code>root</code>, with the same password.</p>
+    <p>Sign in to GitLab as <code>demo</code> with the password <code>P@ssw0rd</code>.</p>
+    <p class="muted">The <code>test</code> and <code>prod</code> pages need no sign-in.</p>
   </div>
   <div class="term" data-title="links">
     <table class="links">
       <tr><td><a href="https://gitlab.playground.localhost" target="_blank" rel="noopener">GitLab</a></td><td>the code and the pipelines</td></tr>
-      <tr><td><a href="https://gitlab.playground.localhost/admin/runners" target="_blank" rel="noopener">Runner</a></td><td>one runner, online</td></tr>
+      <tr><td><a href="https://gitlab.playground.localhost/demo/whoami/-/settings/ci_cd#js-runners-settings" target="_blank" rel="noopener">Runner</a></td><td>the Instance tab shows one runner</td></tr>
       <tr><td><a href="https://gitlab.playground.localhost/demo/hello-world/-/merge_requests" target="_blank" rel="noopener">hello-world</a></td><td>a sample project with merge requests</td></tr>
       <tr><td><a href="https://gitlab.playground.localhost/demo/whoami" target="_blank" rel="noopener">whoami</a></td><td>empty: we build this today</td></tr>
       <tr><td><a href="https://test.playground.localhost" target="_blank" rel="noopener">test</a></td><td>502 Bad Gateway: no app runs here yet</td></tr>
@@ -257,7 +257,7 @@ deploy-prod   manual: a person starts it</pre>
     <h2>Model, effort and cost</h2>
     <p>A bigger model plans better. A smaller model is faster and costs less.</p>
     <p>Low effort for a simple edit. High effort for a hard bug or a design.</p>
-    <p>We run <code>/usage</code> again after iterations 1, 2 and 4.</p>
+    <p>We run <code>/usage</code> again after iterations 1 and 4.</p>
   </div>
   <div class="term">
     <p class="note">Choose the model</p>
@@ -281,6 +281,8 @@ deploy-prod   manual: a person starts it</pre>
     <pre class="prompt" data-id="02-statusline"></pre>
     <p class="note">The result looks like this</p>
 <pre class="out">Opus 5.5 | medium | $1.21 | 14% context</pre>
+    <p class="note">The next task needs none of this chat, so start a new conversation</p>
+    <pre class="cmd">/clear</pre>
   </div>
 </section>
 
@@ -300,6 +302,7 @@ deploy-prod   manual: a person starts it</pre>
       <li>Test it yourself</li>
       <li>Close it with your voice</li>
       <li>Watch the pipeline</li>
+      <li>Compact the chat</li>
     </ul>
     <hr class="term-rule">
     <ul class="diff skip">
@@ -424,13 +427,27 @@ Auto     no routine questions;
     <h2>Watch the pipeline</h2>
     <p>The push started the pipeline. Claude cannot see GitLab yet, so you look yourself.</p>
     <p><a href="https://gitlab.playground.localhost/demo/whoami/-/pipelines/latest" target="_blank" rel="noopener">Open the pipeline</a></p>
-    <p>Then see what the iteration cost, and empty the chat for the next one.</p>
   </div>
   <div class="term">
     <p class="note">See what this iteration cost</p>
     <pre class="cmd">/usage</pre>
-    <p class="note">The next task needs none of this chat</p>
-    <pre class="cmd">/clear</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Watch the window</h2>
+    <p>The context window fills with the chat, the tools and <code>CLAUDE.md</code>.</p>
+    <p>Let's check what a compact does. It replaces the chat with a short summary, and your words say what to keep.</p>
+    <p class="muted"><kbd>Ctrl</kbd><kbd>O</kbd> shows the transcript and the summary.</p>
+  </div>
+  <div class="term">
+    <p class="note">See what fills the window</p>
+    <pre class="cmd">/context</pre>
+    <p class="note">Compact, and keep what matters</p>
+    <pre class="cmd">/compact Keep what we built and how we test it.</pre>
+    <p class="note">Read the short result, then look at the window again</p>
+    <pre class="cmd">/context</pre>
   </div>
 </section>
 
@@ -443,11 +460,11 @@ Auto     no routine questions;
   </div>
   <div class="term" data-title="iteration 2">
     <ul class="diff">
+      <li>A new conversation for each way</li>
       <li>The browser: Claude in Chrome</li>
       <li>MCP: the GitLab server</li>
       <li>The CLI: `glab`</li>
       <li>Compare the three, and a fourth way</li>
-      <li>Watch the context window</li>
     </ul>
     <hr class="term-rule">
     <ul class="diff skip">
@@ -465,10 +482,12 @@ Auto     no routine questions;
     <p class="muted">Use a Chrome profile with no personal tabs.</p>
   </div>
   <div class="term">
+    <p class="note">Start with a fresh context: each way gets the same fair test</p>
+    <pre class="cmd">/clear</pre>
     <p class="note">Check the connection</p>
     <pre class="cmd">/chrome</pre>
     <p class="note">On a new profile it says "Not enabled": exit Claude Code and restart it</p>
-    <pre class="cmd" data-sh>task claude:continue</pre>
+    <pre class="cmd" data-sh>task claude:start</pre>
     <p class="note">Ask</p>
     <pre class="prompt" data-id="08-chrome"></pre>
   </div>
@@ -479,13 +498,13 @@ Auto     no routine questions;
     <h2>Way 2: MCP</h2>
     <p><strong>You need:</strong> one command and a login. Nothing to install.</p>
     <p>Project scope writes <code>.mcp.json</code>. It holds no secret, so the team can commit it.</p>
-    <p>A new server needs a restart. The chat stays.</p>
+    <p>A new server needs a restart, so we start a new conversation.</p>
   </div>
   <div class="term" data-title="claude, then shell, then claude">
     <p class="note">Add the server</p>
     <pre class="cmd">! claude mcp add --scope project --transport http GitLab https://gitlab.playground.localhost/api/v4/mcp</pre>
-    <p class="note">Exit Claude Code, then restart it in the shell</p>
-    <pre class="cmd" data-sh>task claude:continue</pre>
+    <p class="note">Exit Claude Code, then start a new conversation in the shell</p>
+    <pre class="cmd" data-sh>task claude:start</pre>
     <p class="note">Choose "Use this MCP server": the default skips it. Then choose GitLab, Authenticate, and approve in the browser. GitLab calls Claude Code an unverified app</p>
     <pre class="cmd">/mcp</pre>
     <p class="note">Ask</p>
@@ -506,8 +525,8 @@ Auto     no routine questions;
     <pre class="cmd" data-sh>echo "GITLAB_TOKEN=$(pbpaste)" > ~/llm-praxis-demo/whoami/.env</pre>
     <pre class="cmd" data-sh>echo dotenv > ~/llm-praxis-demo/whoami/.envrc</pre>
     <pre class="cmd" data-sh>direnv allow ~/llm-praxis-demo/whoami</pre>
-    <p class="note">Exit Claude Code, then restart it</p>
-    <pre class="cmd" data-sh>task claude:continue</pre>
+    <p class="note">Exit Claude Code, then start a new conversation</p>
+    <pre class="cmd" data-sh>task claude:start</pre>
     <p class="note">Ask</p>
     <pre class="prompt" data-id="10-glab"></pre>
   </div>
@@ -521,21 +540,14 @@ Auto     no routine questions;
     <p class="muted">Research preview, on macOS, with a Pro, Max or Ultra plan. Turn it on in <code>/mcp</code>.</p>
   </div>
   <div class="term" data-title="four ways to connect">
-<pre class="out">          reach         tokens      time
-
-CLI       most of       11k         15 s
-          the API
-
-MCP       what the      11k, plus   15 s
-          server has    3k tools
-
-Browser   what the      20k, plus   60 s
-          page shows    3k tools
-
-Computer  any app       the most    the longest
-use
-
-Measured on one question in this playground.</pre>
+    <table class="links compare">
+      <tr><th>Way</th><th>Reach</th><th>Tokens</th><th>Time</th></tr>
+      <tr><td>CLI</td><td>most of the API</td><td>11k</td><td>15 s</td></tr>
+      <tr><td>MCP</td><td>what the server has</td><td>11k, plus 3k tools</td><td>15 s</td></tr>
+      <tr><td>Browser</td><td>what the page shows</td><td>20k, plus 3k tools</td><td>60 s</td></tr>
+      <tr><td>Computer use</td><td>any app</td><td>the most</td><td>the longest</td></tr>
+    </table>
+    <p class="note">Measured on one question in this playground</p>
   </div>
 </section>
 
@@ -552,23 +564,6 @@ Measured on one question in this playground.</pre>
 GitLab          glab, GitLab MCP
 Argo CD         argocd, its MCP server
 your own API    a small CLI that Claude writes</pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>Watch the window</h2>
-    <p>The context window fills with the chat, the tools and <code>CLAUDE.md</code>. </p>
-    <p>A compact replaces the chat with a summary. Your words say what to keep.</p>
-    <p class="muted"><kbd>Ctrl</kbd><kbd>O</kbd> shows the transcript and the summary.</p>
-  </div>
-  <div class="term">
-    <p class="note">See what fills the window</p>
-    <pre class="cmd">/context</pre>
-    <p class="note">The cost since the last `/clear`</p>
-    <pre class="cmd">/usage</pre>
-    <p class="note">Compact, and keep what we learned</p>
-    <pre class="cmd">/compact Keep what we learned about the GitLab tools.</pre>
   </div>
 </section>
 
