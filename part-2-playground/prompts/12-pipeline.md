@@ -1,7 +1,5 @@
-/plan Add the deployment to ".gitlab-ci.yml" on the new branch "feat/deploy": "deploy-test" on a merge to "main", then a manual "deploy-prod". Both deploys go over SSH to the hosts "test-ssh" and "prod-ssh", user "deploy", systemd service "whoami", with the CI variables "SSH_PRIVATE_KEY" and "SSH_KNOWN_HOSTS".
+/plan Add the deployment to ".gitlab-ci.yml" on the new branch "feat/deploy": "deploy-test" on a merge to "main", then a manual "deploy-prod". "CLAUDE.md" has the server details.
 
-The app should now also show the commit it was built from, and listen on port 80. The access log should go to "/var/log/whoami/access.log" and the PID file to "/run/whoami/whoami.pid".
+The app should also show its commit. Each deploy ships the binary and a minimal systemd unit with no restart policy, then checks that commit.
 
-A deploy should use the binary from "build", copy it to a temp path and rename it, ship the systemd unit, restart the service, and check the commit at "https://test.playground.internal" or "https://prod.playground.internal" with `curl --cacert "$CI_SERVER_TLS_CA_FILE"`. Keep the first unit minimal, with no restart policy.
-
-Then push the branch, open a merge request with the GitLab MCP server and give me the link. I review and merge it there myself, so do not ask me before the push.
+Push the branch without asking me, open a merge request with the GitLab MCP server and give me the link. I merge it.
