@@ -35,5 +35,7 @@ log "Connectors: off"
 
 # direnv loads .env, so the session starts with the token that the owner saved.
 cd "$clone"
+# Forget the outer direnv state: direnv exec would revert the exports above.
+unset DIRENV_DIFF DIRENV_DIR DIRENV_FILE DIRENV_WATCHES
 export DIRENV_LOG_FORMAT=""
 exec direnv exec . claude --chrome "$@"

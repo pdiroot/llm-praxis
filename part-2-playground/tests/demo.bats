@@ -216,3 +216,51 @@ mcp_check() {
   run mcp_check "$BATS_TEST_TMPDIR/l" 1
   [ "$status" -ne 0 ]
 }
+
+# launch_env <outer env...>: run the launcher with a stub claude that prints two values.
+launch_env() {
+  export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
+  export PG_DEMO_HOME="$BATS_TEST_TMPDIR/demo"
+  export XDG_DATA_HOME="$BATS_TEST_TMPDIR/data"
+  mkdir -p "$PG_RUNTIME/ssh" "$PG_DEMO_HOME/whoami" "$BATS_TEST_TMPDIR/bin"
+  touch "$PG_DEMO_HOME/.llm-praxis-demo"
+  echo "Host x" >"$PG_RUNTIME/ssh/config"
+  printf '#!/usr/bin/env bash\necho "$CLAUDE_CONFIG_DIR"\necho "${GITLAB_TOKEN:-}"\n' >"$BATS_TEST_TMPDIR/bin/claude"
+  chmod +x "$BATS_TEST_TMPDIR/bin/claude"
+  echo "GITLAB_TOKEN=from-env-file" >"$PG_DEMO_HOME/whoami/.env"
+  echo dotenv >"$PG_DEMO_HOME/whoami/.envrc"
+  direnv allow "$PG_DEMO_HOME/whoami"
+
+  PATH="$BATS_TEST_TMPDIR/bin:$PATH" run --separate-stderr env "$@" "$ROOT/scripts/demo-claude.sh"
+}
+
+@test "direnv loads .env into the session" {
+  launch_env A=1
+
+  [ "$status" -eq 0 ]
+  [ "${lines[0]}" = "$PG_DEMO_HOME/claude-config" ]
+  [ "${lines[1]}" = from-env-file ]
+}
+
+@test "the outer direnv state cannot undo the demo profile" {
+  launch_env DIRENV_DIFF=stale DIRENV_DIR=-/tmp DIRENV_FILE=/tmp/.envrc
+
+  [ "$status" -eq 0 ]
+  [ "${lines[0]}" = "$PG_DEMO_HOME/claude-config" ]
+}
+
+@test "the launcher stops when direnv is missing" {
+  mkdir -p "$BATS_TEST_TMPDIR/nodirenv"
+  for tool in bash dirname cat; do ln -s "$(command -v "$tool")" "$BATS_TEST_TMPDIR/nodirenv/$tool"; done
+
+  PATH="$BATS_TEST_TMPDIR/nodirenv" run "$ROOT/scripts/demo-claude.sh"
+
+  [ "$status" -ne 0 ]
+  [[ $output == *"brew install direnv"* ]]
+}
+
+@test "each prompt of the deck has its file" {
+  for id in $(grep -o 'data-id="[^"]*"' "$ROOT/slides/index.html" | cut -d'"' -f2); do
+    [ -f "$ROOT/prompts/$id.md" ]
+  done
+}

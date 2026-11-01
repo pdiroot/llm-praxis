@@ -113,15 +113,13 @@ MCP             a way to connect outside
     <ul>
       <li>A Mac on Apple silicon</li>
       <li>Docker Desktop with 8 GB of memory</li>
-      <li>A Claude plan</li>
+      <li>A Claude plan and Claude Code</li>
       <li>Chrome with the Claude in Chrome extension</li>
       <li>Free ports: 80, 443, 2201, 2202, 2222</li>
     </ul>
     <p class="muted">The README lists all the details.</p>
   </div>
   <div class="term" data-title="shell">
-    <p class="note">Claude Code</p>
-    <pre class="cmd" data-sh>curl -fsSL https://claude.ai/install.sh | bash</pre>
     <p class="note">The tools of the playground</p>
     <pre class="cmd" data-sh>brew install go-task go jq glab direnv</pre>
     <p class="note">Start everything: a few minutes the first time</p>
@@ -367,7 +365,7 @@ Auto     no routine questions;
     <p>A review can miss a point, so you look too. Your own comments go into the next prompt.</p>
   </div>
   <div class="term">
-    <p class="note">`/diff` skips files that are not staged, so stage them first</p>
+    <p class="note">`/diff` skips new files until you stage them</p>
     <pre class="prompt" data-id="06-stage"></pre>
     <p class="note">See what changed; the same command closes the panel</p>
     <pre class="cmd">/diff</pre>
@@ -407,7 +405,7 @@ Auto     no routine questions;
   <div class="theory">
     <h2>Close it with your voice</h2>
     <p>You are happy, so you tell Claude to push.</p>
-    <p>The branch goes straight into <code>main</code>. It deploys nothing yet, so we need no merge request.</p>
+    <p>The branch goes straight into <code>main</code>: GitLab is not connected yet, so there is no merge request.</p>
     <p>Hold <kbd>Space</kbd> and speak.</p>
     <p class="muted">If the microphone fails, copy the prompt.</p>
   </div>
@@ -515,13 +513,13 @@ Auto     no routine questions;
     <h2>Compare the ways</h2>
     <p>Start with the CLI or MCP. Use the browser when neither exists, or to test a UI.</p>
     <p><strong>Computer use</strong> is the fourth way: Claude drives any desktop app from screenshots. It needs no API, but it is the hardest and uses the most tokens.</p>
-    <p class="muted">Research preview, on macOS. Turn it on in <code>/mcp</code>.</p>
+    <p class="muted">Research preview, on macOS, with a Pro, Max or Ultra plan. Turn it on in <code>/mcp</code>.</p>
   </div>
   <div class="term" data-title="four ways to connect">
 <pre class="out">          reach         tokens      time
 
-CLI       the most      5k          10 s
-          API calls
+CLI       most of       5k          10 s
+          the API
 
 MCP       what the      8k, plus    15 s
           server has    3k tools
@@ -540,7 +538,7 @@ Measured on one question in this playground.</pre>
   <div class="theory">
     <h2>Not only GitLab</h2>
     <p>Check what each tool offers, because the ways do different things. The GitLab MCP server cannot start a manual job, and <code>glab</code> can.</p>
-    <p>Most services have an MCP server or a CLI, such as Argo CD.</p>
+    <p>Many services have an MCP server and a CLI, such as Argo CD.</p>
     <p><strong>Neither one?</strong> Ask Claude to write a small CLI or MCP server for the API of that service.</p>
   </div>
   <div class="term" data-title="any service">
@@ -548,9 +546,7 @@ Measured on one question in this playground.</pre>
 
 GitLab          glab, GitLab MCP
 Argo CD         argocd, its MCP server
-your own API    a small CLI that Claude writes
-a web UI only   Claude in Chrome
-a desktop app   computer use</pre>
+your own API    a small CLI that Claude writes</pre>
   </div>
 </section>
 
@@ -564,7 +560,7 @@ a desktop app   computer use</pre>
   <div class="term">
     <p class="note">See what fills the window</p>
     <pre class="cmd">/context</pre>
-    <p class="note">The cost so far</p>
+    <p class="note">The cost since the last `/clear`</p>
     <pre class="cmd">/usage</pre>
     <p class="note">Compact, and keep what we learned</p>
     <pre class="cmd">/compact Keep what we learned about the GitLab tools.</pre>
@@ -589,6 +585,7 @@ a desktop app   computer use</pre>
     <hr class="term-rule">
     <ul class="diff skip">
       <li>`/code-review` and `/security-review`, for time</li>
+      <li>A test by hand: the deploy jobs check the app</li>
     </ul>
   </div>
 </section>
@@ -653,6 +650,7 @@ a desktop app   computer use</pre>
   <div class="theory">
     <h2>Iteration 4: troubleshooting</h2>
     <p>Claude Code is not only for writing code. It reads logs and finds causes on servers too.</p>
+    <p><a href="https://gitlab.playground.localhost/demo/whoami/-/merge_requests" target="_blank" rel="noopener">Open the merge requests</a></p>
   </div>
   <div class="term" data-title="iteration 4">
     <ul class="diff">
@@ -677,7 +675,7 @@ a desktop app   computer use</pre>
     <p>I kill the app on <code>prod</code>, and the browser shows that it is down.</p>
     <p>Claude looks. It changes nothing.</p>
   </div>
-  <div class="term" data-title="shell, then claude">
+  <div class="term" data-title="claude, then shell, then claude">
     <pre class="cmd">/clear</pre>
     <p class="note">In your own shell</p>
     <pre class="cmd" data-sh>ssh -F ~/llm-praxis-demo/ssh/config prod.playground.localhost sudo systemctl kill -s KILL whoami</pre>
@@ -697,7 +695,9 @@ a desktop app   computer use</pre>
     <pre class="prompt" data-id="16-ship"></pre>
     <p class="note">In your own shell: it comes back</p>
     <pre class="cmd" data-sh>ssh -F ~/llm-praxis-demo/ssh/config prod.playground.localhost sudo systemctl kill -s KILL whoami</pre>
-    <p class="note">The cost since the last restart</p>
+    <p class="note">Check it, after a few seconds</p>
+    <pre class="cmd" data-sh>curl https://prod.playground.localhost</pre>
+    <p class="note">The cost since `/clear`</p>
     <pre class="cmd">/usage</pre>
   </div>
 </section>

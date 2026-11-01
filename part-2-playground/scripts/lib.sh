@@ -306,11 +306,11 @@ clone_demo() {
 
 # Isolation of the demo session.
 
-# claude_files_in <dir>: print each file in <dir> that Claude Code loads from
-# a parent folder.
+# claude_files_in <dir>: print each file in <dir> that Claude Code or direnv
+# loads from a parent folder.
 claude_files_in() {
   local f
-  for f in CLAUDE.md CLAUDE.local.md .claude/CLAUDE.md .claude/rules AGENTS.md .claude/AGENTS.md .mcp.json; do
+  for f in CLAUDE.md CLAUDE.local.md .claude/CLAUDE.md .claude/rules AGENTS.md .claude/AGENTS.md .mcp.json .envrc; do
     [[ ! -e $1/$f ]] || printf '%s\n' "${1%/}/$f"
   done
 }

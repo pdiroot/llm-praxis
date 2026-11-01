@@ -1,1 +1,1 @@
-Stop the app. Merge the branch into main and push main.
+Stop the app. Merge the branch into "main" and push "main".
