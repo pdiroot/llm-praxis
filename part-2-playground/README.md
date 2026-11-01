@@ -9,10 +9,10 @@ the right the prompts and commands to copy.
 
 | Iteration | Slides | Result | You learn |
 |-----------|--------|--------|-----------|
-| 1 | 12 to 19 | The app runs locally | `CLAUDE.md`, permission modes, plan mode, reviews |
-| 2 | 20 to 31 | The app runs on `test` and `prod` | MCP, the token, a pipeline, the context window |
-| 3 | 32 to 38 | An outage on `prod` is found and fixed | Tests first, your own skill, your own subagent |
-| 4 | 39 to 44 | The app has a web UI | A clean context, a plugin, Claude in Chrome, `/voice` |
+| 1 | 13 to 21 | The app runs locally, and a pipeline tests and builds it | `CLAUDE.md`, permission modes, plan mode, reviews, `/voice` |
+| 2 | 22 to 28 | Claude reads GitLab | Claude in Chrome, MCP, `glab`, computer use, the context window |
+| 3 | 29 to 34 | The app has JSON and runs on `test` and `prod` | Tests first, a merge request, a deployment pipeline |
+| 4 | 35 to 37 | An outage on `prod` is found and fixed | Troubleshooting with Claude Code |
 
 The live talk takes 45 minutes. Alone, plan for two hours.
 
@@ -24,16 +24,16 @@ The live talk takes 45 minutes. Alone, plan for two hours.
   about 4 GB.
 - A Claude plan. The session uses your own plan limits.
 - Claude Code 2.1.312 or later.
-- Chrome with the Claude in Chrome extension, for iteration 4. Use a Chrome
-  profile that has no personal tabs.
-- `task`, `go` 1.27, `jq`, `glab` 1.126.0, `openssl`, `git`, `curl`, `ssh` and
+- Chrome with the Claude in Chrome extension, for iteration 2. Use a Chrome
+  profile that has no personal tabs, and sign in to GitLab there as `demo`.
+- `task`, `go` 1.27, `jq`, `glab` 1.126.0, `direnv`, `openssl`, `git`, `curl`, `ssh` and
   `ssh-keygen`.
 - Free local ports: 80, 443, 2222, 2201 and 2202.
 - The free network `172.30.42.0/24`. A VPN can use the same network.
 
 ```shell
 curl -fsSL https://claude.ai/install.sh | bash
-brew install go-task go jq glab
+brew install go-task go jq glab direnv
 ```
 
 The names `*.playground.localhost` need no change in `/etc/hosts`.
@@ -103,21 +103,28 @@ session can read `~/.ssh` and `~/.claude`. The allow rules for `glab` and
 
 ## Make the GitLab token
 
-Iteration 2 needs a token for `glab`, on slide 24.
+Iteration 2 needs a token for `glab`, on slide 25.
 
 1. Sign in to <https://gitlab.playground.localhost> as `demo`.
 2. Use the link on the slide, or open
    <https://gitlab.playground.localhost/-/user_settings/personal_access_tokens>.
 3. Make a token with the `api` scope. Set the expiration date to tomorrow.
 4. Copy the token. GitLab shows it only one time.
-5. Write it from the clipboard to `.env`:
+5. Write it from the clipboard to `.env`, and let `direnv` load that file:
 
    ```shell
-   echo "GITLAB_TOKEN=$(pbpaste)" > ~/llm-praxis-demo/whoami/.env
+   cd ~/llm-praxis-demo/whoami
+   echo "GITLAB_TOKEN=$(pbpaste)" > .env
+   echo dotenv > .envrc
+   direnv allow
    ```
 
-Never put the token in a prompt or a commit. A hook loads `.env` before each
-command, so the running session can use `glab` at once.
+6. Exit Claude Code and run `task claude:continue`.
+
+Never put the token in a prompt or a commit. The demo session starts through
+`direnv exec`, so it reads `.env` at each start. A token that you save later
+needs a restart. In your own projects, add the `direnv` hook to your shell and
+start `claude` in the folder.
 
 ## Commands
 
@@ -156,7 +163,7 @@ rm -rf ~/.config/playgrounds/tls
 | The network does not start, or a VPN breaks | Turn off the VPN. It can use `172.30.42.0/24` |
 | GitLab does not answer | Run `task playground:status`, then `docker compose logs gitlab`. Check the memory of Docker Desktop |
 | The browser does not trust a page | Run `task playground:start` again, and let macOS trust the root CA |
-| Auto mode blocks a step | Read the reason. Slide 30 has a second prompt that states your intent |
+| Auto mode blocks a step | Read the reason. Slide 34 has a second prompt that states your intent |
 | A session goes wrong | Run `task playground:reset`, then start again from iteration 1 |
 
 ## Develop

@@ -1,1 +1,1 @@
-The app on "prod" is down. Use the "troubleshooter" agent to find out what happened. Do not restart or edit anything yet.
+The app on "prod" is down. Find out what happened from the unit status, the journal and "/var/log/whoami/access.log". Do not restart or edit anything yet. Report the cause, the evidence and what would stop this from happening again.

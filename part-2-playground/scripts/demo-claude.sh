@@ -9,6 +9,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 config="$PG_DEMO_HOME/claude-config"
 clone="$PG_DEMO_HOME/whoami"
 
+command -v direnv >/dev/null || die "direnv is missing: brew install direnv"
+
 demo_home_init
 mkdir -p "$config"
 [[ -e $config/settings.json ]] || cp "$PG_ROOT/demo/settings.json" "$config/settings.json"
@@ -28,5 +30,7 @@ log "Profile:    $config"
 log "Project:    $clone"
 log "Connectors: off"
 
+# direnv loads .env, so the session starts with the token that the owner saved.
 cd "$clone"
-exec claude --chrome "$@"
+export DIRENV_LOG_FORMAT=""
+exec direnv exec . claude --chrome "$@"

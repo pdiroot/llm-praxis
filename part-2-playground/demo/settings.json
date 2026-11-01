@@ -2,18 +2,6 @@
   "disableClaudeAiConnectors": true,
   "syncClaudeAiPlugins": false,
   "syncClaudeAiSkills": false,
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo \"set -a; [ -f '$CLAUDE_PROJECT_DIR/.env' ] && . '$CLAUDE_PROJECT_DIR/.env'; set +a\" >> \"$CLAUDE_ENV_FILE\""
-          }
-        ]
-      }
-    ]
-  },
   "permissions": {
     "deny": [
       "Read(**/.env)"

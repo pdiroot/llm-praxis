@@ -12,9 +12,9 @@ setup() {
   jq -e '.permissions.ask == null' "$SETTINGS"
 }
 
-@test "the settings deny .env, run the hook and extend the auto mode" {
+@test "the settings deny .env, have no hook and extend the auto mode" {
   [ "$(jq -r '.permissions.deny[0]' "$SETTINGS")" = 'Read(**/.env)' ]
-  jq -e '.hooks.SessionStart[0].hooks[0].command | contains("CLAUDE_ENV_FILE") and contains("set -a")' "$SETTINGS"
+  jq -e '.hooks == null' "$SETTINGS"
   [ "$(jq -r '.autoMode.environment[0]' "$SETTINGS")" = '$defaults' ]
   jq -e '.autoMode.environment | length == 3' "$SETTINGS"
 }
