@@ -1,1 +1,1 @@
-I merged it. Find the pipeline of the merge commit and follow the deployment with `glab ci trace deploy-test -p <id>`. When it succeeds, give me the link to test the app myself.
+I merged it. Find the pipeline of the merge commit and follow it with `glab ci trace deploy-test -p <id>`. If the job fails, read its log, fix the cause on a new branch, merge the fix yourself and check again. When it succeeds, give me the link to test the app myself.

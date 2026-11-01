@@ -617,7 +617,7 @@ your own API    a small CLI that Claude writes</pre>
   <div class="theory">
     <h2>Review and merge</h2>
     <p>Open the link and read the change in GitLab. You merge it, not Claude.</p>
-    <p>The merge starts the deployment to <code>test</code>.</p>
+    <p>The merge starts the deployment to <code>test</code>. This is the first real run: if it fails, Claude reads the log and fixes the cause.</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="12-check-test"></pre>
@@ -627,7 +627,7 @@ your own API    a small CLI that Claude writes</pre>
 <section class="slide">
   <div class="theory">
     <h2>Deploy to production</h2>
-    <p>The MCP server cannot do this step, so Claude uses <code>glab</code>.</p>
+    <p>The MCP server cannot do this step, so Claude uses <code>glab</code>. A failure gets the same fix as before.</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="13-deploy-prod"></pre>
