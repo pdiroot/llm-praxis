@@ -1,0 +1,859 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Code reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<!-- deck-shell:start -->
+<style id="shell-css">
+:root {
+  --bg: #2E3440; --surface: #3B4252; --ink: #ECEFF4; --muted: #AEB7C6; --line: #4C566A;
+  --accent: #88C0D0; --accent-ink: #2E3440; --warn: #BF616A; --ok: #A3BE8C;
+  --chip-1: #EBCB8B; --chip-2: #A3BE8C; --chip-3: #88C0D0; --chip-4: #B48EAD; --chip-5: #D08770; --chip-ink: #2E3440;
+  --term-bg: #242933; --term-ink: #ECEFF4;
+  color-scheme: dark;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+:root {
+  --bg: #2E3440; --surface: #3B4252; --ink: #ECEFF4; --muted: #AEB7C6; --line: #4C566A;
+  --accent: #88C0D0; --accent-ink: #2E3440; --warn: #BF616A; --ok: #A3BE8C;
+  --chip-1: #EBCB8B; --chip-2: #A3BE8C; --chip-3: #88C0D0; --chip-4: #B48EAD; --chip-5: #D08770; --chip-ink: #2E3440;
+  --term-bg: #242933; --term-ink: #ECEFF4;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 400 18px/1.55 var(--sans); }
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+code, kbd, pre { font-family: var(--mono); font-size: 0.92em; }
+.summary p > strong:first-child { color: var(--accent); }
+:not(pre) > code { background: var(--surface); border: 1px solid var(--line); border-radius: 5px; padding: 0.05em 0.35em; }
+kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 0.35em; background: var(--surface); }
+
+.deck { padding: 0 16px 96px; }
+.slide { max-width: 1180px; margin: 0 auto; padding: 48px 0 32px; }
+.slide-head { display: flex; align-items: baseline; gap: 16px; }
+.slide-no { font: 600 0.95rem var(--mono); color: var(--muted); min-width: 3.2em; }
+.slide h2 { font-size: clamp(1.9rem, 1.2rem + 2.6vw, 3.4rem); line-height: 1.08; margin: 0 0 20px; letter-spacing: -0.01em; }
+.slide-body { display: grid; gap: 32px; }
+.slide-body.has-widget { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 960px) { .slide-body.has-widget { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: start; } }
+.summary { font-size: clamp(1.1rem, 1rem + 0.5vw, 1.35rem); max-width: 62ch; }
+.summary p { margin: 0 0 0.8em; }
+details.more { margin-top: 20px; max-width: 70ch; border-top: 1px solid var(--line); padding-top: 12px; }
+details.more > summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+details.more[open] > summary { margin-bottom: 8px; }
+
+body.talk .slide { display: none; min-height: calc(100vh - 72px); }
+body.talk .slide.current { display: block; }
+body.read .slide { border-bottom: 1px solid var(--line); }
+
+.bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px; background: var(--surface); border-top: 1px solid var(--line); z-index: 10; }
+.bar button { font: 600 0.95rem var(--sans); color: var(--ink); background: transparent; border: 1px solid var(--line);
+  border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+.bar button:hover { border-color: var(--accent); }
+.bar .primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.ticks { flex: 1; display: flex; gap: 4px; min-width: 0; }
+.ticks button { flex: 1; min-width: 6px; height: 10px; padding: 0; border-radius: 3px; background: var(--line); border: 0; }
+.ticks button.done { background: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.ticks button.current { background: var(--accent); }
+body.read .ticks, body.read .nav-step { display: none; }
+@media (max-width: 600px) { .ticks { display: none; } }
+
+@media print {
+  :root {
+  --bg: #FFFFFF; --surface: #F6F8FA; --ink: #1F2328; --muted: #59636E; --line: #D1D9E0;
+  --accent: #0969DA; --accent-ink: #FFFFFF; --warn: #CF222E; --ok: #1A7F37;
+  --chip-1: #FFF8C5; --chip-2: #DAFBE1; --chip-3: #DDF4FF; --chip-4: #FBEFFF; --chip-5: #FFEFF7; --chip-ink: #1F2328;
+  --term-bg: #24292F; --term-ink: #F6F8FA;
+  }
+  pre.term, .statusbar { background: none; color: #000; border: 1px solid #999; }
+  .bar { display: none; }
+  body.talk .slide, body .slide { display: block !important; min-height: 0; break-after: page; }
+  details.more > summary { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+<!-- deck-shell:end -->
+<style id="page-css">
+.widget { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+.widget h3 { margin: 0 0 12px; font-size: 1rem; }
+.widget .caption { margin: 12px 0 0; font-size: 0.85rem; color: var(--muted); }
+.widget button, .widget select { font: 600 0.9rem var(--sans); color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+.widget button:hover { border-color: var(--accent); }
+.widget button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.widget textarea { width: 100%; min-height: 84px; font: 400 1rem var(--mono); color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 6px; padding: 10px; resize: vertical; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
+.stat { font: 600 1.05rem var(--mono); }
+pre.term { background: var(--term-bg); color: var(--term-ink); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-size: 0.9rem; line-height: 1.6; border-top: 22px solid var(--line); position: relative; }
+pre.term::before { content: ""; position: absolute; top: -15px; left: 12px; width: 8px; height: 8px; border-radius: 50%; background: #E07A41; box-shadow: 14px 0 0 #8C9EFF, 28px 0 0 #A5D6A7; }
+.takeaway { border-left: 4px solid var(--accent); padding: 6px 12px; background: var(--surface); border-radius: 0 6px 6px 0; font-weight: 600; }
+.statusbar { font: 600 0.95rem var(--mono); background: var(--term-bg); color: var(--term-ink); border-radius: 6px; padding: 10px 12px; }
+.statusbar b { color: #E07A41; }
+.rules { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.95rem; }
+.rules th, .rules td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.rule-allowed { color: var(--ok); font-weight: 600; } .rule-asks { color: var(--accent); font-weight: 600; }
+.rule-blocked { color: var(--warn); font-weight: 600; } .rule-classifier { color: var(--muted); font-weight: 600; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.cards button { text-align: left; padding: 10px; }
+.card-detail { margin-top: 12px; }
+.card-detail dt { font-weight: 600; margin-top: 14px; color: var(--accent); } .card-detail dt:first-child { margin-top: 4px; } .card-detail dd { margin: 2px 0 0; }
+.widget input[type="search"] { width: 100%; font: 400 1rem var(--mono); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+.cmd-list { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 6px; max-height: 50vh; overflow-y: auto; }
+.cmd-list li { display: grid; grid-template-columns: minmax(9em, max-content) 1fr; gap: 10px; align-items: baseline; }
+.cmd-list code { font-weight: 600; }
+.cmd-list .tag { font-size: 0.75rem; color: var(--muted); }
+body.read .cmd-list { max-height: none; }
+pre.term.player { min-height: 7em; white-space: pre-wrap; }
+pre.term .out { opacity: 0.75; }
+.repo-list { margin: 10px 0 0; padding-left: 1.2em; }
+.repo-list li { margin-bottom: 6px; }
+</style>
+</head>
+<body class="talk">
+<main class="deck" id="deck">
+
+<section class="slide" id="s-1" aria-labelledby="h-1">
+  <div class="slide-head"><span class="slide-no">1/16</span><h2 id="h-1">What Claude Code is</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>A harness in your terminal.</strong> Claude Code is the harness from AI basics; Claude is the model inside it. It reads your files, runs commands, edits code and checks its own work.</p><p><strong>Permission modes set the rules.</strong> They decide what it may do without asking you.</p><p class="takeaway">Model = brain. Claude Code = hands, eyes, notebook and rules.</p><p>For the hands-on session, open <a href="../part-2-playground/slides/index.html">Claude Code 101</a>.</p></div>
+    <div class="widget" data-widget="term" data-script="intro"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-2" aria-labelledby="h-2">
+  <div class="slide-head"><span class="slide-no">2/16</span><h2 id="h-2">Install and first run</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>Install, then start in a project.</strong> Install the CLI, open a project folder and type <code>claude</code>. The first start asks you to log in in the browser.</p><p><strong>Four ways to start.</strong> <code>claude</code> for a session, <code>claude -p</code> for one answer in a script, <code>claude -c</code> to continue the last chat, <code>claude -r</code> to pick an older one.</p><p class="takeaway">Start Claude Code inside the folder it should work on.</p></div>
+    <div class="widget" data-widget="term" data-script="install"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-3" aria-labelledby="h-3">
+  <div class="slide-head"><span class="slide-no">3/16</span><h2 id="h-3">First session</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>Ask before you change.</strong> Start with questions about the code. Then run <code>/init</code>: Claude writes a <code>CLAUDE.md</code> with the build commands and the rules it found.</p><p><strong>CLAUDE.md is loaded in every session.</strong> Keep it short: commands Claude cannot guess, rules that differ from the defaults, known traps. Edit it with <code>/memory</code>: pick the file, and it opens in your editor (the first row turns auto memory on or off). Commit it to git.</p><p><strong>Edits load later.</strong> Claude reads CLAUDE.md when the session starts. An edit applies after <code>/clear</code>, <code>/compact</code> or a restart, and it does not break the prompt cache.</p><p class="takeaway">Each mistake Claude repeats becomes one line in CLAUDE.md.</p></div>
+    <div class="widget" data-widget="term" data-script="first"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-4" aria-labelledby="h-4">
+  <div class="slide-head"><span class="slide-no">4/16</span><h2 id="h-4">Project or workspace</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>Per project.</strong> Start Claude Code in one git repository. Its <code>CLAUDE.md</code> holds that project's rules.</p><p><strong>Per workspace.</strong> Start it in a folder that holds knowledge files, guides for Claude and several cloned repositories. Claude then sees how the repositories connect.</p><p><strong>One prompt, three merge requests.</strong> Change the application and its pipeline in one repository, its Helm chart in a second and the Terraform for AWS in a third. One session makes all three changes and opens three merge requests, instead of three separate runs.</p></div>
+    <div class="widget" data-widget="workspace"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-5" aria-labelledby="h-5">
+  <div class="slide-head"><span class="slide-no">5/16</span><h2 id="h-5">Context hygiene</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>Watch the window.</strong> <code>/context</code> shows what fills it. One task, one conversation: <code>/clear</code> when you start something new.</p><p><strong>Compact with a focus.</strong> <code>/compact keep the API decisions</code> replaces the chat with a summary. Press <kbd>Ctrl+O</kbd> to read the full summary, and run <code>/context</code> after it to see what is still loaded.</p><p><strong>What survives compaction.</strong> The system prompt, the project's <code>CLAUDE.md</code>, skill descriptions, the plan and a few recent files. Rules you gave only in the chat can be lost, so put lasting rules in <code>CLAUDE.md</code>.</p><p><strong>Side questions.</strong> <code>/btw</code> asks something that does not go into the conversation.</p></div>
+    <div class="widget" data-widget="term" data-script="context"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-6" aria-labelledby="h-6">
+  <div class="slide-head"><span class="slide-no">6/16</span><h2 id="h-6">Models, effort and cost</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>Pick the model and the effort.</strong> <code>/model</code> switches the model. <code>/effort</code> sets how hard it thinks: low, medium, high, xhigh, max or auto.</p><p><strong>Watch the cost.</strong> <code>/usage</code> shows the session cost and your plan limits. <code>/statusline</code> can show the context use all the time.</p><p class="takeaway">Low effort for simple edits. High effort for a hard bug or a design.</p></div>
+    <div class="widget" data-widget="term" data-script="model"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-7" aria-labelledby="h-7">
+  <div class="slide-head"><span class="slide-no">7/16</span><h2 id="h-7">Permission modes</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>New sessions usually start in auto mode.</strong> File edits run, and a safety check decides about commands. Press <kbd>Shift+Tab</kbd> to change the mode.</p><p><strong>Manual mode asks first.</strong> Start in it with <code>claude --permission-mode default</code>, or press <kbd>Shift+Tab</kbd> once from auto mode. Plan mode (<code>/plan</code>) reads and plans, and edits nothing.</p><p><strong>Allow narrow rules.</strong> <code>/permissions</code> manages allow, ask and deny rules, for example one test command, not "any shell command".</p><p class="takeaway">Remember the deleted kube-system from AI basics. Give freedom only where a mistake is cheap.</p></div>
+    <div class="widget" data-widget="modes"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-8" aria-labelledby="h-8">
+  <div class="slide-head"><span class="slide-no">8/16</span><h2 id="h-8">Plan, then execute</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>Plan first.</strong> Press <kbd>Shift+Tab</kbd> until the status bar shows plan mode, or type <code>/plan</code> with the task. Claude reads the code and writes a plan; it edits nothing.</p><p><strong>Read and change the plan.</strong> <kbd>Ctrl+G</kbd> opens the plan in your text editor. Change it, save, and Claude uses your version.</p><p><strong>Approve to execute.</strong> Pick "Yes, and use auto mode", "Yes, manually approve edits" or "Tell Claude what to change". Claude then works through the plan in the mode you picked.</p><p><strong>Check at the end.</strong> Ask it to run the tests or the check named in the plan, then read the changes with <code>/diff</code>.</p></div>
+    <div class="widget" data-widget="term" data-script="plan"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-9" aria-labelledby="h-9">
+  <div class="slide-head"><span class="slide-no">9/16</span><h2 id="h-9">Undo and review</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>Roll back, do not argue.</strong> <kbd>Esc</kbd> <kbd>Esc</kbd> or <code>/rewind</code> lets you pick an earlier point and restore the code, the chat or both. Files that only shell commands changed stay as they are, so use git too.</p><p><strong>Review before you commit.</strong> <code>/diff</code> shows all changes in the working tree. <code>/review</code> checks the diff for bugs.</p></div>
+    <div class="widget" data-widget="term" data-script="undo"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-10" aria-labelledby="h-10">
+  <div class="slide-head"><span class="slide-no">10/16</span><h2 id="h-10">Customize: the feature map</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>Seven ways to teach Claude Code.</strong> CLAUDE.md, skills, subagents, hooks, MCP servers, mods and plugins. Click a card to see what each one is and when to use it.</p><p class="takeaway">Start with CLAUDE.md. Add the others when you repeat yourself.</p></div>
+    <div class="widget" data-widget="features"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-11" aria-labelledby="h-11">
+  <div class="slide-head"><span class="slide-no">11/16</span><h2 id="h-11">Plugins and skills</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>A plugin installs many things at once.</strong> Skills, commands, subagents and hooks. The official marketplace is already added: open <code>/plugin</code> to browse it.</p><p><strong>Skills load when needed.</strong> Claude loads a skill when the task fits, or you type its name as a slash command. <code>/skills</code> lists them with their size.</p><p><strong>Reloading.</strong> Edits to a skill load by themselves. <code>/reload-skills</code> finds skills you added during the session. <code>/reload-plugins</code> applies plugin changes such as hooks, MCP servers and agents.</p><p class="takeaway">Good first plugins: frontend-design, claude-md-management, explanatory-output-style.</p></div>
+    <div class="widget" data-widget="term" data-script="plugins"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-12" aria-labelledby="h-12">
+  <div class="slide-head"><span class="slide-no">12/16</span><h2 id="h-12">MCP</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>Connect outside systems.</strong> An MCP server gives Claude new tools: a docs site, a database, Slack, a monitoring tool. Add one with <code>claude mcp add</code> and manage it with <code>/mcp</code>.</p><p><strong>Only names load at the start.</strong> Full tool details load when Claude uses a tool, so idle servers cost little context.</p><p class="takeaway">An MCP server can read and change data in the outside system. Treat it as a new colleague with that access.</p></div>
+    <div class="widget" data-widget="term" data-script="mcp"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-13" aria-labelledby="h-13">
+  <div class="slide-head"><span class="slide-no">13/16</span><h2 id="h-13">Subagents</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>A helper with its own context.</strong> Claude hands a side task to a subagent. The helper does the work and returns only a short answer, so the main conversation stays small.</p><p><strong>Fresh or forked.</strong> Built-in subagents (such as Explore and Plan) and your custom subagents start fresh: they see only the brief Claude writes. A fork inherits the entire conversation, so it needs no brief and starts from the same cache.</p><p><strong>Your own agents and forks.</strong> A custom subagent is a Markdown file in <code>.claude/agents/</code> with a name, a description and its tools. It can also set its own <code>model</code> and <code>effort</code>, for example a cheap model for searches. <code>/subtask</code> starts a forked subagent for a task.</p></div>
+    <div class="widget" data-widget="subagents"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-14" aria-labelledby="h-14">
+  <div class="slide-head"><span class="slide-no">14/16</span><h2 id="h-14">Output styles</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>How Claude answers you.</strong> An output style is a set of instructions for the tone and format of every reply in the session. What Claude should know about the project still goes in <code>CLAUDE.md</code>.</p><p><strong>Four built-in styles.</strong> Concise leads with the result and skips the narration. Explanatory adds short Insight blocks on why the code looks the way it does. Learning leaves small pieces of code for you to write. Proactive starts work at once and asks fewer routine questions.</p><p><strong>Switch any time.</strong> <code>/output-style concise</code> switches, <code>/output-style</code> alone lists the styles, and <code>/config</code> has the same choice. Your own style is a Markdown file in <code>.claude/output-styles/</code>.</p><p class="takeaway">New to a codebase? Try Explanatory. Replies too long? Try Concise.</p></div>
+    <div class="widget" data-widget="term" data-script="styles"></div>
+  </div>
+</section>
+
+<section class="slide" id="s-15" aria-labelledby="h-15">
+  <div class="slide-head"><span class="slide-no">15/16</span><h2 id="h-15">Good habits</h2></div>
+  <div class="slide-body">
+    <div class="summary"><p><strong>Give a full brief.</strong> The goal, the limits and how to check the result.</p><p><strong>Let Claude verify.</strong> A test or a command it can run is the biggest quality boost you can give it.</p><p><strong>Plan big tasks, review every diff.</strong> And when Claude repeats a mistake, add one line to <code>CLAUDE.md</code>.</p><p><strong>Keep secrets out.</strong> Not in prompts, not in <code>CLAUDE.md</code>.</p></div>
+  </div>
+</section>
+
+<section class="slide" id="s-16" aria-labelledby="h-16">
+  <div class="slide-head"><span class="slide-no">16/16</span><h2 id="h-16">Cheat sheet</h2></div>
+  <div class="slide-body has-widget">
+    <div class="summary"><p><strong>All commands from this page.</strong> Type to filter, or pick a stage. Type <kbd>/</kbd> in Claude Code to see the full menu.</p><p>Every command, workflows, prompting and popular plugins are in <a href="claude-code-201.html">Claude Code 201</a>. Back to <a href="ai-basics.html">AI basics</a>. Many tips here come from <a href="https://howborisusesclaudecode.com/">How Boris uses Claude Code</a>.</p></div>
+    <div class="widget" data-widget="commands"></div>
+  </div>
+</section>
+
+</main>
+
+<script id="commands-data" type="application/json">
+[
+ {
+  "cmd": "claude",
+  "purpose": "Start an interactive session in the current folder",
+  "stage": "start",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "claude -p",
+  "purpose": "Ask one question, print the answer and exit (good for scripts)",
+  "stage": "start",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "claude -c",
+  "purpose": "Continue the most recent conversation in this folder",
+  "stage": "start",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "claude -r",
+  "purpose": "Resume an older conversation from a picker or by id",
+  "stage": "start",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "claude --permission-mode default",
+  "purpose": "Start a session in Manual mode, which asks before each edit and command",
+  "stage": "start",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/help",
+  "purpose": "Show help and the available commands",
+  "stage": "start",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/init",
+  "purpose": "Write a CLAUDE.md guide for this project",
+  "stage": "start",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/memory",
+  "purpose": "Edit CLAUDE.md files and see auto memory",
+  "stage": "start",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/config",
+  "purpose": "Open settings: theme, model, output style and more",
+  "stage": "start",
+  "live": false,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/model",
+  "purpose": "Switch the model and save it as your default",
+  "stage": "start",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/effort",
+  "purpose": "Set how hard the model thinks: low, medium, high, xhigh, max or auto",
+  "stage": "start",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/statusline",
+  "purpose": "Set up the status line under the prompt (for example context use)",
+  "stage": "start",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/context",
+  "purpose": "Show what fills the context window as a colored grid",
+  "stage": "task",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/compact",
+  "purpose": "Summarize the conversation to free context; add a focus if you want",
+  "stage": "task",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/clear",
+  "purpose": "Start a new conversation with an empty context",
+  "stage": "task",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/btw",
+  "purpose": "Ask a side question that does not go into the conversation",
+  "stage": "task",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/plan",
+  "purpose": "Enter plan mode: Claude reads and plans, but does not edit",
+  "stage": "task",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/permissions",
+  "purpose": "Manage allow, ask and deny rules for tools",
+  "stage": "task",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/usage",
+  "purpose": "Show session cost, plan limits and activity (/cost is an alias)",
+  "stage": "task",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/resume",
+  "purpose": "Go back to an earlier conversation",
+  "stage": "task",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/rewind",
+  "purpose": "Roll the conversation and Claude's file edits back to an earlier point (Esc Esc)",
+  "stage": "review",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/diff",
+  "purpose": "Review the changes in your working tree, including Claude's edits",
+  "stage": "review",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/review",
+  "purpose": "Review the current diff for bugs (alias of /code-review)",
+  "stage": "review",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/plugin",
+  "purpose": "Open the plugin menu, or install, enable and disable plugins",
+  "stage": "customize",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/reload-plugins",
+  "purpose": "Reload plugins to apply hooks, MCP servers and agents without a restart",
+  "stage": "customize",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/reload-skills",
+  "purpose": "Find skills added on disk during the session (edits to existing skills load by themselves)",
+  "stage": "customize",
+  "live": false,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/skills",
+  "purpose": "List the skills Claude can use",
+  "stage": "customize",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/mcp",
+  "purpose": "Manage MCP server connections and logins",
+  "stage": "customize",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "claude mcp add",
+  "purpose": "Add an MCP server from the shell",
+  "stage": "customize",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/hooks",
+  "purpose": "View the hooks that run on events such as a file edit",
+  "stage": "customize",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/agents",
+  "purpose": "Reminds you to ask Claude for a subagent or edit .claude/agents/",
+  "stage": "customize",
+  "live": false,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/doctor",
+  "purpose": "Check the installation, settings and CLAUDE.md and propose fixes",
+  "stage": "customize",
+  "live": true,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/subtask",
+  "purpose": "Send a task to a fork: a subagent that inherits the whole conversation",
+  "stage": "customize",
+  "live": false,
+  "verified": "2.1.302"
+ },
+ {
+  "cmd": "/output-style",
+  "purpose": "List or switch the output style (Concise, Explanatory, Learning, Proactive)",
+  "stage": "customize",
+  "live": false,
+  "verified": "2.1.302"
+ }
+]
+</script>
+
+<script id="logic">
+var Deck = {
+  parseHash: function (hash, count) {
+    var m = /^#s-(\d+)$/.exec(hash || '');
+    var n = m ? Number(m[1]) : 0;
+    return n >= 1 && n <= count ? n - 1 : 0;
+  },
+  shouldNavigate: function (ev) {
+    if (ev.targetEditable || ['INPUT', 'TEXTAREA', 'SELECT'].indexOf(ev.targetTag) >= 0) return 0;
+    if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') return -1;
+    if (ev.key === ' ' && ['BUTTON', 'SUMMARY', 'A'].indexOf(ev.targetTag) >= 0) return 0;
+    if (ev.key === 'ArrowRight' || ev.key === 'PageDown' || ev.key === ' ') return 1;
+    return 0;
+  },
+
+  // Checked against https://code.claude.com/docs/en/permission-modes (Claude Code 2.1.302).
+  MODES: {
+    default: { status: '⏸ manual mode on', read: 'allowed', edit: 'asks', bash: 'asks' },
+    acceptEdits: { status: '⏵⏵ accept edits on', read: 'allowed', edit: 'allowed', bash: 'asks' },
+    plan: { status: '⏸ plan mode on', read: 'allowed', edit: 'blocked', bash: 'classifier' },
+    auto: { status: '⏵⏵ auto mode on', read: 'allowed', edit: 'allowed', bash: 'classifier' }
+  },
+  // A terminal session starts in auto (v2.1.283 and later) unless settings turn auto mode off.
+  startMode: 'auto',
+  CYCLE: ['auto', 'default', 'acceptEdits', 'plan'],
+
+  modeRules: function (mode) {
+    var m = Deck.MODES[mode];
+    return { read: m.read, edit: m.edit, bash: m.bash };
+  },
+
+  nextMode: function (mode) {
+    var i = Deck.CYCLE.indexOf(mode);
+    return Deck.CYCLE[(i + 1) % Deck.CYCLE.length];
+  },
+
+  filterCommands: function (cmds, query, stage) {
+    var q = String(query || '').trim().toLowerCase().replace(/^\//, '');
+    return cmds.filter(function (c) {
+      if (stage !== 'all' && c.stage !== stage) return false;
+      return !q || c.cmd.toLowerCase().indexOf(q) >= 0 || c.purpose.toLowerCase().indexOf(q) >= 0;
+    });
+  }
+,
+
+  // Example sessions for the terminal transcripts.
+  SCRIPTS: {
+    intro: [
+      { cmd: '> what does this repository do?', out: 'Reading README.md, src/, charts/ ...\nIt is a payments API in Go with a Helm chart and a CI pipeline.' },
+      { cmd: '> add a health check endpoint and a test for it', out: 'Edit src/health.go? (yes / no)\n... tests pass: 42 passed' }
+    ],
+    install: [
+      { cmd: '$ curl -fsSL https://claude.ai/install.sh | bash', out: 'Claude Code installed.' },
+      { cmd: '$ cd ~/code/my-project', out: '' },
+      { cmd: '$ claude', out: 'Welcome to Claude Code. Log in in your browser to continue.' }
+    ],
+    first: [
+      { cmd: '> what does this project do, and how do I run the tests?', out: 'A Python CLI. Run the tests with: make test' },
+      { cmd: '> /init', out: 'Wrote CLAUDE.md: build, test and lint commands, code style, 3 known traps.' },
+      { cmd: '> /memory', out: 'Opens CLAUDE.md in your editor.' }
+    ],
+    context: [
+      { cmd: '> /context', out: 'system prompt 3%  tools 6%  memory files 1%  messages 41%  free 49%' },
+      { cmd: '> /compact keep the API decisions, drop the debugging', out: 'Compacted. The conversation is now a summary.' },
+      { cmd: '> /context', out: 'system prompt 3%  tools 6%  memory files 1%  messages 4%  free 86%' },
+      { cmd: '> /btw what does the retry logic in client.py do?', out: 'Side answer. It is not added to the conversation.' }
+    ],
+    model: [
+      { cmd: '> /model', out: 'Pick a model: Opus, Sonnet, Haiku ...' },
+      { cmd: '> /effort high', out: 'Effort set to high.' },
+      { cmd: '> /usage', out: 'Session cost and plan limits ...' },
+      { cmd: '> /statusline show the model and the context use in percent', out: 'Status line saved.' }
+    ],
+    plan: [
+      { cmd: '> /plan add retries with backoff to the HTTP client', out: 'Plan mode. Reading client.py, tests/test_client.py ...\nPlan: 1. add a retry helper  2. use it in get()  3. add 3 tests' },
+      { cmd: 'Ctrl+G', out: 'The plan opens in your editor. Save to keep your changes.' },
+      { cmd: '> Yes, manually approve edits', out: 'Edit client.py? (yes / no)\n... tests: 3 new, all pass' }
+    ],
+    undo: [
+      { cmd: '> /rewind', out: 'Pick a point: restore code, conversation, or both.' },
+      { cmd: '> /diff', out: '2 files changed, 18 insertions, 4 deletions' },
+      { cmd: '> /review', out: 'Reviewing the diff ... 1 possible bug in client.py line 42.' }
+    ],
+    plugins: [
+      { cmd: '> /plugin', out: 'Browse, install, enable and disable plugins.' },
+      { cmd: '> /plugin install frontend-design@claude-plugins-official', out: 'Installed frontend-design.' },
+      { cmd: '> /reload-plugins', out: 'Reloaded: 1 plugin, 1 skill.' },
+      { cmd: '> /skills', out: 'frontend-design  (loads when you build a web page)' }
+    ],
+    mcp: [
+      { cmd: '$ claude mcp add --transport http claude-code-docs https://code.claude.com/docs/mcp', out: 'Added MCP server claude-code-docs.' },
+      { cmd: '> /mcp', out: 'claude-code-docs  connected  2 tools' }
+    ],
+    styles: [
+      { cmd: '> /output-style', out: 'default, proactive, concise, explanatory, learning' },
+      { cmd: '> /output-style concise', out: 'Output style: Concise. Replies now lead with the result.' }
+    ]
+  },
+
+  // Repositories touched by one workspace prompt.
+  WORKSPACE: [
+    { repo: 'payments-api', change: 'Add the /v2/refunds endpoint and its CI test job', mr: 'Merge request 1' },
+    { repo: 'helm-charts', change: 'Expose /v2 on the ingress and raise the memory limit', mr: 'Merge request 2' },
+    { repo: 'infra-terraform', change: 'Add the SQS queue and the IAM policy the endpoint needs', mr: 'Merge request 3' }
+  ]
+};
+globalThis.Deck = Deck;
+</script>
+
+<script id="widgets">
+(function () {
+  function el(tag, attrs, text) {
+    var e = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+  function mount(name) { return document.querySelector('[data-widget="' + name + '"]'); }
+  function caption(w, text) { w.appendChild(el('p', { class: 'caption' }, text)); }
+
+  // Permission mode cycler
+  (function () {
+    var LABEL = { allowed: 'runs without asking', asks: 'asks you first', blocked: 'not allowed', classifier: 'a safety check decides' };
+    var w = mount('modes');
+    w.appendChild(el('h3', {}, 'Press Shift+Tab'));
+    var status = el('div', { class: 'statusbar', 'aria-live': 'polite' });
+    var btn = el('button', { type: 'button' }, 'Shift+Tab');
+    var row = el('div', { class: 'row' }); row.appendChild(btn);
+    var table = el('table', { class: 'rules' });
+    w.appendChild(status); w.appendChild(row); w.appendChild(table);
+    caption(w, 'New sessions start in auto mode when your plan and settings allow it. In plan mode, read-only commands run and a safety check decides the rest. Deny rules block in every mode.');
+    var mode = Deck.startMode;
+    function render() {
+      status.textContent = '';
+      status.appendChild(document.createTextNode('> _   '));
+      status.appendChild(el('b', {}, Deck.MODES[mode].status));
+      var r = Deck.modeRules(mode);
+      table.textContent = '';
+      [['Read files and search', r.read], ['Edit files', r.edit], ['Run shell commands', r.bash]].forEach(function (x) {
+        var tr = el('tr', {});
+        tr.appendChild(el('th', { scope: 'row' }, x[0]));
+        tr.appendChild(el('td', { class: 'rule-' + x[1] }, LABEL[x[1]]));
+        table.appendChild(tr);
+      });
+    }
+    btn.addEventListener('click', function () { mode = Deck.nextMode(mode); render(); });
+    render();
+  })();
+
+  // Feature map
+  (function () {
+    var F = [
+      { name: 'CLAUDE.md', what: 'A Markdown file with project rules and commands.', when: 'Facts that apply to every task.', example: '"Run tests with make test. Never edit generated files."', cost: 'Loaded in full at the start of every session.' },
+      { name: 'Skill', what: 'A folder with a SKILL.md procedure, and maybe scripts.', when: 'A procedure you need sometimes.', example: 'A release checklist, a log-search recipe.', cost: 'Only the short description is always loaded; the full text loads on use.' },
+      { name: 'Subagent', what: 'A helper with its own context window and its own tools.', when: 'A side task that reads a lot.', example: 'A read-only code reviewer, a code searcher.', cost: 'Works in its own context; only its answer comes back.' },
+      { name: 'Hook', what: 'A command that runs on an event, such as after a file edit.', when: 'A rule that must always run, with no exceptions.', example: 'Run the formatter after each edit; block writes to migrations.', cost: 'Runs outside the model; no context unless it prints output.' },
+      { name: 'MCP server', what: 'A connection to an outside system that adds tools.', when: 'Claude must read or change data in another system.', example: 'Docs search, a database, Slack.', cost: 'Only tool names load at the start; full tool details load when used.' },
+      { name: 'Mod', what: 'A plugin with JavaScript or TypeScript code that runs inside Claude Code.', when: 'Change how Claude Code looks or behaves: a pane, a guard on a tool call, an instant command.', example: 'A pane that charts context use; a guard that holds rm -rf.', cost: 'Runs inside Claude Code, not in the model; no context unless it adds text.' },
+      { name: 'Plugin', what: 'A package of skills, commands, subagents, hooks, MCP servers and mods.', when: 'Share a setup with the team in one install.', example: 'frontend-design, claude-md-management.', cost: 'The sum of what it contains.' }
+    ];
+    var w = mount('features');
+    w.appendChild(el('h3', {}, 'Seven ways to customize'));
+    var cards = el('div', { class: 'cards' });
+    var detail = el('dl', { class: 'card-detail', 'aria-live': 'polite' });
+    w.appendChild(cards); w.appendChild(detail);
+    var btns = F.map(function (f, i) {
+      var b = el('button', { type: 'button', 'aria-pressed': 'false' }, f.name);
+      b.addEventListener('click', function () { show(i); });
+      cards.appendChild(b);
+      return b;
+    });
+    function show(i) {
+      btns.forEach(function (b, k) { b.setAttribute('aria-pressed', String(k === i)); });
+      detail.textContent = '';
+      [['What it is', F[i].what], ['Use it for', F[i].when], ['Example', F[i].example], ['Context cost', F[i].cost]].forEach(function (x) {
+        detail.appendChild(el('dt', {}, x[0])); detail.appendChild(el('dd', {}, x[1]));
+      });
+    }
+    show(0);
+  })();
+
+  // Command finder
+  (function () {
+    var all = JSON.parse(document.getElementById('commands-data').textContent);
+    var STAGES = { all: 'All', start: 'Start', task: 'During a task', review: 'Review', customize: 'Customize' };
+    var w = mount('commands');
+    w.appendChild(el('h3', {}, 'Find a command'));
+    var input = el('input', { type: 'search', placeholder: 'Type to filter, for example effort or context', 'aria-label': 'Filter commands' });
+    w.appendChild(input);
+    var row = el('div', { class: 'row', role: 'group', 'aria-label': 'Stage' });
+    var stage = 'all';
+    var chips = Object.keys(STAGES).map(function (k) {
+      var b = el('button', { type: 'button', 'aria-pressed': String(k === stage) }, STAGES[k]);
+      b.addEventListener('click', function () { stage = k; render(); });
+      row.appendChild(b);
+      return { k: k, b: b };
+    });
+    w.appendChild(row);
+    var list = el('ul', { class: 'cmd-list', 'aria-live': 'polite' });
+    w.appendChild(list);
+    caption(w, 'Ctrl+K or Cmd+K jumps to the filter. Esc leaves it, so the arrow keys move the slides again.');
+    function render() {
+      chips.forEach(function (c) { c.b.setAttribute('aria-pressed', String(c.k === stage)); });
+      var found = Deck.filterCommands(all, input.value, stage);
+      list.textContent = '';
+      if (!found.length) { list.appendChild(el('li', {}, 'No command matches "' + input.value + '". Try a shorter word.')); return; }
+      found.forEach(function (c) {
+        var li = el('li', {});
+        li.appendChild(el('code', {}, c.cmd));
+        var d = el('span', {}, c.purpose + ' ');
+        d.appendChild(el('span', { class: 'tag' }, c.live ? '(shown live)' : '(page only)'));
+        li.appendChild(d);
+        list.appendChild(li);
+      });
+    }
+    input.addEventListener('input', render);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Escape') input.blur(); });
+    document.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        var slide = w.closest('.slide');
+        if (document.body.classList.contains('talk') && !slide.classList.contains('current')) {
+          addEventListener('hashchange', function () { input.focus(); }, { once: true });
+          location.hash = '#' + slide.id;
+        } else {
+          input.focus();
+        }
+      }
+    });
+    render();
+  })();
+  // Terminal transcripts
+  Array.prototype.forEach.call(document.querySelectorAll('[data-widget="term"]'), function (w) {
+    var pre = el('pre', { class: 'term player' });
+    Deck.SCRIPTS[w.dataset.script].forEach(function (s, i) {
+      if (i) pre.appendChild(document.createTextNode('\n'));
+      pre.appendChild(el('span', { class: 'in' }, s.cmd + '\n'));
+      if (s.out) pre.appendChild(el('span', { class: 'out' }, s.out + '\n'));
+    });
+    w.appendChild(pre);
+  });
+
+  // Workspace with several repositories
+  (function () {
+    var w = mount('workspace');
+    if (!w) return;
+    w.appendChild(el('h3', {}, 'One workspace, three repositories'));
+    var prompt = el('pre', { class: 'term player' }, '> add a refunds endpoint: API and CI, Helm chart, and the AWS queue it needs');
+    w.appendChild(prompt);
+    var row = el('div', { class: 'row' });
+    var run = el('button', { type: 'button' }, 'Run the prompt');
+    row.appendChild(run); w.appendChild(row);
+    var list = el('ol', { class: 'repo-list', 'aria-live': 'polite' });
+    w.appendChild(list);
+    caption(w, 'Illustration: the workspace has a CLAUDE.md, knowledge files and the three repositories cloned side by side.');
+    var timer = null;
+    run.addEventListener('click', function () {
+      clearInterval(timer); list.textContent = ''; var i = 0;
+      timer = setInterval(function () {
+        var r = Deck.WORKSPACE[i++];
+        var li = el('li', {});
+        li.appendChild(el('code', {}, r.repo)); li.appendChild(document.createTextNode(': ' + r.change + '. '));
+        li.appendChild(el('strong', {}, r.mr));
+        list.appendChild(li);
+        if (i >= Deck.WORKSPACE.length) clearInterval(timer);
+      }, 900);
+    });
+  })();
+
+  // Built-in or custom subagent vs fork
+  (function () {
+    var w = mount('subagents');
+    if (!w) return;
+    var K = {
+      fresh: { name: 'Built-in or custom subagent', gets: ['Its own system prompt and tools', 'Only the brief Claude writes'], cache: 'A separate cache: its first request pays full price.', good: 'Independent review, big searches, read-only work.' },
+      fork: { name: 'Fork', gets: ['The same system prompt, tools and model', 'The whole conversation so far'], cache: 'Starts from the parent\'s cache, so the shared part is cheap.', good: 'A side task that needs all the background, or trying two approaches from one point.' }
+    };
+    w.appendChild(el('h3', {}, 'What the helper starts with'));
+    var row = el('div', { class: 'row' });
+    var cur = 'fresh';
+    var btns = Object.keys(K).map(function (k) {
+      var b = el('button', { type: 'button', 'aria-pressed': String(k === cur) }, K[k].name);
+      b.addEventListener('click', function () { cur = k; render(); });
+      row.appendChild(b); return { k: k, b: b };
+    });
+    w.appendChild(row);
+    var dl = el('dl', { class: 'card-detail', 'aria-live': 'polite' });
+    w.appendChild(dl);
+    caption(w, 'Both return only their final answer to the main conversation.');
+    function render() {
+      btns.forEach(function (x) { x.b.setAttribute('aria-pressed', String(x.k === cur)); });
+      var k = K[cur]; dl.textContent = '';
+      [['Starts with', k.gets.join('; ')], ['Cost', k.cache], ['Use it for', k.good]].forEach(function (x) {
+        dl.appendChild(el('dt', {}, x[0])); dl.appendChild(el('dd', {}, x[1]));
+      });
+    }
+    render();
+  })();
+})();
+</script>
+
+<!-- deck-shell:start -->
+<nav class="bar" aria-label="Slide navigation">
+  <button type="button" class="nav-step" data-step="-1" aria-label="Previous slide">Back</button>
+  <div class="ticks" role="group" aria-label="Go to slide"></div>
+  <button type="button" class="nav-step primary" data-step="1" aria-label="Next slide">Next</button>
+  <button type="button" id="mode-toggle" aria-pressed="false"><span class="label-long">Read mode</span></button>
+</nav>
+<script id="shell">
+(function () {
+  var D = globalThis.Deck;
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var ticks = document.querySelector('.ticks');
+  var modeBtn = document.getElementById('mode-toggle');
+  var current = 0;
+
+  slides.forEach(function (s, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Slide ' + (i + 1) + ': ' + s.querySelector('h2').textContent);
+    b.addEventListener('click', function () { go(i); });
+    ticks.appendChild(b);
+  });
+
+  function go(i) {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function (s, k) { s.classList.toggle('current', k === current); });
+    Array.prototype.forEach.call(ticks.children, function (t, k) {
+      t.classList.toggle('current', k === current);
+      t.classList.toggle('done', k < current);
+    });
+    var hash = '#s-' + (current + 1);
+    if (location.hash !== hash) history.replaceState(null, '', hash);
+    if (document.body.classList.contains('read')) slides[current].scrollIntoView({ block: 'start' });
+  }
+
+  function setMode(read) {
+    document.body.classList.toggle('read', read);
+    document.body.classList.toggle('talk', !read);
+    modeBtn.setAttribute('aria-pressed', String(read));
+    modeBtn.querySelector('.label-long').textContent = read ? 'Talk mode' : 'Read mode';
+    go(current);
+  }
+
+  document.querySelectorAll('.nav-step').forEach(function (b) {
+    b.addEventListener('click', function () { go(current + Number(b.dataset.step)); });
+  });
+  modeBtn.addEventListener('click', function () { setMode(!document.body.classList.contains('read')); });
+  if (matchMedia('(max-width: 600px)').matches) setMode(true);
+
+  document.addEventListener('keydown', function (e) {
+    if (document.body.classList.contains('read') || e.metaKey || e.ctrlKey || e.altKey) return;
+    var t = e.target;
+    var step = D.shouldNavigate({ key: e.key, targetTag: t.tagName, targetEditable: !!t.isContentEditable });
+    if (step) { e.preventDefault(); go(current + step); }
+  });
+  addEventListener('hashchange', function () { go(D.parseHash(location.hash, slides.length)); });
+  addEventListener('beforeprint', function () { document.querySelectorAll('details.more').forEach(function (d) { d.open = true; }); });
+
+  go(D.parseHash(location.hash, slides.length));
+})();
+</script>
+<!-- deck-shell:end -->
+</body>
+</html>

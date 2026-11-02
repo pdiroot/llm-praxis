@@ -1,4 +1,6 @@
-# Claude Code 101
+# Claude Code reference
+
+For the hands-on session, open [Claude Code 101](../part-2-playground/README.md).
 
 ## What Claude Code is
 **A harness in your terminal.** Claude Code is the harness from AI basics; Claude is the model inside it. It reads your files, runs commands, edits code and checks its own work.
