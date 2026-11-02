@@ -621,8 +621,8 @@ troubleshoot          Claude Code 102</pre>
     <p class="note">Check the GitLab server: authenticate again if it asks</p>
     <pre class="cmd">/mcp</pre>
     <p class="note">Check the token</p>
-    <pre class="cmd">! glab auth status</pre>
-    <p class="note">If it expired, <a href="https://gitlab.playground.localhost/-/user_settings/personal_access_tokens?name=claude&amp;scopes=api" target="_blank" rel="noopener">make a new token</a>, copy it, then, in the shell</p>
+    <pre class="cmd">! glab ci list -P 1</pre>
+    <p class="note">On 401 it expired: <a href="https://gitlab.playground.localhost/-/user_settings/personal_access_tokens?name=claude&amp;scopes=api" target="_blank" rel="noopener">make a new token</a>, copy it, then, in the shell</p>
     <pre class="cmd" data-sh>echo "GITLAB_TOKEN=$(pbpaste)" > ~/llm-praxis-demo/whoami/.env</pre>
     <p class="note">Exit Claude Code, then start a new conversation</p>
     <pre class="cmd" data-sh>task claude:start</pre>
