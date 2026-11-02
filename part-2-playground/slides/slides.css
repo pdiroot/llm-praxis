@@ -95,6 +95,7 @@ code, kbd { font-family: var(--mono); font-size: .8em; }
 .copy:focus-visible, nav button:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
 
 .prompt-line pre { font-weight: 400; color: var(--mist); }
+.prompt-line + .prompt-line { margin-top: 2em; }
 
 kbd {
   display: inline-block; padding: .08em .5em; margin-right: .15em;

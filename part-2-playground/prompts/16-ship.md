@@ -1,1 +1,1 @@
-Commit, push, open a merge request with the GitLab MCP server and merge it. Find the pipeline of the merge commit and follow the deployment with `glab ci trace deploy-test -p <id>`. When it succeeds, start the next job with `glab ci trigger deploy-prod -p <id>` and follow it with `glab ci trace deploy-prod -p <id>`.
+Commit, push, open a merge request with the GitLab MCP server and merge it. Follow the deployment to "test" with `glab`. When it succeeds, start the deployment to "prod" and follow it.
