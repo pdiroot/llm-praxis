@@ -3,389 +3,949 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Claude Code in a real day</title>
+<title>Claude Code 101 and 102</title>
 <link rel="stylesheet" href="slides.css">
 </head>
 <body>
 
-<section class="slide">
-  <h1>Claude Code in a real day</h1>
-  <p>From an empty folder to production, in 45 minutes.</p>
-  <p class="muted">LLM Praxis, part 2. Part 1 gave the words. Now we use them.</p>
-</section>
-
-<section class="slide">
-  <h2>The playground</h2>
-  <ul>
-    <li>It looks like a company: a GitLab with pipelines.</li>
-    <li>Two servers: <code>test</code> and <code>prod</code>.</li>
-    <li>Company TLS and SSH.</li>
-    <li>Everything runs on this Mac.</li>
-  </ul>
-</section>
-
-<section class="slide">
-  <h2>The app</h2>
-  <ul>
-    <li>A small Go web app, like <code>traefik/whoami</code>.</li>
-    <li>It shows the host name, the IP addresses and the request headers.</li>
-    <li>A merge to <code>main</code> deploys to <code>test</code>.</li>
-    <li><code>prod</code> is a manual job.</li>
-  </ul>
-</section>
-
-<section class="slide">
-  <h2>Three iterations</h2>
-  <div class="cols">
-    <div><h3>1. Plain text</h3>plan, build, review, merge request, deploy to prod</div>
-    <div><h3>2. JSON</h3>a new parameter, then an outage on prod</div>
-    <div><h3>3. Web UI</h3>a plugin and the browser</div>
+<section class="slide opening">
+  <div class="theory">
+    <h1>Claude Code 101</h1>
+    <p>One small project: build an app, prove it in a pipeline, and connect Claude Code to GitLab.</p>
   </div>
-  <p class="muted">Each slide: one or two commands, then the prompt. Then we switch to the terminal.</p>
-</section>
+  <div class="term" data-title="claude">
+<pre class="out">Claude Code
 
-<section class="slide">
-  <h2>Iteration 1: start</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="Gets the project to your Mac. The repository is empty, as on day one of a new service.">git clone</button>
-    <button class="cmd" data-hint="Start Claude Code inside the folder. Then CLAUDE.md, the project settings and the hook all bind to this project.">claude</button>
+What should we build?
+
+> <span class="cursor"></span></pre>
   </div>
-  <div class="hint" aria-live="polite"></div>
-  <p class="muted">First start: log in in the browser.</p>
 </section>
 
 <section class="slide">
-  <h2>Pick the model and the effort</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="Chooses the model. A bigger model plans better. A smaller one is faster and cheaper.">/model</button>
-    <button class="cmd" data-hint="Chooses how long Claude thinks before it answers. More effort for a plan, less for a typo.">/effort</button>
+  <div class="theory">
+    <h2>What we do today</h2>
+    <ul>
+      <li>We learn the basics of Claude Code.</li>
+      <li>We work in single repository mode: one project, one session.</li>
+      <li>We build a small app and connect Claude Code to GitLab.</li>
+    </ul>
+    <p class="muted">This is not workspace mode. We cover some topics and skip many.</p>
   </div>
-  <div class="hint" aria-live="polite"></div>
-</section>
-
-<section class="slide">
-  <h2>/init writes CLAUDE.md</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="Claude reads the project and writes CLAUDE.md: the notes it loads in every session. Read what it wrote.">/init</button>
+  <div class="term" data-title="today">
+    <p class="note">We cover</p>
+    <ul class="diff">
+      <li>Install and settings</li>
+      <li>`CLAUDE.md`</li>
+      <li>Plan mode and permission modes</li>
+      <li>Review of a change</li>
+      <li>A pipeline from a prompt</li>
+      <li>Connect a service: browser, MCP, CLI</li>
+      <li>The context window and the cost</li>
+    </ul>
+    <p class="note">We skip</p>
+    <ul class="diff skip">
+      <li>Deployment and troubleshooting: Claude Code 102</li>
+      <li>Skills, subagents and plugins: Claude Code 201</li>
+      <li>Workspace mode with many repositories</li>
+      <li>Parallel sessions and long-running workflows</li>
+    </ul>
   </div>
-  <div class="hint" aria-live="polite"></div>
-  <p>The folder is empty, so Claude cannot guess where the code lives. We tell it.</p>
 </section>
 
 <section class="slide">
-  <h2>Step: the environment</h2>
-  <p class="muted">What Claude cannot guess goes into CLAUDE.md. No secrets.</p>
-  <pre class="prompt" data-id="03-init-environment"></pre>
-</section>
-
-<section class="slide">
-  <h2>Step: the check commands</h2>
-  <p class="muted">A rule with a reason: the next commit must pass these.</p>
-  <pre class="prompt" data-id="04-claude-md-checks"></pre>
-</section>
-
-<section class="slide">
-  <h2>Plan before code</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="Cycles the modes; press until the footer says plan mode. Or type /plan.">Shift+Tab</button>
+  <div class="theory">
+    <h2>Model and harness</h2>
+    <p><strong>A model</strong> is the brain. It reads text and writes text.</p>
+    <p><strong>A harness</strong> is the hands for the brain: the program around the model, with the tools, the loop, the permissions and the context.</p>
+    <p><strong>An agent</strong> is the two working together.</p>
+    <p class="muted">Claude is a model. Claude Code is a harness.</p>
   </div>
-  <div class="hint" aria-live="polite"></div>
-  <p>In plan mode Claude reads and plans. It changes nothing until you approve.</p>
+  <div class="term" data-title="one turn of the loop">
+<pre class="out">  you
+   │  prompt
+   ▼
+┌─ harness: Claude Code ──────────────┐
+│  tools  permissions  context  files │
+└───────┬──────────────────▲──────────┘
+        │ request          │ answer or tool call
+        ▼                  │
+┌─ model: Claude ──────────┴──────────┐
+│  predicts the next text             │
+└─────────────────────────────────────┘
+
+The harness runs the tool call, adds the
+result and asks the model again.</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Words we use today</h2>
+    <p>You see these words in the interface of Claude Code.</p>
+    <p>The context grows with each turn. Each prompt, answer and tool result stays in the window and goes out again with the next request.</p>
+    <p>The bigger the context, the higher the cost of each request.</p>
+  </div>
+  <div class="term" data-title="words">
+<pre class="out">token           a small piece of text;
+                the unit of size and cost
+
+context window  all the text the model sees
+                in one request
+
+tool            an action the harness runs:
+                read a file, run a command
+
+permission      what runs without asking you
+
+CLAUDE.md       project notes, loaded
+                in each session
+
+MCP             a way to connect outside
+                systems as new tools</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What you need</h2>
+    <p>Everything runs on your own computer.</p>
+    <ul>
+      <li>A Mac on Apple silicon</li>
+      <li>Docker Desktop with 8 GB of memory</li>
+      <li>A Claude plan and Claude Code</li>
+      <li>Chrome with the Claude in Chrome extension</li>
+      <li>Free ports: 80, 443, 2201, 2202, 2222</li>
+    </ul>
+    <p class="muted">The README lists all the details.</p>
+  </div>
+  <div class="term" data-title="shell">
+    <p class="note">The tools of the playground</p>
+    <pre class="cmd" data-sh>brew install go-task go jq glab direnv</pre>
+    <p class="note">Start everything: a few minutes the first time</p>
+    <pre class="cmd" data-sh>task playground:start</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>The playground</h2>
+    <p>A small company on your own computer.</p>
+    <ul>
+      <li><strong>Traefik</strong>, the HTTP load balancer, sits in front of all web traffic.</li>
+      <li><strong>GitLab</strong> keeps the code and starts the pipelines.</li>
+      <li><strong>GitLab Runner</strong> runs each job in Docker-in-Docker.</li>
+      <li><strong><code>test</code></strong> and <strong><code>prod</code></strong> are the two servers.</li>
+    </ul>
+    <p class="muted">Each name is a container in one Docker Compose project. Traefik carries only the web traffic: git and the deploys connect to their containers directly, over SSH.</p>
+  </div>
+  <div class="term" data-title="Docker Compose">
+<pre class="out">┌─ your computer ─────────────────────────┐
+│  browser, Claude Code, git, ssh         │
+└───┬─────────────────────────────────────┘
+    │ HTTPS
+┌───▼─ Docker Compose ────────────────────┐
+│  Traefik: HTTP load balancer            │
+│    │          │         │               │
+│    ▼          ▼         ▼               │
+│  GitLab      test      prod             │
+│    │          ▲         ▲               │
+│    ▼          │ deploy  │ over SSH      │
+│  GitLab Runner ─────────┘               │
+│    │ runs the jobs in                   │
+│    ▼                                    │
+│  Docker-in-Docker                       │
+└─────────────────────────────────────────┘</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What we build</h2>
+    <p>A small web app that tells you who called it: the host name, the IP addresses and the request headers.</p>
+    <p>Its pipeline grows with the app:</p>
+    <ul>
+      <li>Iteration 1: unit tests, build, integration test.</li>
+      <li>Claude Code 102: deploy to <code>test</code> on a merge, and to <code>prod</code> when a person says so.</li>
+    </ul>
+    <p class="muted">We use Go. Any language works if you install it on the servers.</p>
+  </div>
+  <div class="term" data-title=".gitlab-ci.yml">
+<pre class="out">push
+  │
+  ▼
+test          unit tests
+  ▼
+build         the binary, kept as an artifact
+  ▼
+integration   start the binary, call it with curl
+  ▼
+deploy-test   automatic after a merge to main
+  ▼
+deploy-prod   manual: a person starts it</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>A tour of the playground</h2>
+    <p>Open each link and look around before we start.</p>
+    <p>Sign in to GitLab as <code>demo</code> with the password <code>P@ssw0rd</code>.</p>
+    <p class="muted">The <code>test</code> and <code>prod</code> pages need no sign-in.</p>
+  </div>
+  <div class="term" data-title="links">
+    <table class="links">
+      <tr><td><a href="https://gitlab.playground.localhost" target="_blank" rel="noopener">GitLab</a></td><td>the code and the pipelines</td></tr>
+      <tr><td><a href="https://gitlab.playground.localhost/demo/whoami/-/settings/ci_cd#js-runners-settings" target="_blank" rel="noopener">Runner</a></td><td>the Instance tab shows one runner</td></tr>
+      <tr><td><a href="https://gitlab.playground.localhost/demo/hello-world/-/merge_requests" target="_blank" rel="noopener">hello-world</a></td><td>a sample project with merge requests</td></tr>
+      <tr><td><a href="https://gitlab.playground.localhost/demo/whoami" target="_blank" rel="noopener">whoami</a></td><td>empty: we build this today</td></tr>
+      <tr><td><a href="https://test.playground.localhost" target="_blank" rel="noopener">test</a></td><td>502 Bad Gateway: no app runs here yet</td></tr>
+      <tr><td><a href="https://prod.playground.localhost" target="_blank" rel="noopener">prod</a></td><td>502 Bad Gateway: no app runs here yet</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Install and start</h2>
+    <p>Claude Code is a program in your terminal. The native install updates itself.</p>
+    <p>Start it inside the folder it should work on.</p>
+    <p>For this playground we start an isolated session: it has its own empty profile and loads none of your personal setup.</p>
+  </div>
+  <div class="term" data-title="shell: your project">
+    <p class="note">Install on macOS, Linux or WSL</p>
+    <pre class="cmd" data-sh>curl -fsSL https://claude.ai/install.sh | bash</pre>
+    <p class="note">A new session</p>
+    <pre class="cmd" data-sh>claude</pre>
+    <p class="note">Continue the last conversation</p>
+    <pre class="cmd" data-sh>claude -c</pre>
+    <p class="note">Pick an older conversation</p>
+    <pre class="cmd" data-sh>claude -r</pre>
+    <hr class="term-rule">
+    <p class="note">This playground: an isolated session</p>
+    <pre class="cmd" data-sh>task claude:start</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Where settings live</h2>
+    <table>
+      <tr><td><code>~/.claude/settings.json</code></td><td>You, in all projects</td></tr>
+      <tr><td><code>.claude/settings.json</code></td><td>The team: commit it</td></tr>
+      <tr><td><code>.claude/settings.local.json</code></td><td>You, in this project</td></tr>
+    </table>
+    <p class="muted">The narrower file wins.</p>
+  </div>
+  <div class="term" data-title="claude">
+    <p class="note">Change the common settings in a menu</p>
+    <pre class="cmd">/config</pre>
+    <p class="note">The settings you touch first, in the JSON file</p>
+    <pre class="cmd" data-sigil="">{
+  "model": "opus",
+  "effortLevel": "high",
+  "permissions": {
+    "allow": ["Bash(task dev:test)"],
+    "deny": ["Read(**/.env)"]
+  }
+}</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Model, effort and cost</h2>
+    <p>A bigger model plans better. A smaller model is faster and costs less.</p>
+    <p>Low effort for a simple edit. High effort for a hard bug or a design.</p>
+    <p>We run <code>/usage</code> again after iteration 1.</p>
+  </div>
+  <div class="term">
+    <p class="note">Choose the model</p>
+    <pre class="cmd">/model</pre>
+    <p class="note">Choose how hard Claude thinks before it answers</p>
+    <pre class="cmd">/effort</pre>
+    <p class="note">The session cost and the plan limits</p>
+    <pre class="cmd">/usage</pre>
+  </div>
 </section>
 
 <section class="slide" data-cut>
-  <h2>Edit the plan</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="Opens the plan in your editor. Change one line yourself, then approve. The plan is yours.">Ctrl+G</button>
+  <div class="theory">
+    <h2>The status line</h2>
+    <p>A line at the bottom of Claude Code. A script you choose prints it.</p>
+    <p>You tell Claude what to show, and Claude writes the script.</p>
+    <p class="muted">Most keyboard hints in the footer then disappear.</p>
+    <p class="muted">On your own machine, <code>/statusline</code> does this. It always uses <code>~/.claude</code>, so this isolated profile names its own file.</p>
   </div>
-  <div class="hint" aria-live="polite"></div>
-</section>
-
-<section class="slide">
-  <h2>Step: the plan</h2>
-  <pre class="prompt" data-id="05-plan-whoami"></pre>
-</section>
-
-<section class="slide">
-  <h2>Step: build it</h2>
-  <p class="muted">Claude makes a branch, writes the app and the pipeline, and checks the app with curl.</p>
-  <pre class="prompt" data-id="06-build-whoami"></pre>
-</section>
-
-<section class="slide">
-  <h2>See what changed</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="Shows the diff of this session. Read it before you commit, as you would read a colleague's change.">/diff</button>
+  <div class="term">
+    <pre class="prompt" data-id="02-statusline"></pre>
+    <p class="note">The result looks like this</p>
+<pre class="out">Opus 5.5 | medium | $1.21 | 14% context</pre>
+    <p class="note">The next task needs none of this chat, so start a new conversation</p>
+    <pre class="cmd">/clear</pre>
   </div>
-  <div class="hint" aria-live="polite"></div>
-  <p>Commit on the branch, so the review has new files to read.</p>
 </section>
 
 <section class="slide">
-  <h2>A review before the merge</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="Reviews the branch against main for security problems. A live review can miss a point, so you look too.">/security-review</button>
+  <div class="theory">
+    <h2>Iteration 1: the app and its first pipeline</h2>
+    <p>We build the first version, try it on this machine and let a pipeline prove it.</p>
+    <p><a href="https://gitlab.playground.localhost/demo/whoami" target="_blank" rel="noopener">Open whoami</a></p>
   </div>
-  <div class="hint" aria-live="polite"></div>
-  <p>Look at: the access log and the headers it writes, the PID file and its folder, the headers echoed back.</p>
-</section>
-
-<section class="slide">
-  <h2>Step: the decision</h2>
-  <pre class="prompt" data-id="07-review-decision"></pre>
-</section>
-
-<section class="slide">
-  <h2>Connect GitLab: MCP</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="The ! runs the command yourself, not Claude. Project scope writes .mcp.json, which the team can commit. It holds no secret.">claude mcp add</button>
+  <div class="term" data-title="iteration 1">
+    <ul class="diff">
+      <li>Write `CLAUDE.md` with `/init`</li>
+      <li>Plan the app and the pipeline</li>
+      <li>Change the plan</li>
+      <li>Build it on a branch</li>
+      <li>Review the change</li>
+      <li>Test it yourself</li>
+      <li>Close it with your voice</li>
+      <li>Watch the pipeline</li>
+      <li>Compact the chat</li>
+    </ul>
+    <hr class="term-rule">
+    <ul class="diff skip">
+      <li>A merge request: GitLab is not connected yet</li>
+      <li>A deployment: Claude Code 102</li>
+    </ul>
   </div>
-  <div class="hint" aria-live="polite"></div>
-  <p><code>! claude mcp add --scope project --transport http GitLab https://gitlab.playground.localhost/api/v4/mcp</code></p>
-  <p class="muted">Then exit and restart (next slide).</p>
 </section>
 
 <section class="slide">
-  <h2>The restart moment</h2>
-  <p>Claude Code asks you to approve a project server at startup. A server added now loads after a restart.</p>
-  <div class="cmds">
-    <button class="cmd" data-hint="Exit, then start again with this. Same chat, same context, and now the server shows up for approval.">claude --continue</button>
-    <button class="cmd" data-hint="After the approval, lists the MCP servers and runs the login in the browser.">/mcp</button>
+  <div class="theory">
+    <h2>/init writes CLAUDE.md</h2>
+    <p>Claude writes the notes it loads in each session.</p>
+    <p>The folder is empty, so we tell Claude what a new colleague needs to know: what the project is for, where the code lives, how it is built and how we test it.</p>
+    <p class="muted">No secrets.</p>
   </div>
-  <div class="hint" aria-live="polite"></div>
-</section>
-
-<section class="slide">
-  <h2>Ask the sample project</h2>
-  <p class="muted">The MCP server gives Claude typed GitLab tools, with their own login.</p>
-  <pre class="prompt" data-id="08-mcp-sample-questions"></pre>
-</section>
-
-<section class="slide">
-  <h2>A merge request through MCP</h2>
-  <pre class="prompt" data-id="09-mcp-sample-mr"></pre>
-</section>
-
-<section class="slide">
-  <h2>Our merge request</h2>
-  <p class="muted">The merge to main deploys to <code>test</code> while the next slides show.</p>
-  <pre class="prompt" data-id="10-mr-whoami"></pre>
-</section>
-
-<section class="slide">
-  <h2>MCP or CLI?</h2>
-  <div class="cols">
-    <div><h3>MCP</h3>Typed tools with their own login. Good for merge requests.</div>
-    <div><h3>CLI</h3>All that a terminal can do, with your credentials. Good for <code>glab</code> and <code>ssh</code>.</div>
+  <div class="term">
+    <pre class="prompt" data-id="03-init"></pre>
+    <p class="note">You push: the `!` runs a command yourself, and Claude reads the result</p>
+    <pre class="cmd">! git push -u origin main</pre>
   </div>
-  <p class="muted">The MCP server cannot start a manual job. <code>glab</code> can.</p>
 </section>
 
 <section class="slide">
-  <h2>The settings, explained</h2>
-  <ul>
-    <li>A hook loads <code>.env</code> before each command.</li>
-    <li>A deny rule: Claude may not read <code>.env</code>.</li>
-    <li>Ask rules: Claude Code asks before each way to start the prod job.</li>
-  </ul>
-  <pre class="prompt" data-id="11-explain-settings"></pre>
-</section>
-
-<section class="slide">
-  <h2>The token goes into .env</h2>
-  <ul>
-    <li>You make the token in GitLab: the <code>api</code> scope, one day.</li>
-    <li>You put it into <code>.env</code>. Git ignores that file.</li>
-    <li>Claude never sees the value in the chat.</li>
-    <li>The deny rule and the CLAUDE.md line are a guard, not a wall.</li>
-  </ul>
-</section>
-
-<section class="slide">
-  <h2>Deploy to production</h2>
-  <p class="muted">Claude starts the manual job with <code>glab ci trigger</code>. It asks first. Read the request aloud.</p>
-  <pre class="prompt" data-id="12-deploy-prod"></pre>
-</section>
-
-<section class="slide">
-  <h2>A rule matches what is written</h2>
-  <ul>
-    <li>The ask rule matches the command as typed.</li>
-    <li>Not the effect.</li>
-    <li>Claude can take another path to the same job.</li>
-    <li>So we list each way to start a job.</li>
-  </ul>
-  <p class="muted">Part 1: autonomy and safety.</p>
-</section>
-
-<section class="slide">
-  <h2>Iteration 2: the window</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="Shows what fills the context window: the chat, the tools, CLAUDE.md.">/context</button>
-    <button class="cmd" data-hint="Replaces the chat with a summary. The words after it say what to keep, so the decisions survive.">/compact keep the decisions about the app</button>
+  <div class="theory">
+    <h2>Permission modes</h2>
+    <p>A mode decides how much Claude does without asking you.</p>
+    <p>In auto mode, a second model checks the actions and blocks what looks dangerous or leaves your environment.</p>
+    <p>Allow and deny rules come first.</p>
+    <p><kbd>Shift</kbd><kbd>Tab</kbd> changes the mode.</p>
   </div>
-  <div class="hint" aria-live="polite"></div>
-</section>
+  <div class="term" data-title="permission modes">
+<pre class="out">Manual   asks you before actions
 
-<section class="slide">
-  <h2>Read the summary</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="Toggles the transcript view. After /compact it can show the summary.">Ctrl+O</button>
+Accept   edits files with no question,
+edits    asks before commands
+
+Plan     reads and plans,
+         changes no source file
+
+Auto     no routine questions;
+         a classifier checks the actions</pre>
   </div>
-  <div class="hint" aria-live="polite"></div>
-  <p class="muted">CLAUDE.md loads again after a compact. The new lines take effect.</p>
-</section>
-
-<section class="slide" data-cut>
-  <h2>JSON: red, then green</h2>
-  <p class="muted">The test fails first. Then the code makes it pass.</p>
-  <pre class="prompt" data-id="15-json-red-green"></pre>
 </section>
 
 <section class="slide">
-  <h2>Ship the JSON</h2>
-  <p class="muted">Same flow as iteration 1. Nothing new to explain.</p>
-  <pre class="prompt" data-id="16-ship-json"></pre>
-</section>
-
-<section class="slide">
-  <h2>The outage</h2>
-  <p>I kill the app on prod by hand: <code>kill -9</code>. The browser shows prod is down.</p>
-  <pre class="prompt" data-id="17-outage"></pre>
-</section>
-
-<section class="slide">
-  <h2>The fix</h2>
-  <p class="muted">The unit has no restart policy. The rule goes into CLAUDE.md.</p>
-  <pre class="prompt" data-id="18-fix-restart"></pre>
-</section>
-
-<section class="slide">
-  <h2>Iteration 3: a clean start</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="A new task needs a clean context. CLAUDE.md loads again, so it keeps our rules.">/clear</button>
+  <div class="theory">
+    <h2>Plan before code</h2>
+    <p>In plan mode Claude reads and plans. It changes nothing until you approve.</p>
+    <p>The plan is yours: tell Claude what to change, then approve.</p>
+    <p>A good prompt has four parts: the task, the context, the limits and the check.</p>
+    <p class="muted"><kbd>Ctrl</kbd><kbd>G</kbd> opens the plan in your editor.</p>
   </div>
-  <div class="hint" aria-live="polite"></div>
-</section>
-
-<section class="slide">
-  <h2>Step: the first prompt</h2>
-  <pre class="prompt" data-id="19-first-after-clear"></pre>
-</section>
-
-<section class="slide">
-  <h2>A plugin</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="Browse and install plugins. We install frontend-design from the official marketplace. It is a skill for good UI.">/plugin</button>
+  <div class="term">
+    <pre class="prompt" data-id="05-plan-whoami"></pre>
+    <p class="note">When the plan is ready but you are not happy with it, tell Claude what to change</p>
+    <pre class="prompt" data-id="05-plan-change"></pre>
+    <p class="note">Then approve: Yes, and use auto mode</p>
   </div>
-  <div class="hint" aria-live="polite"></div>
 </section>
 
-<section class="slide" data-cut>
-  <h2>Speak the prompt</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="Dictate the prompt with your voice. If the microphone fails, the same prompt is on the next slide.">/voice</button>
+<section class="slide">
+  <div class="theory">
+    <h2>Review the change</h2>
+    <p>Read the diff as you read a colleague's change, then ask for a review.</p>
+    <p>A review can miss a point, so you look too. Your own comments go into the next prompt.</p>
   </div>
-  <div class="hint" aria-live="polite"></div>
-</section>
-
-<section class="slide">
-  <h2>Build the web UI</h2>
-  <pre class="prompt" data-id="20-ui"></pre>
-</section>
-
-<section class="slide">
-  <h2>Claude in Chrome</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="Shows the connection to the browser. Claude opens the page and checks it on screen.">/chrome</button>
+  <div class="term">
+    <p class="note">Only for `/diff`: it skips new files until you stage them</p>
+    <pre class="prompt" data-id="06-stage"></pre>
+    <p class="note">See what changed; the same command closes the panel</p>
+    <pre class="cmd">/diff</pre>
+    <hr class="term-rule">
+    <p class="note">Only for `/security-review`: it reads commits, so commit first</p>
+    <pre class="prompt" data-id="06-commit-branch"></pre>
+    <p class="note">Review the change for bugs, and wait for the summary: about 3 minutes</p>
+    <pre class="cmd">/code-review</pre>
+    <p class="note">Review the change for security problems: about 1 minute</p>
+    <pre class="cmd">/security-review</pre>
   </div>
-  <div class="hint" aria-live="polite"></div>
-  <p class="muted">The browser is an MCP tool too.</p>
-</section>
-
-<section class="slide" data-cut="cut: the prod deploy">
-  <h2>Ship the UI</h2>
-  <p class="muted">Then check test and prod in the browser.</p>
-  <pre class="prompt" data-id="21-ship-ui"></pre>
 </section>
 
 <section class="slide">
-  <h2>Recap</h2>
-  <ul>
-    <li>CLAUDE.md grew by a few lines, each with a reason.</li>
-    <li>Plan, build, review, merge, deploy.</li>
-    <li>MCP for typed tools. CLI for the rest.</li>
-    <li>Rules guard the risky step.</li>
-    <li>One task, one context.</li>
-  </ul>
-</section>
-
-<section class="slide">
-  <h2>What does not go into CLAUDE.md</h2>
-  <ul>
-    <li>Secrets and tokens.</li>
-    <li>Long explanations.</li>
-    <li>What Claude can read from the code.</li>
-  </ul>
-  <p class="muted">At most about 15 lines.</p>
-</section>
-
-<section class="slide">
-  <h2>Phrases to stop writing</h2>
-  <table>
-    <tr><th>Instead of</th><th>Write</th></tr>
-    <tr><td>"Make it better"</td><td>The goal, and how you check it</td></tr>
-    <tr><td>"Be careful"</td><td>A limit: what not to touch</td></tr>
-    <tr><td>"You are an expert"</td><td>The context Claude cannot guess</td></tr>
-    <tr><td>"Fix it"</td><td>What fails, and the command that shows it</td></tr>
-  </table>
-</section>
-
-<section class="slide">
-  <h2>Go back, run, ask aside</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="The way back. Press Esc twice with an empty prompt to rewind the chat and the code to an earlier point.">/rewind (Esc Esc)</button>
-    <button class="cmd" data-hint="Run a shell command yourself, and the output goes into the chat.">!</button>
-    <button class="cmd" data-hint="A side question. It does not enter the chat history or change the task.">/btw</button>
+  <div class="theory">
+    <h2>Fix the findings</h2>
+    <p>Fix what matters and update <code>CLAUDE.md</code>.</p>
+    <p>The fixes stay on the branch for now.</p>
   </div>
-  <div class="hint" aria-live="polite"></div>
-</section>
-
-<section class="slide">
-  <h2>Memory and permissions</h2>
-  <div class="cmds">
-    <button class="cmd" data-hint="Lists the memory files. Pick one to open in your editor. Turns auto memory on or off.">/memory</button>
-    <button class="cmd" data-hint="Shows the allow, ask and deny rules, and lets you change them.">/permissions</button>
+  <div class="term">
+    <pre class="prompt" data-id="07-review-decision"></pre>
   </div>
-  <div class="hint" aria-live="polite"></div>
 </section>
 
 <section class="slide">
-  <h2>Cheat sheet</h2>
-  <table>
-    <tr><td><code>/init</code></td><td>first CLAUDE.md</td></tr>
-    <tr><td><code>/context</code> <code>/compact</code> <code>/clear</code></td><td>manage the window</td></tr>
-    <tr><td><code>Shift+Tab</code> <code>Ctrl+G</code></td><td>plan, edit the plan</td></tr>
-    <tr><td><code>/diff</code> <code>/security-review</code></td><td>check the change</td></tr>
-    <tr><td><code>/mcp</code> <code>/plugin</code></td><td>add tools</td></tr>
-    <tr><td><code>/rewind</code> <code>!</code> <code>/btw</code></td><td>undo, run, ask aside</td></tr>
-    <tr><td><code>/memory</code> <code>/permissions</code></td><td>notes and rules</td></tr>
-  </table>
+  <div class="theory">
+    <h2>Test it yourself</h2>
+    <p>The last review is yours: run the app and see the answers.</p>
+    <p>Nothing goes to origin before you say so.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="07-run-local"></pre>
+    <p class="note">Run the command in your own shell, then try `/health` too</p>
+  </div>
 </section>
 
 <section class="slide">
-  <h2>A look at part 3</h2>
-  <ul>
-    <li>Several repositories in one workspace.</li>
-    <li>Terraform.</li>
-    <li>A deployment to AWS.</li>
-  </ul>
+  <div class="theory">
+    <h2>Close it with your voice</h2>
+    <p>You are happy, so you tell Claude to push.</p>
+    <p>The branch goes straight into <code>main</code>: GitLab is not connected yet, so there is no merge request.</p>
+    <p>Hold <kbd>Space</kbd> and speak.</p>
+    <p class="muted">If the microphone fails, copy the prompt.</p>
+  </div>
+  <div class="term">
+    <pre class="cmd">/voice</pre>
+    <p class="note">Say this</p>
+    <pre class="prompt" data-id="07-close"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Watch the pipeline</h2>
+    <p>The push started the pipeline. Claude cannot see GitLab yet, so you look yourself.</p>
+    <p><a href="https://gitlab.playground.localhost/demo/whoami/-/pipelines/latest" target="_blank" rel="noopener">Open the pipeline</a></p>
+  </div>
+  <div class="term">
+    <p class="note">See what this iteration cost</p>
+    <pre class="cmd">/usage</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Watch the window</h2>
+    <p>The context window fills with the chat, the tools and <code>CLAUDE.md</code>.</p>
+    <p>Let's check what a compact does. It replaces the chat with a short summary, and your words say what to keep.</p>
+    <p class="muted"><kbd>Ctrl</kbd><kbd>O</kbd> shows the transcript and the summary.</p>
+  </div>
+  <div class="term">
+    <p class="note">See what fills the window</p>
+    <pre class="cmd">/context</pre>
+    <p class="note">Compact, and keep what matters</p>
+    <pre class="cmd">/compact Keep what we built and how we test it.</pre>
+    <p class="note">Read the short result, then look at the window again</p>
+    <pre class="cmd">/context</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Iteration 2: connect GitLab</h2>
+    <p>We ask one question in three ways and compare them.</p>
+    <p>GitLab is only the example. The same three ways work for most services.</p>
+    <p><a href="https://gitlab.playground.localhost" target="_blank" rel="noopener">Open GitLab</a></p>
+  </div>
+  <div class="term" data-title="iteration 2">
+    <ul class="diff">
+      <li>A new conversation for each way</li>
+      <li>The browser: Claude in Chrome</li>
+      <li>MCP: the GitLab server</li>
+      <li>The CLI: `glab`</li>
+      <li>Compare the three, and a fourth way</li>
+      <li>Write the choice in `CLAUDE.md`</li>
+    </ul>
+    <hr class="term-rule">
+    <ul class="diff skip">
+      <li>Changes to the app</li>
+      <li>Plan mode and reviews: we only read</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Way 1: the browser</h2>
+    <p><strong>You need:</strong> Chrome, the Claude in Chrome extension, and Claude Code started with <code>--chrome</code>. Our <code>task</code> command does that.</p>
+    <p>Claude sees what you see, with your login in that Chrome.</p>
+    <p class="muted">Use a Chrome profile with no personal tabs.</p>
+  </div>
+  <div class="term">
+    <p class="note">Start with a fresh context: each way gets the same fair test</p>
+    <pre class="cmd">/clear</pre>
+    <p class="note">Check the connection</p>
+    <pre class="cmd">/chrome</pre>
+    <p class="note">On a new profile it says "Not enabled": exit Claude Code and restart it</p>
+    <pre class="cmd" data-sh>task claude:start</pre>
+    <p class="note">Ask</p>
+    <pre class="prompt" data-id="08-chrome"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Way 2: MCP</h2>
+    <p><strong>You need:</strong> one command and a login. Nothing to install.</p>
+    <p>Project scope writes <code>.mcp.json</code>. It holds no secret, so the team can commit it.</p>
+    <p>A new server needs a restart, so we start a new conversation.</p>
+  </div>
+  <div class="term" data-title="claude, then shell, then claude">
+    <p class="note">Add the server</p>
+    <pre class="cmd">! claude mcp add --scope project --transport http GitLab https://gitlab.playground.localhost/api/v4/mcp</pre>
+    <p class="note">Exit Claude Code, then start a new conversation in the shell</p>
+    <pre class="cmd" data-sh>task claude:start</pre>
+    <p class="note">Choose "Use this MCP server": the default skips it. Then choose GitLab, Authenticate, and approve in the browser. GitLab calls Claude Code an unverified app</p>
+    <pre class="cmd">/mcp</pre>
+    <p class="note">Ask</p>
+    <pre class="prompt" data-id="09-mcp"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Way 3: the CLI</h2>
+    <p><strong>You need:</strong> <code>glab</code>, a token and a place for the token.</p>
+    <p>You <a href="https://gitlab.playground.localhost/-/user_settings/personal_access_tokens?name=claude&amp;scopes=api" target="_blank" rel="noopener">make the token in GitLab</a>: the <code>api</code> scope, with tomorrow as the date.</p>
+    <p><code>direnv</code> loads <code>.env</code> into the session. A deny rule stops Claude from reading the file.</p>
+    <p class="muted">A guard, not a wall.</p>
+  </div>
+  <div class="term" data-title="shell, then claude">
+    <p class="note">Copy the token, then, in the shell</p>
+    <pre class="cmd" data-sh>echo "GITLAB_TOKEN=$(pbpaste)" > ~/llm-praxis-demo/whoami/.env</pre>
+    <pre class="cmd" data-sh>echo dotenv > ~/llm-praxis-demo/whoami/.envrc</pre>
+    <pre class="cmd" data-sh>direnv allow ~/llm-praxis-demo/whoami</pre>
+    <p class="note">Exit Claude Code, then start a new conversation</p>
+    <pre class="cmd" data-sh>task claude:start</pre>
+    <p class="note">Ask</p>
+    <pre class="prompt" data-id="10-glab"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Compare the ways</h2>
+    <p>Start with the CLI or MCP. Use the browser when neither exists, or to test a UI.</p>
+    <p><strong>Computer use</strong> is the fourth way: Claude drives any desktop app from screenshots. It needs no API, but it is the hardest and uses the most tokens.</p>
+    <p class="muted">Research preview, on macOS, with a Pro, Max or Ultra plan. Turn it on in <code>/mcp</code>.</p>
+  </div>
+  <div class="term" data-title="four ways to connect">
+    <table class="links compare">
+      <tr><th>Way</th><th>Reach</th><th>Tokens</th><th>Time</th></tr>
+      <tr><td>CLI</td><td>most of the API</td><td>11k</td><td>15 s</td></tr>
+      <tr><td>MCP</td><td>what the server has</td><td>11k, plus 3k tools</td><td>15 s</td></tr>
+      <tr><td>Browser</td><td>what the page shows</td><td>20k, plus 3k tools</td><td>60 s</td></tr>
+      <tr><td>Computer use</td><td>any app</td><td>the most</td><td>the longest</td></tr>
+    </table>
+    <p class="note">Measured on one question in this playground</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Not only GitLab</h2>
+    <p>Check what each tool offers, because the ways do different things. The GitLab MCP server cannot start a manual job, and <code>glab</code> can.</p>
+    <p>Many services have an MCP server and a CLI, such as Argo CD.</p>
+    <p><strong>Neither one?</strong> Ask Claude to write a small CLI or MCP server for the API of that service.</p>
+  </div>
+  <div class="term" data-title="any service">
+<pre class="out">need            first choice
+
+GitLab          glab, GitLab MCP
+Argo CD         argocd, its MCP server
+your own API    a small CLI that Claude writes</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Update CLAUDE.md</h2>
+    <p>We compared the ways, so we write down what we chose.</p>
+    <p>Each new conversation then knows which tool to use, and that the token stays out of git.</p>
+    <p class="muted">Why <code>glab</code> for jobs: the GitLab MCP server cannot start a manual job.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="07-update-claude-md"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>The workflow so far</h2>
+    <p>You saw the first part of the path today. The rest is Claude Code 102, in the same playground.</p>
+    <p>For real work, walk the whole path. Shorten it only when a mistake is cheap.</p>
+    <p>Keep the <a href="#41">cheat sheet</a>, and <a href="#42">run it yourself</a>.</p>
+    <p class="muted"><code>task playground:stop</code> keeps the data, and <code>task playground:start</code> resumes it.</p>
+  </div>
+  <div class="term" data-title="plan to production">
+<pre class="out">plan                  Claude Code 101
+change the plan       Claude Code 101
+build                 Claude Code 101
+/code-review          Claude Code 101
+/security-review      Claude Code 101
+test it yourself      Claude Code 101
+pipeline              Claude Code 101
+connect a service     Claude Code 101</pre>
+    <hr class="term-rule">
+<pre class="out">merge request         Claude Code 102
+human review, merge   Claude Code 102
+deploy to test        Claude Code 102
+deploy to prod        Claude Code 102
+troubleshoot          Claude Code 102</pre>
+  </div>
+</section>
+
+<section class="slide opening">
+  <div class="theory">
+    <h1>Claude Code 102</h1>
+    <p>The same project: deploy the app to <code>test</code> and <code>prod</code>, then find and fix an outage.</p>
+    <p class="muted">We start in a new conversation. <code>CLAUDE.md</code> has our notes.</p>
+  </div>
+  <div class="term" data-title="shell, then claude">
+    <p class="note">Resume the playground: it kept the data</p>
+    <pre class="cmd" data-sh>task playground:start</pre>
+    <p class="note">Start a new conversation</p>
+    <pre class="cmd" data-sh>task claude:start</pre>
+    <p class="note">Check the GitLab server: authenticate again if it asks</p>
+    <pre class="cmd">/mcp</pre>
+    <p class="note">Check the token</p>
+    <pre class="cmd">! glab ci list -P 1</pre>
+    <p class="note">On 401 it expired: <a href="https://gitlab.playground.localhost/-/user_settings/personal_access_tokens?name=claude&amp;scopes=api" target="_blank" rel="noopener">make a new token</a>, copy it, then, in the shell</p>
+    <pre class="cmd" data-sh>echo "GITLAB_TOKEN=$(pbpaste)" > ~/llm-praxis-demo/whoami/.env</pre>
+    <p class="note">Exit Claude Code, then start a new conversation</p>
+    <pre class="cmd" data-sh>task claude:start</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Iteration 3: the deployment</h2>
+    <p>We add the two last pipeline stages.</p>
+    <p>This change goes to servers, so it gets a merge request, and you merge it.</p>
+    <p><a href="https://gitlab.playground.localhost/demo/whoami/-/merge_requests" target="_blank" rel="noopener">Open the merge requests</a></p>
+  </div>
+  <div class="term" data-title="iteration 3">
+    <ul class="diff">
+      <li>Plan the deployment</li>
+      <li>Review and merge it yourself</li>
+      <li>Deploy to `test` and `prod`</li>
+    </ul>
+    <hr class="term-rule">
+    <ul class="diff skip">
+      <li>`/code-review` and `/security-review`, for time</li>
+      <li>A test by hand: the deploy jobs check the app</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Plan the deployment</h2>
+    <p>The pipeline from Claude Code 101 now gets its last two stages.</p>
+    <p class="muted">The deploys use SSH. To connect to a server yourself:</p>
+    <p class="muted"><code>ssh -F ~/llm-praxis-demo/ssh/config test.playground.localhost</code></p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="12-pipeline"></pre>
+    <p class="note">Read the plan, then approve: Yes, and use auto mode</p>
+    <p class="note">If Claude asks about a shell script, read it and choose Yes</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Review and merge</h2>
+    <p>Open the link and read the change in GitLab. You merge it, not Claude.</p>
+    <p>The merge starts the deployment to <code>test</code>. This is the first real run: if it fails, Claude reads the log and fixes the cause.</p>
+    <p>Open <a href="https://test.playground.localhost" target="_blank" rel="noopener"><code>test</code></a> and <a href="https://prod.playground.localhost" target="_blank" rel="noopener"><code>prod</code></a></p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="12-check-test"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Deploy to production</h2>
+    <p>The MCP server cannot do this step, so Claude uses <code>glab</code>. A failure gets the same fix as before.</p>
+    <p>Open <a href="https://test.playground.localhost" target="_blank" rel="noopener"><code>test</code></a> and <a href="https://prod.playground.localhost" target="_blank" rel="noopener"><code>prod</code></a></p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="13-deploy-prod"></pre>
+    <p class="note">If auto mode blocks the job, state what you want and try again</p>
+    <pre class="prompt" data-id="13-deploy-confirm"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Iteration 4: troubleshooting</h2>
+    <p>Claude Code is not only for writing code. It reads logs and finds causes on servers too.</p>
+  </div>
+  <div class="term" data-title="iteration 4">
+    <ul class="diff">
+      <li>Start clean</li>
+      <li>Break `prod`</li>
+      <li>Find the cause, change nothing</li>
+      <li>Fix it and prove the fix</li>
+      <li>See the cost</li>
+    </ul>
+    <hr class="term-rule">
+    <ul class="diff skip">
+      <li>Plan mode: a one-line fix</li>
+      <li>Reviews and human review, for time</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>The outage</h2>
+    <p>A new task needs a clean context. Claude has <code>CLAUDE.md</code> and the code, so our rules stay.</p>
+    <p>Let's kill the app on <code>prod</code>. The browser shows that it is down.</p>
+    <p>Claude looks. It changes nothing.</p>
+    <p>Open <a href="https://prod.playground.localhost" target="_blank" rel="noopener"><code>prod</code></a></p>
+  </div>
+  <div class="term" data-title="claude, then shell, then claude">
+    <pre class="cmd">/clear</pre>
+    <p class="note">In your own shell</p>
+    <pre class="cmd" data-sh>ssh -F ~/llm-praxis-demo/ssh/config prod.playground.localhost sudo systemctl kill -s KILL whoami</pre>
+    <p class="note">In Claude Code</p>
+    <pre class="prompt" data-id="17-outage"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>The fix</h2>
+    <p>The unit has no restart policy. The fix is one line, and you ship it with what you already know.</p>
+    <p>Kill the app again: this time it comes back.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="18-fix-restart"></pre>
+    <pre class="prompt" data-id="16-ship"></pre>
+    <p class="note">In your own shell: it comes back</p>
+    <pre class="cmd" data-sh>ssh -F ~/llm-praxis-demo/ssh/config prod.playground.localhost sudo systemctl kill -s KILL whoami</pre>
+    <p class="note">Check it, after a few seconds: the new first line proves that the new version is live</p>
+    <pre class="cmd" data-sh>curl https://prod.playground.localhost</pre>
+    <p class="note">The cost since `/clear`</p>
+    <pre class="cmd">/usage</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>The full workflow</h2>
+    <p>You saw every step in the two sessions, but not all of them each time.</p>
+    <p>For real work, walk the whole path. Shorten it only when a mistake is cheap.</p>
+  </div>
+  <div class="term" data-title="plan to production">
+<pre class="out">plan                  Claude Code 101
+change the plan       Claude Code 101
+build                 Claude Code 101
+/code-review          Claude Code 101
+/security-review      Claude Code 101
+test it yourself      Claude Code 101
+pipeline              Claude Code 101
+connect a service     Claude Code 101</pre>
+    <hr class="term-rule">
+<pre class="out">merge request         Claude Code 102
+human review, merge   Claude Code 102
+deploy to test        Claude Code 102
+deploy to prod        Claude Code 102
+troubleshoot          Claude Code 102</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Recap</h2>
+    <ul>
+      <li><code>CLAUDE.md</code> grew with the project.</li>
+      <li>Plan, build, review, merge, deploy.</li>
+      <li>Connect a service: CLI, MCP, the browser, computer use.</li>
+      <li>The token stays out of the chat.</li>
+      <li>One task, one context.</li>
+      <li>Claude also reads logs and finds causes.</li>
+    </ul>
+  </div>
+  <div class="term" data-title="what the project keeps">
+<pre class="out">project/
+├── CLAUDE.md        notes for each session
+├── .gitlab-ci.yml   the pipeline
+├── .mcp.json        the connection to GitLab
+├── .envrc           loads .env
+└── .env             the token; git ignores it
+
+The next session starts with all of it.</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Cheat sheet</h2>
+    <p>Type <code>/</code> in Claude Code to see the full menu.</p>
+  </div>
+  <div class="term" data-title="/help">
+<pre class="out">/init                       first CLAUDE.md
+/context /compact /clear    manage the window
+/usage                      the cost and the limits
+/plan  Shift+Tab  Ctrl+G    plan, edit the plan
+/diff /code-review          check the change
+/security-review            check it for security
+/mcp /chrome                connect tools, the browser
+/voice                      speak a prompt
+/rewind ! /btw              undo, run, ask aside
+/memory /permissions        notes and rules</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Run it yourself</h2>
+    <ul>
+      <li><strong>Mac:</strong> it works as it is, on Apple silicon with Docker Desktop.</li>
+      <li><strong>Linux:</strong> it can need some extra work.</li>
+      <li><strong>Windows:</strong> it needs more work.</li>
+    </ul>
+    <p>Any AI harness can help you with these changes. The README has the full steps.</p>
+    <p class="muted">The first start takes a few minutes. <code>task playground:stop</code> keeps the data, and <code>task playground:start</code> resumes it.</p>
+  </div>
+  <div class="term" data-title="shell">
+    <p class="note">Get the playground</p>
+    <pre class="cmd" data-sh>git clone https://github.com/pdiroot/llm-praxis.git</pre>
+    <pre class="cmd" data-sh>cd llm-praxis/part-2-playground</pre>
+    <p class="note">Provision everything with one command</p>
+    <pre class="cmd" data-sh>task playground:start</pre>
+    <p class="note">Prove it with real deployments</p>
+    <pre class="cmd" data-sh>task playground:smoke</pre>
+    <p class="note">Open this deck and follow it</p>
+    <pre class="cmd" data-sh>task slides:open</pre>
+    <p class="note">Start Claude Code in the project</p>
+    <pre class="cmd" data-sh>task claude:start</pre>
+    <p class="note">Delete everything</p>
+    <pre class="cmd" data-sh>task playground:terminate</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What we skipped</h2>
+    <p>You have the basics in one repository. Claude Code 201 goes further.</p>
+  </div>
+  <div class="term" data-title="next">
+    <ul class="diff skip">
+      <li>Your own skills and subagents</li>
+      <li>Plugins</li>
+      <li>Workspace mode with many repositories</li>
+      <li>Parallel sessions</li>
+      <li>Long-running workflows</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide" data-cut="Appendix">
+  <div class="theory">
+    <h2>What you can choose</h2>
+    <p>The harness and the model are two choices.</p>
+    <p>The same model acts differently in a different harness, because each harness has its own system prompt and tools.</p>
+    <p class="muted">Today: Claude Code with Claude models.</p>
+  </div>
+  <div class="term" data-title="choices">
+    <p class="note">Harnesses</p>
+    <ul class="diff plain">
+      <li>Claude Code</li>
+      <li>Codex CLI</li>
+      <li>Gemini CLI</li>
+      <li>OpenCode</li>
+      <li>Cursor</li>
+    </ul>
+    <p class="note">Models</p>
+    <ul class="diff plain">
+      <li>Claude: Haiku, Sonnet, Opus, Fable</li>
+      <li>OpenAI: Luna, Terra, Sol, Astra</li>
+      <li>Google: Gemini</li>
+      <li>Local models, through Ollama and other servers</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide" data-cut="Appendix">
+  <div class="theory">
+    <h2>What stays out of CLAUDE.md</h2>
+    <ul>
+      <li>Secrets and tokens</li>
+      <li>Long explanations</li>
+      <li>What Claude can read from the code</li>
+    </ul>
+    <p class="muted">Keep it short: Claude reads it in each session.</p>
+  </div>
+  <div class="term" data-title="CLAUDE.md">
+<pre class="out"># Commands Claude cannot guess
+# Rules that differ from the defaults
+# Known traps</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut="Appendix">
+  <div class="theory">
+    <h2>Phrases to stop writing</h2>
+    <p>Each phrase on the left of the terminal gives Claude nothing to work with. Give it the line on the right.</p>
+  </div>
+  <div class="term" data-title="prompts">
+<pre class="out">"Make it better"       the goal, and how you check it
+"Be careful"           a limit: what not to touch
+"You are an expert"    the context Claude cannot guess
+"Fix it"               what fails, and the command
+                       that shows it</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut="Appendix">
+  <div class="theory">
+    <h2>Go back, run, ask aside</h2>
+    <p>Roll back, do not argue. Files that only shell commands changed stay as they are, so use git too.</p>
+    <p><kbd>Esc</kbd><kbd>Esc</kbd> also opens the rewind menu, when the prompt is empty.</p>
+  </div>
+  <div class="term">
+    <p class="note">Rewind the chat and the code to an earlier point</p>
+    <pre class="cmd">/rewind</pre>
+    <p class="note">Run a shell command yourself; the output goes into the chat</p>
+    <pre class="cmd">! git status</pre>
+    <p class="note">A side question that stays out of the chat history</p>
+    <pre class="cmd">/btw Why did you pick this port?</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut="Appendix">
+  <div class="theory">
+    <h2>Memory and permissions</h2>
+    <p>The notes and the rules are yours to read and change.</p>
+  </div>
+  <div class="term">
+    <p class="note">The memory files; pick one to open in your editor</p>
+    <pre class="cmd">/memory</pre>
+    <p class="note">The allow, ask and deny rules</p>
+    <pre class="cmd">/permissions</pre>
+  </div>
 </section>
 
 <nav>
-  <button id="prev" aria-label="Previous slide">&larr; Previous</button>
+  <button id="prev" aria-label="Previous slide">Previous</button>
   <span id="counter"></span>
-  <button id="next" aria-label="Next slide">Next &rarr;</button>
+  <button id="next" aria-label="Next slide">Next</button>
 </nav>
 
 <script src="prompts.js"></script>

@@ -1,14 +1,10 @@
 [
   {
-    "message": "feat: add the health endpoint",
-    "files": ["go.mod", "main.go", "health.go", "health_test.go"]
+    "message": "feat: say hello",
+    "files": ["go.mod", "main.go", "main_test.go"]
   },
   {
-    "message": "feat: add the notes endpoint",
-    "files": ["notes.go", "notes_test.go"]
-  },
-  {
-    "message": "docs: describe the service",
+    "message": "docs: describe the app",
     "files": ["README.md"]
   }
 ]

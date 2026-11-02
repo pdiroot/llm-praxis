@@ -23,7 +23,7 @@ keepers() { find "$PG_RUNTIME/ssh" "$PG_RUNTIME/tls" -type f -exec shasum {} + |
 
 @test "reset during a pipeline" {
   before=$(keepers)
-  dir="$ROOT/checkpoints/1-end/main"
+  dir="$ROOT/smoke"
   mapfile -t files < <(cd "$dir" && find . -type f | sed 's|^\./||')
   API_SUDO=demo push_dir demo%2Fwhoami main "feat: whoami" "$dir" "${files[@]}"
   for _ in $(seq 30); do
@@ -34,7 +34,7 @@ keepers() { find "$PG_RUNTIME/ssh" "$PG_RUNTIME/tls" -type f -exec shasum {} + |
   [[ $s == running || $s == pending || $s == created ]]
 
   demo_home_init
-  mkdir -p "$PG_DEMO_HOME/claude-config" "$PG_DEMO_HOME/whoami" "$PG_DEMO_HOME/sample-service"
+  mkdir -p "$PG_DEMO_HOME/claude-config" "$PG_DEMO_HOME/whoami"
   CREATED=1
   PATH="$STUB:$PATH" run "$ROOT/scripts/reset.sh"
   echo "$output"
@@ -48,9 +48,8 @@ keepers() { find "$PG_RUNTIME/ssh" "$PG_RUNTIME/tls" -type f -exec shasum {} + |
   [ "$status" -ne 255 ] # 255 is ssh itself failing
   [ ! -e "$PG_DEMO_HOME/claude-config" ]
   [ ! -e "$PG_DEMO_HOME/whoami" ]
-  [ ! -e "$PG_DEMO_HOME/sample-service" ]
   grep -q "CLAUDE_CONFIG_DIR=$PG_DEMO_HOME/claude-config auth logout" "$BATS_TEST_TMPDIR/claude.log"
   grep -q "CLAUDE_CONFIG_DIR= auth status" "$BATS_TEST_TMPDIR/claude.log"
   [ "$(keepers)" = "$before" ]
-  [ "$(api GET /projects/demo%2Fsample-service/repository/commits?per_page=100 | jq length)" -gt 0 ]
+  [ "$(api GET /projects/demo%2Fhello-world/repository/commits?per_page=100 | jq length)" -gt 0 ]
 }

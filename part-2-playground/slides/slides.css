@@ -1,52 +1,162 @@
+/* Two materials: the textbook on the left, the terminal on the right. */
 :root {
-  --bg: #fbfbf9; --fg: #1d2330; --muted: #5d6677; --accent: #b4430a;
-  --card: #eef0f4; --line: #cfd4de; --code: #e3e7ee; --ok: #176b3a;
+  --paper: #e6eee8; --ink: #12302b; --ink-soft: #456259; --rule: #b9cbc0;
+  --pine: #0e2a26; --pine-bar: #1b403a; --pine-line: #2f5a52;
+  --mist: #cfe3da; --dim: #8fb3a6; --amber: #ffbf5e;
+  --serif: "Iowan Old Style", Charter, Georgia, serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #14171f; --fg: #eceff5; --muted: #a2abbd; --accent: #ffa05c;
-    --card: #20252f; --line: #3a4150; --code: #272d3a; --ok: #6fd69a;
-  }
-}
+
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg);
-  font: 28px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-code, pre, .cmd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-code { background: var(--code); padding: 0 .2em; border-radius: 4px; font-size: .9em; }
-.slide { display: none; position: absolute; inset: 0 0 64px 0; overflow: auto;
-  padding: 20px 72px 16px; }
-.slide.on { display: flex; flex-direction: column; }
-.slide.on > * { flex-shrink: 0; }
-.slide[data-cut]::after { content: "cut point"; position: fixed; top: 10px; right: 16px;
-  font-size: 14px; color: var(--muted); opacity: .6; }
+
+html, body {
+  margin: 0; height: 100%; overflow: hidden;
+  background: var(--paper); color: var(--ink);
+  font: clamp(17px, 2.6vh, 30px)/1.42 var(--serif);
+}
+
+.slide {
+  display: none; position: absolute; inset: 0;
+  grid-template-columns: minmax(0, 38fr) minmax(0, 62fr);
+}
+
+.slide.on { display: grid; }
+
+/* The theory pane. */
+.theory {
+  padding: 5vh 3.2vw 9vh 4vw; overflow: auto;
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+h1 { font-size: 3.5em; line-height: 1; margin: 0 0 .35em; letter-spacing: -.02em; }
+h2 { font-size: 1.85em; line-height: 1.1; margin: 0 0 .5em; letter-spacing: -.01em; }
+p { margin: .35em 0; }
+ul { margin: 0; padding-left: 1.05em; }
+li { margin: .32em 0; }
+.muted { color: var(--ink-soft); font-size: .86em; }
+.theory a { color: var(--ink); text-underline-offset: .15em; }
+
+code, kbd { font-family: var(--mono); font-size: .8em; }
+.theory code { background: #d3e0d7; padding: .06em .28em; border-radius: 3px; }
+
+.theory table { border-collapse: collapse; width: 100%; font-size: .88em; }
+.theory td, .theory th {
+  text-align: left; vertical-align: top; padding: .32em .5em .32em 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* The terminal window. */
+.term {
+  margin: 3vh 3vh 3vh 0; min-height: 0; display: flex; flex-direction: column;
+  background: var(--pine); color: var(--mist); border-radius: 12px;
+  border: 1px solid var(--pine-line); overflow: hidden;
+  font: clamp(13px, 2.3vh, 27px)/1.45 var(--mono);
+}
+
+.term-bar {
+  flex: none; display: flex; align-items: center; gap: .45em;
+  padding: .5em 1em; background: var(--pine-bar);
+  color: var(--dim); font-size: .78em;
+}
+
+.term-bar i { width: .8em; height: .8em; border-radius: 50%; background: var(--pine-line); }
+.term-bar span { margin-left: .7em; }
+
+.term-body { flex: 1; min-height: 0; overflow: auto; padding: 1.1em 1.3em; }
+.term pre { margin: 0; font: inherit; white-space: pre-wrap; overflow-wrap: anywhere; }
+.term pre.out { white-space: pre; overflow-wrap: normal; }
+
+.note { margin: 1em 0 .25em; color: var(--dim); }
+.note::before { content: "# "; }
+.term-rule { border: 0; border-top: 1px dashed var(--dim); margin: 1.4em 0 1em; }
+.term-rule + .note { margin-top: 0; }
+.note:first-child { margin-top: 0; }
+
+/* A line to type: the sigil stays out of a selection and out of the copy. */
+.line { display: flex; align-items: flex-start; gap: .7em; margin: .25em 0; }
+.line::before {
+  content: attr(data-sigil); flex: none; color: var(--dim);
+  user-select: none; -webkit-user-select: none;
+}
+
+.line pre { flex: 1; min-width: 0; color: var(--amber); font-weight: 500; }
+
+/* The width fits "Copied", so the line does not move when the label changes. */
+.copy {
+  flex: none; width: calc(6ch + 1.5em + 2px); text-align: center;
+  font: .72em var(--mono); padding: .25em .75em; cursor: pointer;
+  user-select: none; -webkit-user-select: none;
+  color: var(--mist); background: transparent;
+  border: 1px solid var(--pine-line); border-radius: 5px;
+}
+
+.copy:hover { color: var(--pine); background: var(--amber); border-color: var(--amber); }
+.copy.done { color: var(--pine); background: var(--mist); border-color: var(--mist); }
+.copy:focus-visible, nav button:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+.prompt-line pre { font-weight: 400; color: var(--mist); }
+.prompt-line + .prompt-line { margin-top: 2em; }
+
+kbd {
+  display: inline-block; padding: .08em .5em; margin-right: .15em;
+  color: var(--pine); background: var(--mist);
+  border-radius: 4px; box-shadow: 0 2px 0 var(--dim);
+  font-size: .95em; font-weight: 600;
+}
+
+.keys { margin: .4em 0; }
+
+/* A list that reads like a diff: what is in, and what is out. */
+.diff { list-style: none; margin: 0; padding: 0; }
+.diff li { margin: .12em 0; color: var(--mist); }
+.diff li::before { content: "+ "; color: var(--amber); font-weight: 600; }
+.diff.skip li { color: var(--dim); }
+.diff.skip li::before { content: "- "; color: var(--dim); }
+.diff.plain li::before { content: "* "; }
+
+/* The one moving thing in the deck. */
+.cursor {
+  display: inline-block; width: .6em; height: 1.1em; vertical-align: text-bottom;
+  background: var(--amber); animation: blink 1.1s steps(1) infinite;
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
+
+/* The title slide gives the terminal more room. */
+.slide.opening { grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); }
+
+/* The strip under the theory pane. */
+nav {
+  position: fixed; left: 4vw; bottom: 2.6vh; display: flex; align-items: center; gap: .7em;
+  font: .62em var(--mono); color: var(--ink-soft);
+}
+
+nav button {
+  font: inherit; padding: .2em .7em; cursor: pointer; color: var(--ink);
+  background: transparent; border: 1px solid var(--rule); border-radius: 5px;
+}
+
+.slide[data-cut]::after {
+  content: "Cut point"; position: fixed; left: 24vw; bottom: 3vh;
+  font: .62em var(--mono); color: var(--ink-soft);
+}
+
 .slide[data-cut]:not([data-cut=""])::after { content: attr(data-cut); }
-h1 { font-size: 64px; margin: .3em 0 .2em; line-height: 1.1; }
-h2 { font-size: 40px; margin: 0 0 .3em; color: var(--accent); line-height: 1.15; }
-ul { padding-left: 1.1em; margin: 0; }
-li { margin: .25em 0; }
-.muted { color: var(--muted); }
-.cols { display: flex; gap: 32px; }
-.cols > * { flex: 1; background: var(--card); padding: 12px 22px; border-radius: 12px; }
-.cols h3 { margin: .2em 0; color: var(--accent); font-size: 30px; }
-.cmds { display: flex; flex-wrap: wrap; gap: 14px; margin: 18px 0; }
-.cmd { font-size: 30px; padding: 8px 18px; border-radius: 10px; cursor: pointer;
-  color: var(--fg); background: var(--card); border: 2px solid var(--line); }
-.cmd:hover, .cmd:focus-visible, .cmd.on { border-color: var(--accent); outline: none; }
-.hint { min-height: 3.6em; margin: 12px 0; padding: 14px 22px; font-size: 32px;
-  border-left: 8px solid var(--accent); background: var(--card); border-radius: 0 12px 12px 0; }
-.hint:empty::before { content: "Hover over a command or press Tab."; color: var(--muted); }
-.slide.on > .prompt-box { flex: 1 1 0; min-height: 0; }
-.prompt-box { position: relative; margin-top: 10px; display: flex; flex-direction: column; }
-pre.prompt { flex: 1; min-height: 0; margin: 0; padding: 10px 16px; background: var(--code); border-radius: 12px;
-  font-size: clamp(16px, 2.4vh, 24px); line-height: 1.25; white-space: pre-wrap; overflow: auto; }
-.copy { position: absolute; top: 8px; right: 8px; font-size: 18px; padding: 4px 12px;
-  border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--fg); cursor: pointer; }
-table { border-collapse: collapse; width: 100%; }
-td, th { text-align: left; padding: 6px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { color: var(--accent); }
-nav { position: fixed; left: 0; right: 0; bottom: 0; height: 64px; display: flex;
-  align-items: center; justify-content: center; gap: 24px; background: var(--card);
-  border-top: 1px solid var(--line); font-size: 20px; }
-nav button { font-size: 22px; padding: 6px 22px; border-radius: 8px; cursor: pointer;
-  border: 1px solid var(--line); background: var(--bg); color: var(--fg); }
-p { margin: .3em 0; }
+
+@media (max-width: 760px) {
+  html, body { overflow: auto; }
+  .slide.on, .slide.opening { display: block; position: static; padding-bottom: 56px; }
+  .term { margin: 0 16px 16px; }
+  .term pre.out { overflow-x: auto; }
+  .theory { padding: 24px 16px; }
+  nav { left: 16px; background: var(--paper); }
+}
+
+/* The tour: a link on the left, what it shows on the right. */
+.links { border-collapse: collapse; width: 100%; }
+.links td { padding: .4em .8em .4em 0; vertical-align: top; }
+.links a, .note a { color: var(--amber); text-underline-offset: .15em; }
+.compare th { padding: .4em .8em .4em 0; text-align: left; color: var(--amber); }
+.compare th, .compare td { border-bottom: 1px solid var(--pine-line); }

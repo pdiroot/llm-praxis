@@ -7,8 +7,10 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 for vm in test prod; do
   ssh -F "$PG_RUNTIME/ssh/config" "$vm.playground.localhost" '
+    set -e
     sudo systemctl disable --now whoami 2>/dev/null || true
     sudo rm -rf /usr/local/bin/whoami /etc/systemd/system/whoami.service /var/log/whoami /run/whoami
-    sudo systemctl daemon-reload'
+    sudo systemctl daemon-reload
+    sudo journalctl --rotate --vacuum-time=1s >/dev/null 2>&1 || true'
   log "$vm: clean"
 done

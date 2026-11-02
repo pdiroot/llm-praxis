@@ -5,6 +5,7 @@ x-vm: &vm
   cgroup: host
   tmpfs: [/tmp, /run, /run/lock]
   stop_signal: SIGRTMIN+3
+
 services:
   traefik:
     image: traefik:v3.7.16
@@ -18,6 +19,7 @@ services:
       - ./traefik/dynamic.yaml:/etc/traefik/dynamic.yaml:ro
       - ./runtime/tls:/tls:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+
   gitlab:
     image: gitlab/gitlab-ce:19.5.3-ce.0
     hostname: gitlab.playground.localhost
@@ -45,16 +47,19 @@ services:
       - traefik.http.routers.gitlab.entrypoints=web,websecure
       - traefik.http.routers.gitlab.rule=Host(`gitlab.playground.localhost`) || Host(`gitlab.playground.internal`)
       - traefik.http.services.gitlab.loadbalancer.server.port=80
+
   docker:
     image: docker:29.9.2-dind
     privileged: true
     environment: { DOCKER_TLS_CERTDIR: "" }
     command: ["--host=tcp://0.0.0.0:2375"]
+
   runner:
     image: gitlab/gitlab-runner:v19.5.2
     volumes:
       - ./runtime/runner:/etc/gitlab-runner
       - ./runtime/tls:/tls:ro
+
   test:
     <<: *vm
     hostname: test.playground.localhost
@@ -71,6 +76,7 @@ services:
       - traefik.http.routers.test.entrypoints=web,websecure
       - traefik.http.routers.test.rule=Host(`test.playground.localhost`) || Host(`test.playground.internal`)
       - traefik.http.services.test.loadbalancer.server.port=80
+
   prod:
     <<: *vm
     hostname: prod.playground.localhost
@@ -87,6 +93,7 @@ services:
       - traefik.http.routers.prod.entrypoints=web,websecure
       - traefik.http.routers.prod.rule=Host(`prod.playground.localhost`) || Host(`prod.playground.internal`)
       - traefik.http.services.prod.loadbalancer.server.port=80
+
 networks:
   # Fixed addresses, so the runner's extra_hosts survive a recreate.
   default:
@@ -94,6 +101,7 @@ networks:
       config:
         - subnet: 172.30.42.0/24
           ip_range: 172.30.42.0/25
+
 volumes:
   gitlab-config:
   gitlab-data:

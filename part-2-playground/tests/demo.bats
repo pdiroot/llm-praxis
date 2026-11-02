@@ -6,50 +6,15 @@ setup() {
   SETTINGS="$ROOT/demo/settings.json"
 }
 
-# asks <command>: 0 when a Bash(...) ask rule matches; * is a glob.
-asks() {
-  local rule pattern
-  while IFS= read -r rule; do
-    pattern=${rule#Bash(}
-    pattern=${pattern%)}
-    # shellcheck disable=SC2053
-    [[ $1 == $pattern ]] && return 0
-  done < <(jq -r '.permissions.ask[]' "$SETTINGS")
-  return 1
+@test "glab and git push need no approval, and .env stays denied" {
+  jq -e '.permissions.allow | index("Bash(glab *)") and index("Bash(git push *)")' "$SETTINGS"
+  jq -e '.permissions.deny | index("Read(**/.env)")' "$SETTINGS"
+  jq -e '.permissions.ask == null' "$SETTINGS"
 }
 
-@test "every job start asks" {
-  asks 'glab ci trigger deploy-prod -b main'
-  asks 'glab ci run -b main'
-  asks 'glab api -X POST projects/:id/jobs/49/play'
-  asks 'glab api projects/:id/jobs/49/play -X POST'
-  asks 'glab ci retry 49'
-  asks 'glab api -X POST projects/:id/jobs/49/retry'
-  asks 'glab ci run-trig -t x -b main'
-  asks 'glab api graphql -f query=mutation{jobPlay(input:{id:"gid://gitlab/Ci::Build/49"}){job{id}}}'
-  asks 'glab api -X POST projects/:id/pipelines -f ref=main'
-  asks 'glab api projects/:id/pipelines -X POST -f ref=main'
-  asks 'glab api graphql -f query=mutation{jobRetry(input:{id:"gid://gitlab/Ci::Build/49"}){job{id}}}'
-  asks 'glab api projects/:id/pipelines -f ref=main'
-  asks 'glab api projects/:id/pipeline --field ref=main'
-  asks "glab api -H 'X: y' graphql -f query=mutation{jobPlay(input:{id:\"gid://gitlab/Ci::Build/49\"}){job{id}}}"
-  asks 'glab api -f ref=main projects/:id/pipeline'
-  asks 'glab api --field=ref=main projects/:id/pipeline'
-  asks 'glab api projects/:id/pipeline -fref=main'
-}
-
-@test "a read does not ask" {
-  run ! asks 'glab api user'
-  run ! asks 'glab ci list'
-  run ! asks 'glab api projects/:id/pipelines'
-  run ! asks 'glab api projects/:id/pipelines/12/jobs'
-  run ! asks 'glab api projects/:id/jobs'
-  run ! asks 'glab api projects/:id/pipelines?per_page=5'
-}
-
-@test "the settings deny .env, run the hook and extend the auto mode" {
+@test "the settings deny .env, have no hook and extend the auto mode" {
   [ "$(jq -r '.permissions.deny[0]' "$SETTINGS")" = 'Read(**/.env)' ]
-  jq -e '.hooks.SessionStart[0].hooks[0].command | contains("CLAUDE_ENV_FILE") and contains("set -a")' "$SETTINGS"
+  jq -e '.hooks == null' "$SETTINGS"
   [ "$(jq -r '.autoMode.environment[0]' "$SETTINGS")" = '$defaults' ]
   jq -e '.autoMode.environment | length == 3' "$SETTINGS"
 }
@@ -71,7 +36,9 @@ echo "$PWD"
 echo "$*"
 STUB
   chmod +x "$BATS_TEST_TMPDIR/bin/claude"
-  PATH="$BATS_TEST_TMPDIR/bin:$PATH" run "$ROOT/scripts/demo-claude.sh" --resume
+
+  PATH="$BATS_TEST_TMPDIR/bin:$PATH" run --separate-stderr "$ROOT/scripts/demo-claude.sh" --resume
+
   [ "$status" -eq 0 ]
   # Absolute paths: macOS may resolve the temp dir through a symlink, so compare the pwd by suffix.
   [ "${lines[0]}" = "$PG_DEMO_HOME/claude-config" ]
@@ -79,7 +46,13 @@ STUB
   [ "${lines[2]}" = "$PG_RUNTIME/tls/ca.crt" ]
   [ "${lines[3]}" = nano ]
   [[ ${lines[4]} == */demo/whoami ]]
-  [ "${lines[5]}" = "--chrome --resume" ]
+  [ "${lines[5]}" = "--add-dir $PG_DEMO_HOME/ssh --chrome --resume" ]
+}
+
+@test "the demo settings keep the account's plugins, skills and connectors out" {
+  [ "$(jq .syncClaudeAiPlugins "$SETTINGS")" = false ]
+  [ "$(jq .syncClaudeAiSkills "$SETTINGS")" = false ]
+  [ "$(jq .disableClaudeAiConnectors "$SETTINGS")" = true ]
 }
 
 @test "the settings are copied once and never overwritten" {
@@ -91,8 +64,10 @@ STUB
   mkdir -p "$BATS_TEST_TMPDIR/bin"
   printf '#!/usr/bin/env bash\n' >"$BATS_TEST_TMPDIR/bin/claude"
   chmod +x "$BATS_TEST_TMPDIR/bin/claude"
+
   PATH="$BATS_TEST_TMPDIR/bin:$PATH" "$ROOT/scripts/demo-claude.sh"
   cmp "$SETTINGS" "$PG_DEMO_HOME/claude-config/settings.json"
+
   echo '{"mine":1}' >"$PG_DEMO_HOME/claude-config/settings.json"
   PATH="$BATS_TEST_TMPDIR/bin:$PATH" "$ROOT/scripts/demo-claude.sh"
   [ "$(cat "$PG_DEMO_HOME/claude-config/settings.json")" = '{"mine":1}' ]
@@ -106,7 +81,9 @@ STUB
   echo "Host x" >"$PG_RUNTIME/ssh/config"
   printf '#!/usr/bin/env bash\n' >"$BATS_TEST_TMPDIR/bin/claude"
   chmod +x "$BATS_TEST_TMPDIR/bin/claude"
+
   PATH="$BATS_TEST_TMPDIR/bin:$PATH" "$ROOT/scripts/demo-claude.sh"
+
   cmp "$PG_RUNTIME/ssh/config" "$PG_DEMO_HOME/ssh/config"
   [ "$(stat -f %Lp "$PG_DEMO_HOME/ssh/config")" = 600 ]
 }
@@ -120,7 +97,9 @@ STUB
   touch "$BATS_TEST_TMPDIR/up/CLAUDE.md"
   printf '#!/usr/bin/env bash\necho started\n' >"$BATS_TEST_TMPDIR/bin/claude"
   chmod +x "$BATS_TEST_TMPDIR/bin/claude"
+
   PATH="$BATS_TEST_TMPDIR/bin:$PATH" run "$ROOT/scripts/demo-claude.sh"
+
   [ "$status" -ne 0 ]
   [[ $output == *"$(cd "$BATS_TEST_TMPDIR" && pwd -P)/up/CLAUDE.md"* ]]
   [[ $output != *started* ]]
@@ -200,24 +179,6 @@ home_ok() { PG_DEMO_HOME="$1" bash -c "source '$ROOT/scripts/lib.sh'; $2"; }
   [ "$status" -ne 0 ]
 }
 
-@test "the checkpoint clone step marks a fresh home" {
-  # Run only the clone step of checkpoint.sh, with git stubbed.
-  export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
-  export PG_DEMO_HOME="$BATS_TEST_TMPDIR/fresh"
-  mkdir -p "$PG_RUNTIME/ssh" "$BATS_TEST_TMPDIR/bin"
-  echo "Host x" >"$PG_RUNTIME/ssh/config"
-  printf '#!/usr/bin/env bash\nmkdir -p "${@: -1}/.git"\n' >"$BATS_TEST_TMPDIR/bin/git"
-  chmod +x "$BATS_TEST_TMPDIR/bin/git"
-  start=$(grep -n 'log "4/5 demo clone"' "$ROOT/scripts/checkpoint.sh" | cut -d: -f1)
-  end=$(grep -n 'log "5/5 check"' "$ROOT/scripts/checkpoint.sh" | cut -d: -f1)
-  { echo "source '$ROOT/scripts/lib.sh'; set -euo pipefail; branch=''"; sed -n "${start},$((end - 1))p" "$ROOT/scripts/checkpoint.sh"; } >"$BATS_TEST_TMPDIR/step.sh"
-  PATH="$BATS_TEST_TMPDIR/bin:$PATH" run bash "$BATS_TEST_TMPDIR/step.sh"
-  echo "$output"
-  [ "$status" -eq 0 ]
-  [ -f "$PG_DEMO_HOME/.llm-praxis-demo" ]
-  [ -d "$PG_DEMO_HOME/whoami/.git" ]
-}
-
 # mcp_check <list-file> <rc> [mcp.json content]: run mcp_foreign with a claude stub.
 mcp_check() {
   export PG_DEMO_HOME="$BATS_TEST_TMPDIR/demo"
@@ -254,4 +215,52 @@ mcp_check() {
   : >"$BATS_TEST_TMPDIR/l"
   run mcp_check "$BATS_TEST_TMPDIR/l" 1
   [ "$status" -ne 0 ]
+}
+
+# launch_env <outer env...>: run the launcher with a stub claude that prints two values.
+launch_env() {
+  export PG_RUNTIME="$BATS_TEST_TMPDIR/runtime"
+  export PG_DEMO_HOME="$BATS_TEST_TMPDIR/demo"
+  export XDG_DATA_HOME="$BATS_TEST_TMPDIR/data"
+  mkdir -p "$PG_RUNTIME/ssh" "$PG_DEMO_HOME/whoami" "$BATS_TEST_TMPDIR/bin"
+  touch "$PG_DEMO_HOME/.llm-praxis-demo"
+  echo "Host x" >"$PG_RUNTIME/ssh/config"
+  printf '#!/usr/bin/env bash\necho "$CLAUDE_CONFIG_DIR"\necho "${GITLAB_TOKEN:-}"\n' >"$BATS_TEST_TMPDIR/bin/claude"
+  chmod +x "$BATS_TEST_TMPDIR/bin/claude"
+  echo "GITLAB_TOKEN=from-env-file" >"$PG_DEMO_HOME/whoami/.env"
+  echo dotenv >"$PG_DEMO_HOME/whoami/.envrc"
+  direnv allow "$PG_DEMO_HOME/whoami"
+
+  PATH="$BATS_TEST_TMPDIR/bin:$PATH" run --separate-stderr env "$@" "$ROOT/scripts/demo-claude.sh"
+}
+
+@test "direnv loads .env into the session" {
+  launch_env A=1
+
+  [ "$status" -eq 0 ]
+  [ "${lines[0]}" = "$PG_DEMO_HOME/claude-config" ]
+  [ "${lines[1]}" = from-env-file ]
+}
+
+@test "the outer direnv state cannot undo the demo profile" {
+  launch_env DIRENV_DIFF=stale DIRENV_DIR=-/tmp DIRENV_FILE=/tmp/.envrc
+
+  [ "$status" -eq 0 ]
+  [ "${lines[0]}" = "$PG_DEMO_HOME/claude-config" ]
+}
+
+@test "the launcher stops when direnv is missing" {
+  mkdir -p "$BATS_TEST_TMPDIR/nodirenv"
+  for tool in bash dirname cat; do ln -s "$(command -v "$tool")" "$BATS_TEST_TMPDIR/nodirenv/$tool"; done
+
+  PATH="$BATS_TEST_TMPDIR/nodirenv" run "$ROOT/scripts/demo-claude.sh"
+
+  [ "$status" -ne 0 ]
+  [[ $output == *"brew install direnv"* ]]
+}
+
+@test "each prompt of the deck has its file" {
+  for id in $(grep -o 'data-id="[^"]*"' "$ROOT/slides/index.html" | cut -d'"' -f2); do
+    [ -f "$ROOT/prompts/$id.md" ]
+  done
 }
