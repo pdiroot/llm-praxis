@@ -586,7 +586,7 @@ your own API    a small CLI that Claude writes</pre>
     <h2>The workflow so far</h2>
     <p>You saw the first part of the path today. The rest is Claude Code 102, in the same playground.</p>
     <p>For real work, walk the whole path. Shorten it only when a mistake is cheap.</p>
-    <p>Keep the <a href="#41">cheat sheet</a>, and <a href="#42">run it yourself</a>.</p>
+    <p>Keep the <a href="#41">cheat sheet</a>, and <a href="#46">run it yourself</a>.</p>
     <p class="muted"><code>task playground:stop</code> keeps the data, and <code>task playground:start</code> resumes it.</p>
   </div>
   <div class="term" data-title="plan to production">
@@ -814,6 +814,66 @@ The next session starts with all of it.</pre>
   </div>
 </section>
 
+<section class="slide" data-cut>
+  <div class="theory">
+    <h2>Go back, run, ask aside</h2>
+    <p>Roll back, do not argue. Files that only shell commands changed stay as they are, so use git too.</p>
+    <p><kbd>Esc</kbd><kbd>Esc</kbd> also opens the rewind menu, when the prompt is empty.</p>
+  </div>
+  <div class="term">
+    <p class="note">Rewind the chat and the code to an earlier point</p>
+    <pre class="cmd">/rewind</pre>
+    <p class="note">Run a shell command yourself; the output goes into the chat</p>
+    <pre class="cmd">! git status</pre>
+    <p class="note">A side question that stays out of the chat history</p>
+    <pre class="cmd">/btw Why did you pick this port?</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut>
+  <div class="theory">
+    <h2>Memory and permissions</h2>
+    <p>The notes and the rules are yours to read and change.</p>
+  </div>
+  <div class="term">
+    <p class="note">The memory files; pick one to open in your editor</p>
+    <pre class="cmd">/memory</pre>
+    <p class="note">The allow, ask and deny rules</p>
+    <pre class="cmd">/permissions</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut>
+  <div class="theory">
+    <h2>What stays out of CLAUDE.md</h2>
+    <ul>
+      <li>Secrets and tokens</li>
+      <li>Long explanations</li>
+      <li>What Claude can read from the code</li>
+    </ul>
+    <p class="muted">Keep it short: Claude reads it in each session.</p>
+  </div>
+  <div class="term" data-title="CLAUDE.md">
+<pre class="out"># Commands Claude cannot guess
+# Rules that differ from the defaults
+# Known traps</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut>
+  <div class="theory">
+    <h2>Phrases to stop writing</h2>
+    <p>Each phrase on the left of the terminal gives Claude nothing to work with. Give it the line on the right.</p>
+  </div>
+  <div class="term" data-title="prompts">
+<pre class="out">"Make it better"       the goal, and how you check it
+"Be careful"           a limit: what not to touch
+"You are an expert"    the context Claude cannot guess
+"Fix it"               what fails, and the command
+                       that shows it</pre>
+  </div>
+</section>
+
 <section class="slide">
   <div class="theory">
     <h2>Run it yourself</h2>
@@ -883,66 +943,6 @@ The next session starts with all of it.</pre>
       <li>Google: Gemini</li>
       <li>Local models, through Ollama and other servers</li>
     </ul>
-  </div>
-</section>
-
-<section class="slide" data-cut="Appendix">
-  <div class="theory">
-    <h2>What stays out of CLAUDE.md</h2>
-    <ul>
-      <li>Secrets and tokens</li>
-      <li>Long explanations</li>
-      <li>What Claude can read from the code</li>
-    </ul>
-    <p class="muted">Keep it short: Claude reads it in each session.</p>
-  </div>
-  <div class="term" data-title="CLAUDE.md">
-<pre class="out"># Commands Claude cannot guess
-# Rules that differ from the defaults
-# Known traps</pre>
-  </div>
-</section>
-
-<section class="slide" data-cut="Appendix">
-  <div class="theory">
-    <h2>Phrases to stop writing</h2>
-    <p>Each phrase on the left of the terminal gives Claude nothing to work with. Give it the line on the right.</p>
-  </div>
-  <div class="term" data-title="prompts">
-<pre class="out">"Make it better"       the goal, and how you check it
-"Be careful"           a limit: what not to touch
-"You are an expert"    the context Claude cannot guess
-"Fix it"               what fails, and the command
-                       that shows it</pre>
-  </div>
-</section>
-
-<section class="slide" data-cut="Appendix">
-  <div class="theory">
-    <h2>Go back, run, ask aside</h2>
-    <p>Roll back, do not argue. Files that only shell commands changed stay as they are, so use git too.</p>
-    <p><kbd>Esc</kbd><kbd>Esc</kbd> also opens the rewind menu, when the prompt is empty.</p>
-  </div>
-  <div class="term">
-    <p class="note">Rewind the chat and the code to an earlier point</p>
-    <pre class="cmd">/rewind</pre>
-    <p class="note">Run a shell command yourself; the output goes into the chat</p>
-    <pre class="cmd">! git status</pre>
-    <p class="note">A side question that stays out of the chat history</p>
-    <pre class="cmd">/btw Why did you pick this port?</pre>
-  </div>
-</section>
-
-<section class="slide" data-cut="Appendix">
-  <div class="theory">
-    <h2>Memory and permissions</h2>
-    <p>The notes and the rules are yours to read and change.</p>
-  </div>
-  <div class="term">
-    <p class="note">The memory files; pick one to open in your editor</p>
-    <pre class="cmd">/memory</pre>
-    <p class="note">The allow, ask and deny rules</p>
-    <pre class="cmd">/permissions</pre>
   </div>
 </section>
 
