@@ -586,7 +586,7 @@ your own API    a small CLI that Claude writes</pre>
     <h2>The workflow so far</h2>
     <p>You saw the first part of the path today. The rest is Claude Code 102, in the same playground.</p>
     <p>For real work, walk the whole path. Shorten it only when a mistake is cheap.</p>
-    <p>Keep the <a href="#41">cheat sheet</a>, and <a href="#42">run it yourself</a>.</p>
+    <p>Keep the <a href="#41">cheat sheet</a>, and <a href="#46">run it yourself</a>.</p>
     <p class="muted"><code>task playground:stop</code> keeps the data, and <code>task playground:start</code> resumes it.</p>
   </div>
   <div class="term" data-title="plan to production">
@@ -679,13 +679,15 @@ troubleshoot          Claude Code 102</pre>
 <section class="slide">
   <div class="theory">
     <h2>Deploy to production</h2>
-    <p>The MCP server cannot do this step, so Claude uses <code>glab</code>. A failure gets the same fix as before.</p>
+    <p>The MCP server cannot do this step, so Claude uses <code>glab</code>. If the job fails, Claude reads its log, fixes the cause and runs it again, as on <code>test</code>.</p>
     <p>Open <a href="https://test.playground.localhost" target="_blank" rel="noopener"><code>test</code></a> and <a href="https://prod.playground.localhost" target="_blank" rel="noopener"><code>prod</code></a></p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="13-deploy-prod"></pre>
     <p class="note">If auto mode blocks the job, state what you want and try again</p>
     <pre class="prompt" data-id="13-deploy-confirm"></pre>
+    <p class="note">Or approve the action on the Recently blocked tab, then ask Claude to try again</p>
+    <pre class="cmd">/permissions</pre>
   </div>
 </section>
 
@@ -738,7 +740,7 @@ troubleshoot          Claude Code 102</pre>
     <pre class="prompt" data-id="16-ship"></pre>
     <p class="note">In your own shell: it comes back</p>
     <pre class="cmd" data-sh>ssh -F ~/llm-praxis-demo/ssh/config prod.playground.localhost sudo systemctl kill -s KILL whoami</pre>
-    <p class="note">Check it, after a few seconds: the new first line proves that the new version is live</p>
+    <p class="note">Check it, after a few seconds: the app answers again</p>
     <pre class="cmd" data-sh>curl https://prod.playground.localhost</pre>
     <p class="note">The cost since `/clear`</p>
     <pre class="cmd">/usage</pre>
@@ -776,7 +778,7 @@ troubleshoot          Claude Code 102</pre>
       <li><code>CLAUDE.md</code> grew with the project.</li>
       <li>Plan, build, review, merge, deploy.</li>
       <li>Connect a service: CLI, MCP, the browser, computer use.</li>
-      <li>The token stays out of the chat.</li>
+      <li>Secrets, such as the GitLab token, stay out of the chat and out of git.</li>
       <li>One task, one context.</li>
       <li>Claude also reads logs and finds causes.</li>
     </ul>
@@ -809,6 +811,66 @@ The next session starts with all of it.</pre>
 /voice                      speak a prompt
 /rewind ! /btw              undo, run, ask aside
 /memory /permissions        notes and rules</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut>
+  <div class="theory">
+    <h2>Go back, run, ask aside</h2>
+    <p>Roll back, do not argue. Files that only shell commands changed stay as they are, so use git too.</p>
+    <p><kbd>Esc</kbd><kbd>Esc</kbd> also opens the rewind menu, when the prompt is empty.</p>
+  </div>
+  <div class="term">
+    <p class="note">Rewind the chat and the code to an earlier point</p>
+    <pre class="cmd">/rewind</pre>
+    <p class="note">Run a shell command yourself; the output goes into the chat</p>
+    <pre class="cmd">! git status</pre>
+    <p class="note">A side question that stays out of the chat history</p>
+    <pre class="cmd">/btw Why did you pick this port?</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut>
+  <div class="theory">
+    <h2>Memory and permissions</h2>
+    <p>The notes and the rules are yours to read and change.</p>
+  </div>
+  <div class="term">
+    <p class="note">The memory files; pick one to open in your editor</p>
+    <pre class="cmd">/memory</pre>
+    <p class="note">The allow, ask and deny rules</p>
+    <pre class="cmd">/permissions</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut>
+  <div class="theory">
+    <h2>What stays out of CLAUDE.md</h2>
+    <ul>
+      <li>Secrets and tokens</li>
+      <li>Long explanations</li>
+      <li>What Claude can read from the code</li>
+    </ul>
+    <p class="muted">Keep it short: Claude reads it in each session.</p>
+  </div>
+  <div class="term" data-title="CLAUDE.md">
+<pre class="out"># Commands Claude cannot guess
+# Rules that differ from the defaults
+# Known traps</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut>
+  <div class="theory">
+    <h2>Phrases to stop writing</h2>
+    <p>Each phrase on the left of the terminal gives Claude nothing to work with. Give it the line on the right.</p>
+  </div>
+  <div class="term" data-title="prompts">
+<pre class="out">"Make it better"       the goal, and how you check it
+"Be careful"           a limit: what not to touch
+"You are an expert"    the context Claude cannot guess
+"Fix it"               what fails, and the command
+                       that shows it</pre>
   </div>
 </section>
 
@@ -852,6 +914,8 @@ The next session starts with all of it.</pre>
       <li>Workspace mode with many repositories</li>
       <li>Parallel sessions</li>
       <li>Long-running workflows</li>
+      <li>Spec-driven development</li>
+      <li>Local LLMs</li>
     </ul>
   </div>
 </section>
@@ -868,7 +932,7 @@ The next session starts with all of it.</pre>
     <ul class="diff plain">
       <li>Claude Code</li>
       <li>Codex CLI</li>
-      <li>Gemini CLI</li>
+      <li>Antigravity</li>
       <li>OpenCode</li>
       <li>Cursor</li>
     </ul>
@@ -879,66 +943,6 @@ The next session starts with all of it.</pre>
       <li>Google: Gemini</li>
       <li>Local models, through Ollama and other servers</li>
     </ul>
-  </div>
-</section>
-
-<section class="slide" data-cut="Appendix">
-  <div class="theory">
-    <h2>What stays out of CLAUDE.md</h2>
-    <ul>
-      <li>Secrets and tokens</li>
-      <li>Long explanations</li>
-      <li>What Claude can read from the code</li>
-    </ul>
-    <p class="muted">Keep it short: Claude reads it in each session.</p>
-  </div>
-  <div class="term" data-title="CLAUDE.md">
-<pre class="out"># Commands Claude cannot guess
-# Rules that differ from the defaults
-# Known traps</pre>
-  </div>
-</section>
-
-<section class="slide" data-cut="Appendix">
-  <div class="theory">
-    <h2>Phrases to stop writing</h2>
-    <p>Each phrase on the left of the terminal gives Claude nothing to work with. Give it the line on the right.</p>
-  </div>
-  <div class="term" data-title="prompts">
-<pre class="out">"Make it better"       the goal, and how you check it
-"Be careful"           a limit: what not to touch
-"You are an expert"    the context Claude cannot guess
-"Fix it"               what fails, and the command
-                       that shows it</pre>
-  </div>
-</section>
-
-<section class="slide" data-cut="Appendix">
-  <div class="theory">
-    <h2>Go back, run, ask aside</h2>
-    <p>Roll back, do not argue. Files that only shell commands changed stay as they are, so use git too.</p>
-    <p><kbd>Esc</kbd><kbd>Esc</kbd> also opens the rewind menu, when the prompt is empty.</p>
-  </div>
-  <div class="term">
-    <p class="note">Rewind the chat and the code to an earlier point</p>
-    <pre class="cmd">/rewind</pre>
-    <p class="note">Run a shell command yourself; the output goes into the chat</p>
-    <pre class="cmd">! git status</pre>
-    <p class="note">A side question that stays out of the chat history</p>
-    <pre class="cmd">/btw Why did you pick this port?</pre>
-  </div>
-</section>
-
-<section class="slide" data-cut="Appendix">
-  <div class="theory">
-    <h2>Memory and permissions</h2>
-    <p>The notes and the rules are yours to read and change.</p>
-  </div>
-  <div class="term">
-    <p class="note">The memory files; pick one to open in your editor</p>
-    <pre class="cmd">/memory</pre>
-    <p class="note">The allow, ask and deny rules</p>
-    <pre class="cmd">/permissions</pre>
   </div>
 </section>
 
