@@ -18,6 +18,6 @@ window.PROMPTS = {
   "13-deploy-prod": "Deploy to production: start the manual job with `glab` and follow it. If it fails, fix the cause and run it again. When it succeeds, give me the link to test the app myself.\n",
   "16-ship": "Commit, push, open a merge request with the GitLab MCP server and merge it. Follow the deployment to \"test\" with `glab`. When it succeeds, start the deployment to \"prod\" and follow it.\n",
   "17-outage": "The app on \"prod\" is down. Connect with `ssh -F ../ssh/config prod.playground.localhost`. Find out what happened from the unit status, the journal and the access log. Do not restart or edit anything yet. Report the cause, the evidence and what would stop this from happening again.\n",
-  "18-fix-restart": "Restart the app on \"prod\". On a new branch, make the service restart when it dies, and add the first line \"Hello from whoami v2\" to the answer, so we can see the new version.\n\nAdd to \"CLAUDE.md\": each service must restart when it dies, and where its logs are.\n"
+  "18-fix-restart": "Restart the app on \"prod\". On a new branch, make the service restart when it dies.\n\nAdd to \"CLAUDE.md\": each service must restart when it dies, and where its logs are.\n"
 }
 ;
