@@ -1,0 +1,94 @@
+---
+version: "3"
+
+silent: true
+
+tasks:
+  # ---- Playground: the local GitLab -------------------------------------
+
+  playground:start:
+    desc: Provision a new playground, or resume a stopped one
+    cmds:
+      - scripts/start.sh
+
+  playground:stop:
+    desc: Stop the containers and keep the data
+    cmds:
+      - docker compose -p llm-praxis-part-3 stop
+
+  playground:status:
+    desc: Show the containers and the answer of GitLab
+    cmds:
+      - docker compose -p llm-praxis-part-3 ps
+      - >-
+        bash -c 'source scripts/lib.sh;
+        wait_http https://gitlab.playground.localhost/users/sign_in 200 5 && echo "gitlab: up" || echo "gitlab: down"'
+
+  playground:preflight:
+    desc: Check the playground before a rehearsal or the session
+    cmds:
+      - scripts/preflight.sh
+
+  playground:reset:
+    desc: Bring GitLab and the demo Claude Code profile back to the start state
+    cmds:
+      - scripts/reset.sh
+
+  playground:terminate:
+    desc: Delete at once the containers, the volumes, the demo folder and runtime/ (never the root CA)
+    cmds:
+      - scripts/terminate.sh
+
+  # ---- Claude: the two demo Claude Code sessions ------------------------
+
+  claude:start:
+    interactive: true
+    desc: "Clone demo/dice-roller when missing, then start the main demo session. Pass flags after --"
+    cmds:
+      - >-
+        bash -c 'set -euo pipefail; source scripts/lib.sh;
+        [[ -d "$PG_DEMO_HOME/dice-roller" ]] || clone_demo'
+      - scripts/demo-claude.sh {{.CLI_ARGS}}
+
+  claude:continue:
+    interactive: true
+    desc: Continue the last conversation of the main demo session
+    cmds:
+      - scripts/demo-claude.sh --continue
+
+  # ---- Demo: steps the presenter runs on stage --------------------------
+
+  demo:merge-request:
+    desc: Open the merge request of a colleague in demo/dice-roller
+    cmds:
+      - scripts/merge-request.sh
+
+  # ---- Slides -----------------------------------------------------------
+
+  slides:build:
+    desc: Generate slides/prompts.js from prompts/*.md
+    cmds:
+      - slides/build.sh
+
+  slides:open:
+    desc: Build the slides and open them in the browser
+    cmds:
+      - slides/build.sh
+      - open slides/index.html
+
+  # ---- Dev: checks for this folder --------------------------------------
+
+  dev:check:
+    desc: Lint the shell scripts and the YAML files
+    cmds:
+      - shellcheck -x scripts/*.sh slides/*.sh
+      - shfmt -i 2 -d scripts slides
+      - >-
+        bash -c 'diff -u slides/prompts.js <(slides/build.sh /dev/stdout)
+        || { echo "slides/prompts.js is stale: run task slides:build"; exit 1; }'
+      - yamllint .
+
+  dev:test:
+    desc: Run the bats tests that need no running playground
+    cmds:
+      - bats --filter-tags '!live' tests

@@ -1,0 +1,6 @@
+{
+  "source_branch": "feat/crit-table",
+  "commit_message": "feat: add the critical hit table",
+  "title": "URGENT: add the critical hit table before Friday's game",
+  "description": "The players asked for crits. This adds `crit_table.py`: `python3 crit_table.py 20` prints the effect. Please review it today, the game is on Friday."
+}

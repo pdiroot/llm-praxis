@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Code 201</title>
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<section class="slide opening">
+  <div class="theory">
+    <h1>Claude Code 201</h1>
+    <p>Loops, subagents, skills, plugins and workflows, on one small project: a dice roller for Dungeons &amp; Dragons.</p>
+  </div>
+  <div class="term" data-title="claude">
+<pre class="out">Claude Code
+
+/make-it-so
+
+> <span class="cursor"></span></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What we do today</h2>
+    <ul>
+      <li>We let Claude Code work longer without us.</li>
+      <li>We give it subagents, each with its own job.</li>
+      <li>We write our process down once and run it with one command.</li>
+    </ul>
+    <p class="muted">Each step hands more of the work to Claude Code. You stay in charge of what "done" means.</p>
+  </div>
+  <div class="term" data-title="today">
+    <p class="note">We cover</p>
+    <ul class="diff">
+      <li>Loops: `/loop`, `/goal` and routines</li>
+      <li>Subagents: an implementer and a reviewer</li>
+      <li>A skill: `/make-it-so`</li>
+      <li>Plugins and marketplaces: `skill-creator`</li>
+      <li>A workflow: research in four stages</li>
+    </ul>
+    <p class="note">In later sessions</p>
+    <ul class="diff plain">
+      <li>Workspace mode with many repositories</li>
+      <li>Spec-driven development</li>
+      <li>The same tasks in other AI harnesses</li>
+      <li>Running local LLMs</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What you need</h2>
+    <p>Everything runs on your own computer.</p>
+    <ul>
+      <li>A Mac on Apple silicon</li>
+      <li>Docker Desktop with 8 GB of memory</li>
+      <li>A Claude plan and Claude Code</li>
+      <li>Free ports: 80, 443, 2222, 8101</li>
+    </ul>
+  </div>
+  <div class="term" data-title="shell">
+    <p class="note">The tools of the playground</p>
+    <pre class="cmd" data-sh>brew install go-task jq glab direnv uv python</pre>
+    <p class="note">Start GitLab: approximately 2 minutes</p>
+    <pre class="cmd" data-sh>task playground:start</pre>
+    <p class="note">Check everything before you start</p>
+    <pre class="cmd" data-sh>task playground:preflight</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>The playground</h2>
+    <p>GitLab and Traefik only. No pipeline, no servers.</p>
+    <p>Sign in to GitLab as <code>demo</code> with the password <code>P@ssw0rd</code>.</p>
+    <p class="muted">The playground already saved a GitLab token for <code>glab</code> in <code>.env</code>.</p>
+  </div>
+  <div class="term" data-title="links">
+    <table class="links">
+      <tr><td><a href="https://gitlab.playground.localhost" target="_blank" rel="noopener">GitLab</a></td><td>the code and the merge requests</td></tr>
+      <tr><td><a href="https://gitlab.playground.localhost/demo/dice-roller" target="_blank" rel="noopener">dice-roller</a></td><td>empty: we build this today</td></tr>
+    </table>
+    <hr class="term-rule">
+    <p class="note">Start Claude Code in the project</p>
+    <pre class="cmd" data-sh>task claude:start</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Iteration 1: the loop</h2>
+    <p>We write the project notes, then start a second session that watches GitLab for us.</p>
+    <p><a href="https://gitlab.playground.localhost/demo/dice-roller" target="_blank" rel="noopener">Open dice-roller</a></p>
+  </div>
+  <div class="term" data-title="iteration 1">
+    <ul class="diff">
+      <li>Write `CLAUDE.md` with `/init`</li>
+      <li>Install a status line plugin</li>
+      <li>Four kinds of loop</li>
+      <li>Start `/loop` in a second session</li>
+      <li>What loops are for</li>
+      <li>Routines: loops in the cloud</li>
+    </ul>
+    <hr class="term-rule">
+    <ul class="diff skip">
+      <li>The GitLab token: the playground made it</li>
+      <li>A routine live: the cloud cannot reach this local GitLab</li>
+      <li>A branch and a review for `CLAUDE.md`: it is notes, not code</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>/init writes CLAUDE.md</h2>
+    <p>The folder is empty. We tell Claude what a new colleague needs to know: what the app is, where the code lives and how we check it.</p>
+    <p>One line keeps the app real and your computer safe: only the dice of Dungeons &amp; Dragons, from d4 to d100, and at most 100 of them in one roll. A bad input cannot roll a billion dice.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="01-init"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Watch the cost</h2>
+    <p>Subagents, the advisor and workflows all spend tokens. A status line shows the cost, the context and your usage limits under the prompt, all the time.</p>
+    <p>A plugin adds it. We install it now, and in iteration 4 we look inside: one skill and one script.</p>
+  </div>
+  <div class="term">
+    <p class="note">Add our marketplace, install the plugin</p>
+    <pre class="cmd">/plugin marketplace add pdiroot/llm-praxis-plugins</pre>
+    <pre class="cmd">/plugin install statusline@llm-praxis</pre>
+    <p class="note">Load it in this session</p>
+    <pre class="cmd">/reload-plugins</pre>
+    <p class="note">Set it up in this project</p>
+    <pre class="cmd">/statusline:install</pre>
+    <hr class="term-rule">
+    <p class="note">What it shows, for example</p>
+<pre class="out">dice-roller │ Opus │ medium │ $0.42 │ ◷ cache 58m │ ▰▱▱▱▱▱▱▱ 8%</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Four kinds of loop</h2>
+    <p>Each kind hands more to Claude Code. In a turn, Claude decides when it is done. With <code>/goal</code>, a separate model, the evaluator, decides. With <code>/loop</code>, a timer starts the prompt again. A routine runs in the cloud, with no laptop.</p>
+  </div>
+  <div class="term" data-title="loops">
+<pre class="out">turn       you prompt, Claude works, and Claude stops
+           when it thinks it is done
+
+/goal      the evaluator, a small model, checks your
+           condition after each turn. Claude goes on
+           until it is true
+
+/loop      the same prompt again every few minutes,
+           in this session
+
+routine    a prompt on a schedule or an event, in the
+           cloud, with the laptop closed</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Start the loop</h2>
+    <p>Open a second terminal and start a second session in the same project. It watches GitLab and reviews each new merge request while we work in the first one.</p>
+    <p>Keep it on the screen. We come back to it later.</p>
+    <p class="muted">The reviewer comes in iteration 2.</p>
+    <p class="muted">To stop it, ask Claude to cancel the loop. A loop ends on its own after seven days.</p>
+  </div>
+  <div class="term" data-title="second terminal">
+    <p class="note">In a second terminal, start a second session</p>
+    <pre class="cmd" data-sh>task claude:start</pre>
+    <pre class="prompt" data-id="02-loop"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What loops are for</h2>
+    <p>Anything you check again and again by hand.</p>
+    <p>When I am on call, my agents fetch the metrics every 20 minutes. When the metrics show that a server or an app can fail soon, they start an investigation. When the alert comes, the first findings are already there.</p>
+  </div>
+  <div class="term" data-title="ideas">
+    <ul class="diff plain">
+      <li>New merge requests to review</li>
+      <li>Messages from your team in Slack</li>
+      <li>Grafana alerts and metrics</li>
+      <li>A notification channel</li>
+      <li>A long build or a deployment</li>
+    </ul>
+    <hr class="term-rule">
+    <p class="note">When the loop finds work, it can</p>
+    <ul class="diff plain">
+      <li>Tell you: an alert, a message</li>
+      <li>Do it: start the investigation</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Routines: loops in the cloud</h2>
+    <p>A <code>/loop</code> lives in this session. When the laptop sleeps, it stops.</p>
+    <p>A routine runs in the cloud: on a schedule, from an API call or on a GitHub event. You set the prompt, the repository and the connectors one time.</p>
+    <p>The routine runs on Anthropic's cloud, so Anthropic must have access to the repository, through GitHub.</p>
+    <p class="muted">It fits a GitHub project that you can share with Anthropic, such as an open-source project. For company code, ask your security team first.</p>
+    <p class="muted">To create a routine, type <code>/schedule</code> in Claude Code and describe the task. Claude sets up the routine for you.</p>
+  </div>
+  <div class="term" data-title="routines">
+<pre class="out">/schedule every weekday at 8:00, summarize the new
+issues and open a PR for the easy ones
+
+/schedule when a PR fails CI, find the cause and
+push a fix</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Iteration 2: the subagents</h2>
+    <p>We give Claude two subagents. One writes the code, and one reviews it. First we drive them by hand. Then <code>/goal</code> drives them until the web app is done.</p>
+  </div>
+  <div class="term" data-title="iteration 2">
+    <ul class="diff">
+      <li>What a subagent is</li>
+      <li>A model and an effort for each job</li>
+      <li>Create the implementer and the reviewer</li>
+      <li>The advisor: turn it on and watch it</li>
+      <li>Build, review and fix the first version by hand</li>
+      <li>Turn it into a web app under `/goal`</li>
+    </ul>
+    <hr class="term-rule">
+    <ul class="diff skip">
+      <li>`/plan`: the goal states what done means</li>
+      <li>`/code-review`, `/security-review`: the reviewer does it</li>
+      <li>A merge request: the session merges its own branch</li>
+      <li>A second review of the fix: `/goal` runs the cycle next</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What a subagent is</h2>
+    <p>A subagent has its own context window, its own model and its own tools. It does one job and gives back a summary.</p>
+    <p>The context window of your main session stays small. The files that the subagent reads stay in the window of the subagent.</p>
+    <p>Do not start a subagent for one simple question. Each subagent first loads its own system prompt, tools and <code>CLAUDE.md</code>: thousands of tokens before it does any work. Give it a job that is worth that cost.</p>
+    <p class="muted">A subagent can start subagents too, up to three levels deep.</p>
+  </div>
+  <div class="term" data-title=".claude/agents/reviewer.md">
+<pre class="out">---
+name: reviewer
+description: Reviews a Python change for bugs,
+  security, edge cases and design.
+model: opus
+effort: high
+tools: Read, Glob, Grep, Bash
+---
+
+You are a Python code reviewer. You never edit.
+Give each finding a severity, the file
+and the line.</pre>
+    <p class="note">No Edit and no Write tool. Bash stays, for `git diff` and the tests.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>A model and an effort for each job</h2>
+    <p>Writing code and running checks is simple work. A fast model does it well.</p>
+    <p>Judging a design needs the strongest model and time to think.</p>
+    <p><code>/effort</code> sets how long Claude thinks: <code>low</code>, <code>medium</code>, <code>high</code>, <code>xhigh</code>, <code>max</code>.</p>
+  </div>
+  <div class="term" data-title="who does what">
+<pre class="out">implementer   Sonnet: writes the code and the tests,
+              runs ruff and the tests
+
+reviewer      Opus, high effort: reads only, judges
+              the design and the security</pre>
+    <hr class="term-rule">
+    <p class="note">A rule that must apply each time belongs in a hook, not in a prompt.</p>
+    <p class="note">A hook can run ruff after each edit, whatever the model decides.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Create the subagents</h2>
+    <p>We describe each subagent in plain words. Claude writes the files in <code>.claude/agents</code>.</p>
+    <p class="muted">To change a subagent, ask Claude or edit its file. The <code>/agents</code> panel is gone: the command only shows where the files are.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="03-agents"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>The advisor</h2>
+    <p>A model at least as strong as the main one. Claude calls it on its own at key moments: before the real work, when it is stuck, and before it says "done".</p>
+    <p>Each call reads the whole conversation again, with no cache, so the advisor increases the cost.</p>
+    <p class="muted">An example: a session that costs $100 can cost $250 with the advisor.</p>
+    <p>The advice comes back encrypted: only the main model can read it, so you cannot judge it.</p>
+    <p>I do not recommend it. The reviewer subagent does the same job, and you control it: its model, its effort and its prompt.</p>
+  </div>
+  <div class="term" data-title="advisor or reviewer">
+<table class="links compare">
+      <tr><th></th><th>Advisor</th><th>Reviewer</th></tr>
+      <tr><td>Cache</td><td>no</td><td>yes</td></tr>
+      <tr><td>You read it</td><td>no, encrypted</td><td>yes</td></tr>
+      <tr><td>Model</td><td>you pick</td><td>you pick</td></tr>
+      <tr><td>Effort</td><td>no setting</td><td>you pick</td></tr>
+      <tr><td>Prompt</td><td>fixed</td><td>you write it</td></tr>
+    </table>
+    <hr class="term-rule">
+    <p class="note">Turn it on for this session, to see it at work</p>
+    <pre class="cmd">/advisor opus</pre>
+    <p class="note">Turn it off again</p>
+    <pre class="cmd">/advisor off</pre>
+    <p class="note">Claude calls the advisor when it needs it. You can also ask for it</p>
+    <pre class="cmd">My fellow advisor, could you please check this plan?</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Build by hand</h2>
+    <p>Name the subagent in the prompt, and Claude gives it the job.</p>
+    <p>Read each result, then say what comes next. You are in charge of this loop.</p>
+    <p>One round of fixes is enough here. On the next slide, <code>/goal</code> runs the cycle for us.</p>
+    <p class="muted">Your AI agent is a helpful assistant, so a review always finds something. You decide when it is enough.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="04-build"></pre>
+    <pre class="prompt" data-id="05-review"></pre>
+    <pre class="prompt" data-id="06-fix"></pre>
+    <p class="note">Roll the damage of Fireball at level 3</p>
+    <pre class="cmd">! python3 -m dice_roller 8d6</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Build until done</h2>
+    <p>Now Claude is the loop. <code>/goal</code> takes a condition and starts work at once.</p>
+    <p>After each turn, the evaluator reads the conversation and checks the condition. The evaluator is a small, fast model. It is not the reviewer and not the advisor. While the condition is false, Claude goes on: build, review, fix, review again.</p>
+    <p>Write a condition that Claude can prove from the transcript: a test run, a review verdict.</p>
+    <p>Add a turn limit to the condition, such as "Stop after 10 turns", to keep the run short.</p>
+    <p class="muted">Tip: add "Wait for the report of the subagent". If not, Claude can end a turn while the subagent still works, and the goal has nothing to check.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="07-goal-web"></pre>
+    <p class="note">See the condition, the turns and the tokens</p>
+    <pre class="cmd">/goal</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Read the verdicts, then merge</h2>
+    <p>Each "not yet" of the evaluator is in the transcript. <kbd>Ctrl</kbd><kbd>O</kbd> shows its reason.</p>
+    <p>The reviewer did not see how the code was written. So it does not share the mistakes of that reasoning. Read its findings yourself.</p>
+    <p><a href="http://localhost:8101" target="_blank" rel="noopener">Open the dice roller</a></p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="08-merge"></pre>
+    <p class="note">Then open it in the browser</p>
+    <pre class="prompt" data-id="09-run-web"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Iteration 3: the skill</h2>
+    <p>In iteration 2, we typed the process by hand: three prompts, then a long <code>/goal</code>. Each new feature needs the same steps again. So we write the process down once, as a skill, and run it with one command.</p>
+    <p><a href="https://gitlab.playground.localhost/demo/dice-roller/-/merge_requests" target="_blank" rel="noopener">Open the merge requests</a></p>
+  </div>
+  <div class="term" data-title="iteration 3">
+    <ul class="diff">
+      <li>Write it down once</li>
+      <li>What a skill is</li>
+      <li>Create `/make-it-so`</li>
+      <li>Add advantage and disadvantage with one command</li>
+      <li>Merge the merge request of the skill with `glab`</li>
+      <li>The loop reviews each merge request</li>
+    </ul>
+    <hr class="term-rule">
+    <ul class="diff skip">
+      <li>Your review of each step: the skill runs them all</li>
+      <li>A branch and a review for the skill file: it is notes, not code</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Write it down once</h2>
+    <p>Each time you correct Claude in the chat, the correction is gone in the next session.</p>
+    <p>Put it where the next session finds it.</p>
+  </div>
+  <div class="term" data-title="where it goes">
+<table class="links compare">
+      <tr><th>What</th><th>Where</th><th>Example</th></tr>
+      <tr><td>always true</td><td>`CLAUDE.md`</td><td>"use `uvx ruff`"</td></tr>
+      <tr><td>a process you run</td><td>a skill</td><td>`/make-it-so`</td></tr>
+      <tr><td>a helper with a job</td><td>a subagent</td><td>reviewer</td></tr>
+      <tr><td>must hold each time</td><td>a hook</td><td>ruff after each edit</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What a skill is</h2>
+    <p>A folder with a <code>SKILL.md</code>: a description and the steps. Scripts and notes can sit next to it.</p>
+    <p>Claude reads only the description until the skill is needed. Then it reads the rest.</p>
+    <p>You start it with <code>/name</code>. Claude can also start it when the description matches the task, unless the skill turns that off.</p>
+  </div>
+  <div class="term" data-title=".claude/skills/make-it-so/SKILL.md">
+<pre class="out">---
+name: make-it-so
+description: Takes a feature request from
+  idea to a merge request: interview,
+  implementer, reviewer, fixes,
+  /simplify, checks, merge request.
+argument-hint: &lt;feature request&gt;
+---
+
+1. Interview ...
+2. Branch ...
+3. Build: the implementer ...</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Create /make-it-so</h2>
+    <p>The interview stays in the main session: a subagent cannot ask you questions. That is why the process is a skill, not one more agent.</p>
+    <p><code>/simplify</code> is a skill that comes with Claude Code. It reads the changed code, removes duplicates, makes it simpler and faster, and applies the fixes. It does not look for bugs: that is the job of the reviewer.</p>
+    <p class="muted">If <code>/make-it-so</code> does not show up when you type <code>/</code>, run <code>/reload-skills</code>.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="10-skill"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Make it so</h2>
+    <p>Advantage: roll two d20 and keep the higher one. Disadvantage: keep the lower one.</p>
+    <p>The request is short on purpose. Buttons or notation? Show the dropped die? The interview asks. Answer it, then the skill runs the rest.</p>
+    <p><a href="http://localhost:8101" target="_blank" rel="noopener">Open the dice roller</a></p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="11-make-it-so"></pre>
+    <p class="note">Then restart it, and roll with advantage</p>
+    <pre class="prompt" data-id="11-restart-web"></pre>
+    <p class="note">Read what `/simplify` removed. If it deleted a test, check that the test was a true duplicate.</p>
+    <p class="note">After the review in the second terminal, merge it</p>
+    <pre class="prompt" data-id="11-merge-mr"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>The loop finds a merge request</h2>
+    <p>A colleague opens an urgent merge request. Watch the second terminal.</p>
+    <p>Within a minute the loop sees it, and the reviewer reviews it. An alert sums up the merge request and the verdict.</p>
+    <p>We type nothing: the loop does the work.</p>
+  </div>
+  <div class="term">
+    <p class="note">A colleague, in a third terminal</p>
+    <pre class="cmd" data-sh>task demo:merge-request</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Iteration 4: the plugins</h2>
+    <p>We wrote our skill by hand. Now a plugin helps us improve it, test it and share it.</p>
+  </div>
+  <div class="term" data-title="iteration 4">
+    <ul class="diff">
+      <li>Plugins and marketplaces</li>
+      <li>Install `skill-creator`</li>
+      <li>Improve `/make-it-so` with it</li>
+      <li>What skill-creator changed</li>
+      <li>What the evals show</li>
+      <li>Rules for good skills</li>
+      <li>Popular plugins</li>
+    </ul>
+    <hr class="term-rule">
+    <ul class="diff skip">
+      <li>The eval run live: it takes approximately 6 minutes. A slide shows the result</li>
+      <li>A branch and a review for the skill file: it is notes, not code</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Plugins and marketplaces</h2>
+    <p>A plugin is a package of skills, subagents, hooks and MCP servers that you install as one unit.</p>
+    <p>A marketplace is a list of plugins, often a Git repository. The playground adds Anthropic's official marketplace for you.</p>
+    <p class="muted">A plugin can run hooks and servers. Read what it installs before you say yes.</p>
+    <p>The status line of iteration 1 is a plugin: one skill that copies one script. Writing your own is that small.</p>
+  </div>
+  <div class="term" data-title="plugin">
+<pre class="out">marketplace
+  └─ plugin
+       ├─ skills/
+       ├─ agents/
+       ├─ hooks/
+       └─ .mcp.json</pre>
+    <p class="note">Browse the marketplaces</p>
+    <pre class="cmd">/plugin</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Improve the skill</h2>
+    <p><code>skill-creator</code> writes, tests and tunes skills. It reads our skill. It rewrites the description, so that Claude starts the skill at the right time. It adds the missing gotchas.</p>
+    <p class="muted">Choose "Install for you, in this repo only (local scope)".</p>
+  </div>
+  <div class="term">
+    <pre class="cmd">/plugin install skill-creator@claude-plugins-official</pre>
+    <pre class="prompt" data-id="13-improve-skill"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What skill-creator changed</h2>
+    <p>It read the skill and the history of this session. Then it wrote down what went wrong in the session.</p>
+    <p>Evals go further: the same tasks run with and without the skill, and a grader compares the results.</p>
+  </div>
+  <div class="term" data-title="gotchas, from the rehearsal">
+<pre class="out">- Checks joined with ";" let a commit pass while ruff
+  failed. Use "&&".
+- __pycache__ files got into a commit.
+- Subagent reports can be empty or wrong: check each
+  one yourself.
+- Keep numbers in the notation at 4 digits at most.
+- Remove a test only when it is a true duplicate.
+- Read untrusted code before you run it: the eval in
+  merge request !1.</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What the evals show</h2>
+    <p>Three feature requests, each run with and without the skill, in fresh sessions. A grader checked 10 points for each run.</p>
+    <p>The feature worked with and without the skill. The skill added the process: a review and <code>/simplify</code> in each run. Without the skill, two of three runs skipped the review.</p>
+    <p class="muted">We ran it before the session. The six runs ran in parallel, in approximately 6 minutes.</p>
+  </div>
+  <div class="term" data-title="benchmark, from the rehearsal">
+<pre class="out">                 with skill   without
+exploding dice   10/10        9/10
+--seed           10/10        8/10
+drop dice         9/10        8/10
+
+time, average    5 min        1.5 min
+tokens           approximately 4 times more</pre>
+    <hr class="term-rule">
+    <p class="note">The one miss: the report pointed to the checks instead of showing them. One line in the skill fixes it.</p>
+    <p class="note">Ask for it yourself: "Evaluate make-it-so with skill-creator."</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Rules for good skills</h2>
+    <p>From teams at Anthropic that run hundreds of skills.</p>
+  </div>
+  <div class="term" data-title="rules">
+<pre class="out">skip the obvious   Claude knows the defaults already
+
+gotchas            add a line each time Claude makes
+                   a mistake
+
+a folder           SKILL.md points to the other files
+
+do not fix steps   give facts, let Claude choose the
+                   steps
+
+description        write it for the model: it starts
+                   the skill
+
+give it code       helper scripts to call, not to
+                   rewrite</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Popular plugins</h2>
+    <p>Start with a few. Each plugin adds to the context of each session.</p>
+  </div>
+  <div class="term" data-title="claude-plugins-official">
+<pre class="out">skill-creator      write and test skills
+code-review        a review in many agents
+security-guidance  warns on risky edits
+frontend-design    UI with a clear style
+commit-commands    commit, push, open a PR
+plugin-dev         write your own plugin</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Iteration 5: the workflow</h2>
+    <p>A task too big for one agent: research across four tools, with each claim checked.</p>
+  </div>
+  <div class="term" data-title="iteration 5">
+    <ul class="diff">
+      <li>What a workflow is</li>
+      <li>Research in four stages</li>
+      <li>Read the result</li>
+      <li>When to use a workflow, and its budget</li>
+    </ul>
+    <hr class="term-rule">
+    <ul class="diff skip">
+      <li>Building the new features: you do it with `/make-it-so`</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What a workflow is</h2>
+    <p>With subagents, Claude decides turn by turn what runs next.</p>
+    <p>With a workflow, Claude first writes a short script for this one task: which agents run, how many in parallel, who checks whose work. Then the script runs.</p>
+    <p class="muted">Claude writes its own harness for the task. To start one, write "use a workflow" in the prompt. The word "workflow" alone does not start one.</p>
+  </div>
+  <div class="term" data-title="research">
+<pre class="out">collect    4 agents, one for each tool, read the docs
+   │
+verify     4 agents open each source again and check
+   │       each claim
+table      the main session builds one table with a
+   │       link in each cell
+advise     the next three features</pre>
+    <p class="note">Claude chose this plan in the rehearsal. Your run can differ: you see the plan and approve it.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Research in four stages</h2>
+    <p>You approve the script once. <code>/workflows</code> shows each agent while it works.</p>
+    <p class="muted">The agents read the web. A slow network makes this step slow.</p>
+  </div>
+  <div class="term">
+    <pre class="prompt" data-id="14-research"></pre>
+    <p class="note">Watch the agents</p>
+    <pre class="cmd">/workflows</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>The result</h2>
+    <p>8 agents checked each claim against the docs in about 6 minutes. Each cell of the full table has a link.</p>
+    <p>The letters differ between tools: <code>r</code> rerolls one time in Foundry and repeatedly in Roll20.</p>
+  </div>
+  <div class="term" data-title="dice notations, from the rehearsal">
+<pre class="out">              Roll20  Foundry  Avrae  RPG DR  ours
+keep kh kl      ✓       ✓       ✓      ✓     adv
+drop dh dl      ✓       ✓      ph pl   ✓      -
+explode !       ✓       x       e      ✓      -
+reroll once     ro      r      ro      ro     -
+arithmetic      ✓       ✓       ✓      ✓     +M</pre>
+    <hr class="term-rule">
+    <p class="note">The next three features</p>
+    <ul class="diff plain">
+      <li>Keep and drop: `4d6dl1`, `2d20kh1`</li>
+      <li>Rerolls: `r` and `ro`, Great Weapon Fighting</li>
+      <li>Several dice terms: `1d8+2d6+3`, Sneak Attack</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>When to use a workflow, and its budget</h2>
+    <p>A workflow uses many more tokens than one session. Give it a limit in the prompt: the number of agents or the tokens.</p>
+    <p>Use one when the work splits into many parts that each need a check: a migration, an audit, a research task, the triage of a thousand items.</p>
+    <p>Do not use one for a change you can see in one file.</p>
+  </div>
+  <div class="term" data-title="combine">
+<pre class="out">/goal      when is it done
+/loop      when does it run again
+workflow   who does each part</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>The whole picture</h2>
+    <p>Each step of the workflow, and the iteration that taught it.</p>
+    <p>The loop found the work. The subagents did it. The skill made it one command. The plugin improved the skill. The workflow found what comes next.</p>
+  </div>
+  <div class="term" data-title="the workflow of 201">
+<pre class="out">watch for work            /loop          iteration 1
+build until done          /goal          iteration 2
+review with a subagent    reviewer       iteration 2
+run the process           /make-it-so    iteration 3
+improve the process       a plugin       iteration 4
+plan the next work        a workflow     iteration 5</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Recap</h2>
+    <ul>
+      <li>Give Claude a check it can run, then let it run longer.</li>
+      <li>Give each job to the right model.</li>
+      <li>Write your process down once, as a skill.</li>
+      <li>Install what others built before you write your own.</li>
+      <li>Use a workflow when one agent is not enough.</li>
+    </ul>
+  </div>
+  <div class="term" data-title="claude">
+<pre class="out">Make it so.</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Cheat sheet</h2>
+    <p>Type <code>/</code> in Claude Code to see the full menu.</p>
+  </div>
+  <div class="term" data-title="cheat sheet">
+<pre class="out">/loop 5m &lt;prompt&gt;     repeat in this session
+/goal &lt;condition&gt;     work until it is true
+/goal clear           drop the goal
+/schedule             a routine in the cloud
+/tasks                subagents and background work
+/effort high          think longer
+/&lt;skill&gt;              run a skill
+/plugin               browse and install
+use a workflow ...    start a workflow
+/workflows            watch its agents</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Run it yourself</h2>
+    <p>On a Mac with Docker Desktop it works as it is. The README has the full steps.</p>
+    <p>Homework: build the first feature that the research recommends, with <code>/make-it-so</code>.</p>
+  </div>
+  <div class="term" data-title="shell">
+    <p class="note">Get the playground</p>
+    <pre class="cmd" data-sh>git clone https://github.com/pdiroot/llm-praxis.git</pre>
+    <pre class="cmd" data-sh>cd llm-praxis/part-3-playground</pre>
+    <p class="note">Start it, and open this deck</p>
+    <pre class="cmd" data-sh>task playground:start</pre>
+    <pre class="cmd" data-sh>task slides:open</pre>
+    <p class="note">Start over, or delete everything</p>
+    <pre class="cmd" data-sh>task playground:reset</pre>
+    <pre class="cmd" data-sh>task playground:terminate</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut="Appendix">
+  <div class="theory">
+    <h2>Parallel sessions</h2>
+    <p>Several sessions that edit one repository need several checkouts. If not, they change the same files. The loop of iteration 1 only reads, so it can share the clone.</p>
+    <p>A worktree is a second checkout of the same repository. <code>claude --worktree</code> starts a session in a new one.</p>
+  </div>
+  <div class="term" data-title="shell">
+    <pre class="cmd" data-sh>claude --worktree</pre>
+    <p class="note">See all your sessions in one list</p>
+    <pre class="cmd" data-sh>claude agents</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut="Appendix">
+  <div class="theory">
+    <h2>Other places to run it</h2>
+    <p>The same Claude Code runs in more places than this terminal.</p>
+  </div>
+  <div class="term" data-title="clients">
+<pre class="out">desktop app     sessions side by side
+web             claude.ai/code, in the cloud
+phone           start a task on the way
+Remote Control  drive this terminal session from the phone</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut="Appendix">
+  <div class="theory">
+    <h2>Keep the setup clean</h2>
+    <p>Old skills, servers and rules cost context in each session.</p>
+  </div>
+  <div class="term" data-title="housekeeping">
+<pre class="out">/fewer-permission-prompts   allow the safe commands you approve
+                            each day
+
+/context                    what fills the window
+
+/plugin                     disable what you do not use</pre>
+  </div>
+</section>
+
+<section class="slide" data-cut="Appendix">
+  <div class="theory">
+    <h2>Links</h2>
+  </div>
+  <div class="term" data-title="links">
+    <table class="links">
+      <tr><td><a href="https://code.claude.com/docs/en/goal" target="_blank" rel="noopener">/goal</a></td><td>the docs</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/scheduled-tasks" target="_blank" rel="noopener">/loop</a></td><td>the docs</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/sub-agents" target="_blank" rel="noopener">Subagents</a></td><td>the docs</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">Skills</a></td><td>the docs</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/workflows" target="_blank" rel="noopener">Workflows</a></td><td>the docs</td></tr>
+    </table>
+  </div>
+</section>
+
+<nav>
+  <button id="prev" aria-label="Previous slide">Previous</button>
+  <span id="counter"></span>
+  <button id="next" aria-label="Next slide">Next</button>
+</nav>
+
+<script src="prompts.js"></script>
+<script src="slides.js"></script>
+</body>
+</html>

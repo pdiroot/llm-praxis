@@ -1,0 +1,6 @@
+# The git config of the demo session: your own config, without commit signing.
+[include]
+  path = ~/.gitconfig
+
+[commit]
+  gpgSign = false

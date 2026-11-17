@@ -51,3 +51,11 @@ Run these in `part-2-playground/`:
 - `task dev:test` runs the `bats` tests that need no running playground.
 - `task dev:test-live` runs `task playground:reset`, the live `bats` tests, then `task playground:reset` again.
 - `part-2-playground/README.md` lists the other tasks.
+
+## Part 3 commands
+
+Run these in `part-3-playground/`:
+
+- `task dev:check` runs `shellcheck`, `shfmt -i 2 -d` and `yamllint`.
+- `task dev:test` runs the `bats` tests that need no running playground.
+- `part-3-playground/README.md` lists the other tasks.

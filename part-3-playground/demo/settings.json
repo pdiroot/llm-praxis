@@ -1,0 +1,36 @@
+{
+  "disableClaudeAiConnectors": true,
+  "syncClaudeAiPlugins": false,
+  "syncClaudeAiSkills": false,
+  "enableWorkflows": true,
+  "permissions": {
+    "deny": [
+      "Read(**/.env)"
+    ],
+    "allow": [
+      "Bash(glab *)",
+      "Bash(git push *)",
+      "Bash(osascript *)",
+      "Bash(uvx ruff *)"
+    ]
+  },
+  "autoMode": {
+    "environment": [
+      "$defaults",
+      "Source control: the local GitLab at gitlab.playground.localhost, a training playground on this Mac, with the project demo/dice-roller",
+      "Trusted internal domains: *.playground.localhost are local training containers on this Mac. Pushes, merges and merge request reviews in demo/dice-roller are the purpose of the training",
+      "Research on the public web about dice notations of tabletop games is part of the training"
+    ]
+  },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
+  },
+  "env": {
+    "CLAUDE_CODE_FORK_SUBAGENT": "0"
+  }
+}

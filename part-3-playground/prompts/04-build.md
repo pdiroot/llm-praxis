@@ -1,0 +1,1 @@
+Create the branch "feat/roll". Use the implementer to build the first version of "dice-roller". `python3 -m dice_roller 4d6+2` should print each die and the total. It should accept "NdS", "dS" and a "+" or "-" modifier.

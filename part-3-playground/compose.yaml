@@ -1,0 +1,47 @@
+---
+# Part 3 runs alone: part 2 uses the same ports, subnet and host names.
+name: llm-praxis-part-3
+
+services:
+  traefik:
+    image: traefik:v3.7.16
+    ports: ["127.0.0.1:443:443", "[::1]:443:443", "127.0.0.1:80:80", "[::1]:80:80"]
+    networks:
+      default:
+        aliases: [gitlab.playground.internal]
+    volumes:
+      - ./traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro
+      - ./traefik/dynamic.yaml:/etc/traefik/dynamic.yaml:ro
+      - ./runtime/tls:/tls:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  gitlab:
+    image: gitlab/gitlab-ce:19.5.3-ce.0
+    hostname: gitlab.playground.localhost
+    environment:
+      GITLAB_ROOT_PASSWORD: P@ssw0rd
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url "https://gitlab.playground.localhost"
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        nginx['proxy_set_headers'] = { "X-Forwarded-Proto" => "https", "X-Forwarded-Ssl" => "on" }
+        letsencrypt['enable'] = false
+        gitlab_rails['gitlab_shell_ssh_port'] = 2222
+        prometheus_monitoring['enable'] = false
+        puma['worker_processes'] = 2
+    ports: ["127.0.0.1:2222:22", "[::1]:2222:22"]
+    volumes:
+      - gitlab-config:/etc/gitlab
+      - gitlab-data:/var/opt/gitlab
+      - gitlab-logs:/var/log/gitlab
+    shm_size: 256m
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gitlab.entrypoints=web,websecure
+      - traefik.http.routers.gitlab.rule=Host(`gitlab.playground.localhost`) || Host(`gitlab.playground.internal`)
+      - traefik.http.services.gitlab.loadbalancer.server.port=80
+
+volumes:
+  gitlab-config:
+  gitlab-data:
+  gitlab-logs:
