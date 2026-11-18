@@ -137,7 +137,7 @@
     <pre class="cmd">/plugin install statusline@llm-praxis</pre>
     <p class="note">Load it in this session</p>
     <pre class="cmd">/reload-plugins</pre>
-    <p class="note">Set it up in this project</p>
+    <p class="note">Set it up for you, in each project</p>
     <pre class="cmd">/statusline:install</pre>
     <hr class="term-rule">
     <p class="note">What it shows, for example</p>
@@ -177,6 +177,8 @@ routine    a prompt on a schedule or an event, in the
   <div class="term" data-title="second terminal">
     <p class="note">In a second terminal, start a second session</p>
     <pre class="cmd" data-sh>task claude:start</pre>
+    <p class="note">The loop is simple work, so switch to the cheaper Sonnet</p>
+    <pre class="cmd">/model sonnet</pre>
     <pre class="prompt" data-id="02-loop"></pre>
   </div>
 </section>
@@ -373,6 +375,8 @@ reviewer      Opus, high effort: reads only, judges
     <pre class="prompt" data-id="08-merge"></pre>
     <p class="note">Then open it in the browser</p>
     <pre class="prompt" data-id="09-run-web"></pre>
+    <p class="note">Turn the advisor off again</p>
+    <pre class="cmd">/advisor off</pre>
   </div>
 </section>
 
@@ -528,7 +532,6 @@ argument-hint: &lt;feature request&gt;
   <div class="theory">
     <h2>Improve the skill</h2>
     <p><code>skill-creator</code> writes, tests and tunes skills. It reads our skill. It rewrites the description, so that Claude starts the skill at the right time. It adds the missing gotchas.</p>
-    <p class="muted">Choose "Install for you, in this repo only (local scope)".</p>
   </div>
   <div class="term">
     <pre class="cmd">/plugin install skill-creator@claude-plugins-official</pre>
@@ -539,19 +542,27 @@ argument-hint: &lt;feature request&gt;
 <section class="slide">
   <div class="theory">
     <h2>What skill-creator changed</h2>
-    <p>It read the skill and the history of this session. Then it wrote down what went wrong in the session.</p>
+    <p>It read the skill and the history of this session. It made the steps more exact, and it wrote down what went wrong in the session.</p>
     <p>Evals go further: the same tasks run with and without the skill, and a grader compares the results.</p>
   </div>
-  <div class="term" data-title="gotchas, from the rehearsal">
-<pre class="out">- Checks joined with ";" let a commit pass while ruff
-  failed. Use "&&".
-- __pycache__ files got into a commit.
-- Subagent reports can be empty or wrong: check each
-  one yourself.
-- Keep numbers in the notation at 4 digits at most.
-- Remove a test only when it is a true duplicate.
-- Read untrusted code before you run it: the eval in
-  merge request !1.</pre>
+  <div class="term" data-title="from two rehearsal runs">
+    <p class="note">Steps it changed</p>
+<pre class="out">description  when to use it, with examples such as
+             "add advantage"
+interview    questions in rounds; the answers are
+             the spec for both subagents
+reports      a subagent report is a claim: run the
+             checks yourself
+merge req.   says what was not tested, such as the
+             page in a browser</pre>
+    <hr class="term-rule">
+    <p class="note">Gotchas it added</p>
+<pre class="out">- The app on port 8101 keeps the old code until
+  it restarts.
+- In a URL, "+" is a space. Send "%2B".
+- Stage files by name, not with "git add -A".
+- GitLab shows no pipeline: the local checks are
+  the only gate.</pre>
   </div>
 </section>
 
@@ -657,7 +668,7 @@ advise     the next three features</pre>
   <div class="theory">
     <h2>Research in four stages</h2>
     <p>You approve the script once. <code>/workflows</code> shows each agent while it works.</p>
-    <p class="muted">The agents read the web. A slow network makes this step slow.</p>
+    <p class="muted">The agents read the web. A slow network makes this step slow. Roll20 refuses automated readers, so its column can come back "unverified".</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="14-research"></pre>
