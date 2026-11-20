@@ -668,21 +668,14 @@ argument-hint: &lt;feature request&gt;
     <p>From teams at Anthropic that run hundreds of skills.</p>
   </div>
   <div class="term" data-title="rules">
-<pre class="out">skip the obvious   Claude knows the defaults already
-
-gotchas            add a line each time Claude makes
-                   a mistake
-
-a folder           SKILL.md points to the other files
-
-do not fix steps   give facts, let Claude choose the
-                   steps
-
-description        write it for the model: it starts
-                   the skill
-
-give it code       helper scripts to call, not to
-                   rewrite</pre>
+    <table class="links compare">
+      <tr><td>Skip the obvious</td><td>Claude knows the defaults. Write only what is special to your project</td></tr>
+      <tr><td>Add gotchas</td><td>Each time Claude makes a mistake, add one line about it</td></tr>
+      <tr><td>Give facts, not fixed steps</td><td>Say what must be true and why. Let Claude choose how to get there</td></tr>
+      <tr><td>Write the description for the model</td><td>Claude reads it to decide when to use the skill. Say when, with example requests</td></tr>
+      <tr><td>Use a folder</td><td>Keep SKILL.md short. Put details, templates and scripts in files next to it</td></tr>
+      <tr><td>Give it code</td><td>A helper script that Claude runs, instead of code that it writes again each time</td></tr>
+    </table>
   </div>
 </section>
 
