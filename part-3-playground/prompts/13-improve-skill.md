@@ -1,1 +1,1 @@
-Use "skill-creator" to improve the skill "make-it-so". It should improve the description, the steps and the gotchas. Do not run the evals. Commit the skill on a new branch, push it and open a merge request with `glab`.
+Use "skill-creator" to improve the skill "make-it-so". It should improve the description, the steps and the gotchas. Do not run the evals. Commit the skill to "main". Push "main".
