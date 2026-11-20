@@ -817,19 +817,26 @@ use a workflow   who does each part</pre>
 <section class="slide">
   <div class="theory">
     <h2>What agent view is</h2>
-    <p>One screen for all your sessions. You type a prompt, and a new session starts in the background. A row shows if it works, waits for you, or is done.</p>
-    <p>Two sessions that edit one repository change the same files. So before a background session edits, it moves into a worktree: a second checkout of the same repository, with its own branch.</p>
+    <p>One screen for all your sessions. Each prompt starts a new session in the background.</p>
+    <p>Before a session edits, it moves into a worktree: a second checkout of the repository, with its own branch. So two sessions never change the same files.</p>
     <p class="muted">The sessions do not talk to each other. Each one reports only to you.</p>
   </div>
   <div class="term" data-title="agent view, a sketch">
-<pre class="out">  session                    state
-● keep and drop              working
-● rerolls                    waits for you
-✓ advantage (201)            done
-
-Space  peek and reply
-Enter  attach: the full session
-←      detach, back to the list</pre>
+    <p class="note">One list, all your sessions</p>
+<div style="border:1px solid var(--pine-line); border-radius:8px; padding:.6em 1em; margin:.4em 0 .8em">
+      <div style="color:var(--dim); margin-bottom:.4em">claude agents</div>
+      <table class="links" style="width:auto">
+        <tr><td style="color:#7fd48a">●</td><td>keep and drop</td><td style="color:#7fd48a">working</td></tr>
+        <tr><td style="color:var(--amber)">●</td><td>rerolls</td><td style="color:var(--amber)">waits for you</td></tr>
+        <tr><td style="color:var(--dim)">✓</td><td style="color:var(--dim)">advantage</td><td style="color:var(--dim)">done</td></tr>
+      </table>
+      <div style="color:var(--dim); margin-top:.4em">&gt; a new prompt starts a new session</div>
+    </div>
+    <p class="keys"><kbd>Space</kbd> peek and reply &nbsp; <kbd>Enter</kbd> attach &nbsp; <kbd>←</kbd> back to the list</p>
+    <p class="note">Each session edits its own checkout</p>
+<pre class="out">dice-roller                         <span style="color:#8cc4ff">main</span>
+├─ .claude/worktrees/keep-drop      <span style="color:#8cc4ff">feat/keep-drop</span>
+└─ .claude/worktrees/rerolls        <span style="color:#8cc4ff">feat/rerolls</span></pre>
   </div>
 </section>
 
