@@ -485,6 +485,59 @@ argument-hint: &lt;feature request&gt;
   </div>
 </section>
 
+<section class="slide opening" data-cut="Claude Code 202">
+  <div class="theory">
+    <h1>Claude Code 202</h1>
+    <p>Plugins, workflows, parallel sessions and agent teams, on the same dice roller.</p>
+  </div>
+  <div class="term" data-title="claude">
+<pre class="out">Claude Code
+
+/make-it-so, twice at once
+
+> <span class="cursor"></span></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What we do in 202</h2>
+    <ul>
+      <li>We improve our process with a plugin.</li>
+      <li>We let many agents research one question.</li>
+      <li>We run several sessions at once, and a team whose members talk to each other.</li>
+    </ul>
+    <p class="muted">201 gave one session more work. 202 gives the work to more sessions.</p>
+  </div>
+  <div class="term" data-title="202">
+    <p class="note">We cover</p>
+    <ul class="diff">
+      <li>Plugins and marketplaces: `skill-creator`</li>
+      <li>A workflow: research in four stages</li>
+      <li>Agent view: two features in parallel</li>
+      <li>An agent team: an implementer and a reviewer that talk</li>
+    </ul>
+    <p class="note">Extra</p>
+    <ul class="diff plain">
+      <li>Remote Control: one session, then many</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Where 201 ended</h2>
+    <p><code>main</code> has the web app, advantage and disadvantage, and the skill <code>/make-it-so</code>. The implementer and the reviewer are in <code>.claude/agents/</code>.</p>
+    <p>Start the playground again. It keeps GitLab, the clone and the demo profile.</p>
+  </div>
+  <div class="term" data-title="shell">
+    <p class="note">Resume the stopped playground</p>
+    <pre class="cmd" data-sh>task playground:start</pre>
+    <p class="note">Continue the main session of 201</p>
+    <pre class="cmd" data-sh>task claude:continue</pre>
+  </div>
+</section>
+
 <section class="slide">
   <div class="theory">
     <h2>Iteration 4: the plugins</h2>
@@ -638,10 +691,6 @@ plugin-dev         write your own plugin</pre>
       <li>Read the result</li>
       <li>When to use a workflow, and its budget</li>
     </ul>
-    <hr class="term-rule">
-    <ul class="diff skip">
-      <li>Building the new features: you do it with `/make-it-so`</li>
-    </ul>
   </div>
 </section>
 
@@ -716,17 +765,175 @@ workflow   who does each part</pre>
 
 <section class="slide">
   <div class="theory">
+    <h2>Iteration 6: parallel sessions</h2>
+    <p>The research gave us three features. One session builds them one after the other. Agent view builds two at the same time.</p>
+  </div>
+  <div class="term" data-title="iteration 6">
+    <ul class="diff">
+      <li>What agent view is</li>
+      <li>Two features with `/make-it-so`, at the same time</li>
+      <li>Peek, reply, attach</li>
+      <li>Two merge requests</li>
+    </ul>
+    <hr class="term-rule">
+    <ul class="diff skip">
+      <li>The third feature, several dice terms: homework</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What agent view is</h2>
+    <p>One screen for all your sessions. You type a prompt, and a new session starts in the background. A row shows if it works, waits for you, or is done.</p>
+    <p>Two sessions that edit one repository change the same files. So before a background session edits, it moves into a worktree: a second checkout of the same repository, with its own branch.</p>
+    <p class="muted">The sessions do not talk to each other. Each one reports only to you.</p>
+  </div>
+  <div class="term" data-title="agent view, a sketch">
+<pre class="out">  session                    state
+● keep and drop              working
+● rerolls                    waits for you
+✓ advantage (201)            done
+
+Space  peek and reply
+Enter  attach: the full session
+←      detach, back to the list</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Two features at once</h2>
+    <p>Open agent view in a second terminal. Type each prompt, then press Enter. Each prompt starts its own session.</p>
+    <p class="muted">The skill asks its questions first. Answer them in the peek panel.</p>
+  </div>
+  <div class="term">
+    <pre class="cmd" data-sh>task claude:start -- agents</pre>
+    <p class="note">The first session</p>
+    <pre class="prompt" data-id="15-keep-drop"></pre>
+    <p class="note">The second session</p>
+    <pre class="prompt" data-id="15-rerolls"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Two merge requests</h2>
+    <p>Each session ran the whole process of <code>/make-it-so</code> in its own worktree: the implementer, the reviewer, the checks, a merge request.</p>
+    <p>Both features change the parser. Merge the first one, and the second one needs a rebase. Ask its session to do it.</p>
+    <p class="muted">You coordinate: you read the rows, answer the questions and choose the order of the merges.</p>
+  </div>
+  <div class="term" data-title="who does what">
+<pre class="out">you             start the sessions, answer,
+                merge
+each session    one feature, one worktree,
+                one merge request
+subagents       implementer and reviewer, inside
+                each session</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Iteration 7: the agent team</h2>
+    <p>Our subagents end after each task, and they talk only to the main session. A team keeps the implementer and the reviewer alive, and they talk to each other.</p>
+  </div>
+  <div class="term" data-title="iteration 7">
+    <ul class="diff">
+      <li>What an agent team is</li>
+      <li>A phone layout and a light theme, built by a team</li>
+      <li>Watch the rounds of review</li>
+      <li>Who coordinates: four ways to run many agents</li>
+    </ul>
+    <hr class="term-rule">
+    <ul class="diff skip">
+      <li>Split panes in tmux: the team runs inside one terminal</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What an agent team is</h2>
+    <p>A lead and its teammates. Each teammate is a full session with its own context. It stays alive until the team ends.</p>
+    <p>Teammates send messages to each other. The lead sees the result, not each message. You can open any teammate and talk to it.</p>
+    <p>A teammate can use a subagent definition. Our implementer and reviewer from iteration 2 become teammates.</p>
+    <p class="muted">Agent teams are experimental. Teammates share one checkout, so only one of them writes files.</p>
+  </div>
+  <div class="term" data-title="the team">
+<pre class="out">            lead
+           ╱    ╲
+ implementer ──── reviewer
+  writes code      reads only,
+                   looks at the page
+
+ ──── messages, no lead in between</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>A team builds the new look</h2>
+    <p>The page is dark only, and it is made for a large screen. The team moves it to Pico CSS: a phone layout, and a light and a dark theme.</p>
+    <p>The page blocks all scripts. So the theme switch works on the server, with a cookie. The reviewer checks this.</p>
+    <p class="muted">The task turns on agent teams for this session only. The implementer downloads Pico CSS, so it needs the network.</p>
+  </div>
+  <div class="term">
+    <p class="note">Leave the main session, then start a team session</p>
+    <pre class="cmd" data-sh>task claude:team</pre>
+    <pre class="prompt" data-id="16-team"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Watch them talk</h2>
+    <p>The reviewer opens the page in headless Chrome at the width of a phone, in both themes, and looks at the screenshots.</p>
+    <p>It sends its findings to the implementer. The implementer fixes them and answers. They repeat until the reviewer has no blocking finding.</p>
+    <p class="muted">Open the page on your own phone when the merge request is ready.</p>
+  </div>
+  <div class="term" data-title="agent panel">
+<pre class="out">↑ ↓      select a teammate
+Enter    view it, and type to talk to it
+</pre>
+    <hr class="term-rule">
+    <p class="note">Ask the lead at any time</p>
+<pre class="out">What does the reviewer still block?</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Who coordinates?</h2>
+    <p>Four ways to run many agents. Choose by who holds the plan, and by whether the workers must talk.</p>
+  </div>
+  <div class="term" data-title="many agents">
+    <table class="links compare">
+      <tr><th></th><th>plan</th><th>workers talk</th><th>lives</th></tr>
+      <tr><td>subagents</td><td>main session</td><td>no, report up</td><td>one task</td></tr>
+      <tr><td>workflow</td><td>a script</td><td>no, the script checks</td><td>one run</td></tr>
+      <tr><td>agent view</td><td>you</td><td>no, report to you</td><td>until you close it</td></tr>
+      <tr><td>agent team</td><td>the lead</td><td>yes, directly</td><td>the whole team run</td></tr>
+    </table>
+    <p class="note">Each one multiplies the tokens. Start with the smallest that does the job.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
     <h2>The whole picture</h2>
     <p>Each step of the workflow, and the iteration that taught it.</p>
-    <p>The loop found the work. The subagents did it. The skill made it one command. The plugin improved the skill. The workflow found what comes next.</p>
+    <p>The loop found the work. The subagents did it. The skill made it one command. The plugin improved the skill. The workflow found what comes next. Agent view and the team built it.</p>
   </div>
-  <div class="term" data-title="the workflow of 201">
+  <div class="term" data-title="201 and 202">
 <pre class="out">watch for work            /loop          iteration 1
 build until done          /goal          iteration 2
 review with a subagent    reviewer       iteration 2
 run the process           /make-it-so    iteration 3
 improve the process       a plugin       iteration 4
-plan the next work        a workflow     iteration 5</pre>
+plan the next work        a workflow     iteration 5
+build in parallel         agent view     iteration 6
+build and review, rounds  an agent team  iteration 7</pre>
   </div>
 </section>
 
@@ -739,6 +946,8 @@ plan the next work        a workflow     iteration 5</pre>
       <li>Write your process down once, as a skill.</li>
       <li>Install what others built before you write your own.</li>
       <li>Use a workflow when one agent is not enough.</li>
+      <li>Run independent work in parallel sessions.</li>
+      <li>Use a team when the workers must talk.</li>
     </ul>
   </div>
   <div class="term" data-title="claude">
@@ -761,7 +970,10 @@ plan the next work        a workflow     iteration 5</pre>
 /&lt;skill&gt;              run a skill
 /plugin               browse and install
 use a workflow ...    start a workflow
-/workflows            watch its agents</pre>
+/workflows            watch its agents
+claude agents         agent view
+create an agent team  start a team
+/remote-control       drive this session from a phone</pre>
   </div>
 </section>
 
@@ -769,7 +981,7 @@ use a workflow ...    start a workflow
   <div class="theory">
     <h2>Run it yourself</h2>
     <p>On a Mac with Docker Desktop it works as it is. The README has the full steps.</p>
-    <p>Homework: build the first feature that the research recommends, with <code>/make-it-so</code>.</p>
+    <p>Homework: build the third feature, several dice terms such as <code>1d8+2d6+3</code>, with <code>/make-it-so</code>.</p>
   </div>
   <div class="term" data-title="shell">
     <p class="note">Get the playground</p>
@@ -784,29 +996,37 @@ use a workflow ...    start a workflow
   </div>
 </section>
 
-<section class="slide" data-cut="Appendix">
+<section class="slide" data-cut="Extra">
   <div class="theory">
-    <h2>Parallel sessions</h2>
-    <p>Several sessions that edit one repository need several checkouts. If not, they change the same files. The loop of iteration 1 only reads, so it can share the clone.</p>
-    <p>A worktree is a second checkout of the same repository. <code>claude --worktree</code> starts a session in a new one.</p>
+    <h2>Remote Control: one session</h2>
+    <p>Drive a session on this Mac from your phone or a browser. The code, the files and the tools stay on the Mac. Only the chat goes through claude.ai.</p>
+    <p>Type in the session, then scan the QR code with the Claude app. The terminal and the phone show the same conversation.</p>
+    <p class="muted">It needs a claude.ai login in the session. An API key does not work. The Mac must stay awake.</p>
   </div>
-  <div class="term" data-title="shell">
-    <pre class="cmd" data-sh>claude --worktree</pre>
-    <p class="note">See all your sessions in one list</p>
-    <pre class="cmd" data-sh>claude agents</pre>
+  <div class="term">
+    <p class="note">In the main session</p>
+    <pre class="cmd">/remote-control</pre>
+    <p class="note">On the phone</p>
+<pre class="out">Claude app  →  Code  →  the session</pre>
   </div>
 </section>
 
-<section class="slide" data-cut="Appendix">
+<section class="slide" data-cut="Extra">
   <div class="theory">
-    <h2>Other places to run it</h2>
-    <p>The same Claude Code runs in more places than this terminal.</p>
+    <h2>Remote Control: many sessions</h2>
+    <p>Server mode waits for sessions. You start each new one from the phone or from claude.ai/code. It runs on this Mac, in the clone.</p>
+    <p>With <code>--spawn worktree</code>, each session gets its own worktree, as in agent view. Press <code>w</code> in the server to switch to one shared folder.</p>
   </div>
-  <div class="term" data-title="clients">
-<pre class="out">desktop app     sessions side by side
-web             claude.ai/code, in the cloud
-phone           start a task on the way
-Remote Control  drive this terminal session from the phone</pre>
+  <div class="term">
+    <p class="note">Start the server in the clone, and leave it running</p>
+    <pre class="cmd" data-sh>task claude:start -- remote-control --spawn worktree</pre>
+    <hr class="term-rule">
+<pre class="out">Remote Control   a session on this Mac,
+                 from the phone
+web              a session in the cloud,
+                 claude.ai/code
+--teleport       a cloud session, into
+                 this terminal</pre>
   </div>
 </section>
 
@@ -836,6 +1056,10 @@ Remote Control  drive this terminal session from the phone</pre>
       <tr><td><a href="https://code.claude.com/docs/en/sub-agents" target="_blank" rel="noopener">Subagents</a></td><td>the docs</td></tr>
       <tr><td><a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">Skills</a></td><td>the docs</td></tr>
       <tr><td><a href="https://code.claude.com/docs/en/workflows" target="_blank" rel="noopener">Workflows</a></td><td>the docs</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/agent-view" target="_blank" rel="noopener">Agent view</a></td><td>the docs</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/agent-teams" target="_blank" rel="noopener">Agent teams</a></td><td>the docs</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/agents" target="_blank" rel="noopener">Many agents</a></td><td>which way to choose</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/remote-control" target="_blank" rel="noopener">Remote Control</a></td><td>the docs</td></tr>
     </table>
   </div>
 </section>

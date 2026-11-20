@@ -13,12 +13,21 @@ on the right the prompts and commands to copy.
 | 1, the loop | 5 to 11 | `CLAUDE.md`, a status line, and a second session that checks GitLab each minute | `/loop`, the four kinds of loop, routines, a first plugin |
 | 2, the subagents | 12 to 19 | The first version of the dice roller, built by hand, then a web app with a dark theme for Dungeons & Dragons, built under `/goal` | Subagents, a model and an effort for each job, the advisor, `/goal` |
 | 3, the skill | 20 to 25 | Advantage and disadvantage, added with one command | Skills, `/make-it-so`, a review of a colleague's merge request |
-| 4, the plugins | 26 to 32 | A better `/make-it-so`, and its evals | Marketplaces, `skill-creator` |
-| 5, the workflow | 33 to 37 | A table of the dice notations of four tools, and the next features | Workflows |
 
-Slides 38 to 41 close the session, and slides 42 to 45 are an appendix. A
-rehearsal measured approximately 35 minutes of live steps. With the talk,
-plan for approximately 70 minutes. Alone, plan for 2 hours.
+Slide 26 starts the second session, Claude Code 202. It continues from the
+state at the end of iteration 3.
+
+| Iteration | Slides | Result | You learn |
+|-----------|--------|--------|-----------|
+| 4, the plugins | 29 to 35 | A better `/make-it-so`, and its evals | Marketplaces, `skill-creator` |
+| 5, the workflow | 36 to 40 | A table of the dice notations of four tools, and the next features | Workflows |
+| 6, parallel sessions | 41 to 44 | Keep and drop, and rerolls, built at the same time | Agent view, worktrees |
+| 7, the agent team | 45 to 49 | A phone layout and a light theme, built by a team | Agent teams, the four ways to run many agents |
+
+Slides 50 to 53 close the session. Slides 54 and 55 are an extra on Remote
+Control, and slides 56 and 57 are an appendix. A rehearsal of 201 measured
+approximately 35 minutes of live steps. With the talk, plan for
+approximately 70 minutes. Alone, plan for 2 hours.
 
 The part 2 playground (Claude Code 101 and 102) teaches the basics. This
 playground does not repeat them.
@@ -117,6 +126,7 @@ session can read `~/.ssh` and `~/.claude`.
 | `task playground:preflight` | Checks the playground before a talk |
 | `task claude:start` | Starts a demo session. Run it in a second terminal for the loop |
 | `task claude:continue` | Continues the last conversation of the main session |
+| `task claude:team` | Starts a main session with agent teams turned on, for iteration 7 |
 | `task playground:stop` | Stops the containers and keeps the data |
 | `task playground:start` | Provisions a new playground, or resumes a stopped one |
 | `task playground:reset` | Empties the project and the sessions of the demo profile. The login stays. Use it for a new attempt |
