@@ -887,12 +887,12 @@ use a workflow   who does each part</pre>
   </div>
   <div class="term" data-title="many agents">
     <table class="links compare">
-      <tr><th></th><th>plan</th><th>reports to</th><th>lives</th></tr>
-      <tr><td>subagents</td><td>main session</td><td>the main session</td><td>one task</td></tr>
-      <tr><td>workflow</td><td>a script</td><td>the script</td><td>one run</td></tr>
-      <tr><td>agent view</td><td>you</td><td>you</td><td>until you close it</td></tr>
+      <tr><th></th><th>plan</th><th>reports to</th><th>lives</th><th>tokens</th></tr>
+      <tr><td>subagents</td><td>Claude</td><td>Claude</td><td>one task</td><td>a bit more</td></tr>
+      <tr><td>workflow</td><td>a script</td><td>the script</td><td>one run</td><td>many times</td></tr>
+      <tr><td>agent&nbsp;view</td><td>you</td><td>you</td><td>until closed</td><td>the same</td></tr>
     </table>
-    <p class="note">Each one multiplies the tokens. Start with the smallest that does the job.</p>
+    <p class="note">Agent view runs the same sessions at the same time, so the cost does not grow. A workflow gives each agent its own context, so the cost grows with each agent.</p>
   </div>
 </section>
 
