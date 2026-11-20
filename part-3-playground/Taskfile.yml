@@ -58,7 +58,7 @@ tasks:
 
   claude:team:
     interactive: true
-    desc: "Start a main demo session with agent teams turned on, for iteration 7. Pass flags after --"
+    desc: "Start a main demo session with agent teams turned on. Pass flags after --"
     env:
       CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "1"
     cmds:

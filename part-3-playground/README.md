@@ -21,11 +21,10 @@ state at the end of iteration 3.
 |-----------|--------|--------|-----------|
 | 4, the plugins | 29 to 35 | A better `/make-it-so`, and its evals | Marketplaces, `skill-creator` |
 | 5, the workflow | 36 to 40 | A table of the dice notations of four tools, and the next features | Workflows |
-| 6, parallel sessions | 41 to 44 | Keep and drop, and rerolls, built at the same time | Agent view, worktrees |
-| 7, the agent team | 45 to 49 | A phone layout and a light theme, built by a team | Agent teams, the four ways to run many agents |
+| 6, parallel sessions | 41 to 45 | Keep and drop, and rerolls, built at the same time | Agent view, worktrees, three ways to run many agents |
 
-Slides 50 to 53 close the session. Slides 54 and 55 are an extra on Remote
-Control, and slides 56 and 57 are an appendix. A rehearsal of 201 measured
+Slides 46 to 49 close the session. Slides 50 and 51 are an extra on Remote
+Control, and slides 52 and 53 are an appendix. A rehearsal of 201 measured
 approximately 35 minutes of live steps. With the talk, plan for
 approximately 70 minutes. Alone, plan for 2 hours.
 
@@ -126,7 +125,7 @@ session can read `~/.ssh` and `~/.claude`.
 | `task playground:preflight` | Checks the playground before a talk |
 | `task claude:start` | Starts a demo session. Run it in a second terminal for the loop |
 | `task claude:continue` | Continues the last conversation of the main session |
-| `task claude:team` | Starts a main session with agent teams turned on, for iteration 7 |
+| `task claude:team` | Starts a main session with agent teams turned on |
 | `task playground:stop` | Stops the containers and keeps the data |
 | `task playground:start` | Provisions a new playground, or resumes a stopped one |
 | `task playground:reset` | Empties the project and the sessions of the demo profile. The login stays. Use it for a new attempt |

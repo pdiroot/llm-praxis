@@ -488,7 +488,7 @@ argument-hint: &lt;feature request&gt;
 <section class="slide opening">
   <div class="theory">
     <h1>Claude Code 202</h1>
-    <p>Plugins, workflows, parallel sessions and agent teams, on the same dice roller.</p>
+    <p>Plugins, workflows, parallel sessions and Remote Control, on the same dice roller.</p>
   </div>
   <div class="term" data-title="claude">
 <pre class="out">Claude Code
@@ -505,7 +505,7 @@ argument-hint: &lt;feature request&gt;
     <ul>
       <li>We improve our process with a plugin.</li>
       <li>We let many agents research one question.</li>
-      <li>We run several sessions at once, and a team whose members talk to each other.</li>
+      <li>We run several sessions at once, and drive them from a phone.</li>
     </ul>
     <p class="muted">201 gave one session more work. 202 gives the work to more sessions.</p>
   </div>
@@ -515,7 +515,6 @@ argument-hint: &lt;feature request&gt;
       <li>Plugins and marketplaces: `skill-creator`</li>
       <li>A workflow: research in four stages</li>
       <li>Agent view: two features in parallel</li>
-      <li>An agent team: an implementer and a reviewer that talk</li>
     </ul>
     <p class="note">Extra</p>
     <ul class="diff plain">
@@ -835,85 +834,16 @@ subagents       implementer and reviewer, inside
 
 <section class="slide">
   <div class="theory">
-    <h2>Iteration 7: the agent team</h2>
-    <p>Our subagents end after each task, and they talk only to the main session. A team keeps the implementer and the reviewer alive, and they talk to each other.</p>
-  </div>
-  <div class="term" data-title="iteration 7">
-    <ul class="diff">
-      <li>What an agent team is</li>
-      <li>A phone layout and a light theme, built by a team</li>
-      <li>Watch the rounds of review</li>
-      <li>Who coordinates: four ways to run many agents</li>
-    </ul>
-    <hr class="term-rule">
-    <ul class="diff skip">
-      <li>Split panes in tmux: the team runs inside one terminal</li>
-    </ul>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>What an agent team is</h2>
-    <p>A lead and its teammates. Each teammate is a full session with its own context. It stays alive until the team ends.</p>
-    <p>Teammates send messages to each other. The lead sees the result, not each message. You can open any teammate and talk to it.</p>
-    <p>A teammate can use a subagent definition. Our implementer and reviewer from iteration 2 become teammates.</p>
-    <p class="muted">Agent teams are experimental. Teammates share one checkout, so only one of them writes files.</p>
-  </div>
-  <div class="term" data-title="the team">
-<pre class="out">            lead
-           ╱    ╲
- implementer ──── reviewer
-  writes code      reads only,
-                   looks at the page
-
- ──── messages, no lead in between</pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>A team builds the new look</h2>
-    <p>The page is dark only, and it is made for a large screen. The team moves it to Pico CSS: a phone layout, and a light and a dark theme.</p>
-    <p>The page blocks all scripts. So the theme switch works on the server, with a cookie. The reviewer checks this.</p>
-    <p class="muted">The task turns on agent teams for this session only. The implementer downloads Pico CSS, so it needs the network.</p>
-  </div>
-  <div class="term">
-    <p class="note">Leave the main session, then start a team session</p>
-    <pre class="cmd" data-sh>task claude:team</pre>
-    <pre class="prompt" data-id="16-team"></pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
-    <h2>Watch them talk</h2>
-    <p>The reviewer opens the page in headless Chrome at the width of a phone, in both themes, and looks at the screenshots.</p>
-    <p>It sends its findings to the implementer. The implementer fixes them and answers. They repeat until the reviewer has no blocking finding.</p>
-    <p class="muted">Open the page on your own phone when the merge request is ready.</p>
-  </div>
-  <div class="term" data-title="agent panel">
-<pre class="out">↑ ↓      select a teammate
-Enter    view it, and type to talk to it
-</pre>
-    <hr class="term-rule">
-    <p class="note">Ask the lead at any time</p>
-<pre class="out">What does the reviewer still block?</pre>
-  </div>
-</section>
-
-<section class="slide">
-  <div class="theory">
     <h2>Who coordinates?</h2>
-    <p>Four ways to run many agents. Choose by who holds the plan, and by whether the workers must talk.</p>
+    <p>Three ways to run many agents. Choose by who holds the plan.</p>
+    <p class="muted">Agents that talk to each other, in a team or across sessions, are the topic of Claude Code 301.</p>
   </div>
   <div class="term" data-title="many agents">
     <table class="links compare">
-      <tr><th></th><th>plan</th><th>workers talk</th><th>lives</th></tr>
-      <tr><td>subagents</td><td>main session</td><td>no, report up</td><td>one task</td></tr>
-      <tr><td>workflow</td><td>a script</td><td>no, the script checks</td><td>one run</td></tr>
-      <tr><td>agent view</td><td>you</td><td>no, report to you</td><td>until you close it</td></tr>
-      <tr><td>agent team</td><td>the lead</td><td>yes, directly</td><td>the whole team run</td></tr>
+      <tr><th></th><th>plan</th><th>reports to</th><th>lives</th></tr>
+      <tr><td>subagents</td><td>main session</td><td>the main session</td><td>one task</td></tr>
+      <tr><td>workflow</td><td>a script</td><td>the script</td><td>one run</td></tr>
+      <tr><td>agent view</td><td>you</td><td>you</td><td>until you close it</td></tr>
     </table>
     <p class="note">Each one multiplies the tokens. Start with the smallest that does the job.</p>
   </div>
@@ -923,7 +853,7 @@ Enter    view it, and type to talk to it
   <div class="theory">
     <h2>The whole picture</h2>
     <p>Each step of the workflow, and the iteration that taught it.</p>
-    <p>The loop found the work. The subagents did it. The skill made it one command. The plugin improved the skill. The workflow found what comes next. Agent view and the team built it.</p>
+    <p>The loop found the work. The subagents did it. The skill made it one command. The plugin improved the skill. The workflow found what comes next. Agent view built it in parallel.</p>
   </div>
   <div class="term" data-title="201 and 202">
 <pre class="out">watch for work            /loop          iteration 1
@@ -932,8 +862,7 @@ review with a subagent    reviewer       iteration 2
 run the process           /make-it-so    iteration 3
 improve the process       a plugin       iteration 4
 plan the next work        a workflow     iteration 5
-build in parallel         agent view     iteration 6
-build and review, rounds  an agent team  iteration 7</pre>
+build in parallel         agent view     iteration 6</pre>
   </div>
 </section>
 
@@ -947,7 +876,6 @@ build and review, rounds  an agent team  iteration 7</pre>
       <li>Install what others built before you write your own.</li>
       <li>Use a workflow when one agent is not enough.</li>
       <li>Run independent work in parallel sessions.</li>
-      <li>Use a team when the workers must talk.</li>
     </ul>
   </div>
   <div class="term" data-title="claude">
@@ -972,7 +900,6 @@ build and review, rounds  an agent team  iteration 7</pre>
 use a workflow ...    start a workflow
 /workflows            watch its agents
 claude agents         agent view
-create an agent team  start a team
 /remote-control       drive this session from a phone</pre>
   </div>
 </section>
@@ -1057,7 +984,6 @@ web              a session in the cloud,
       <tr><td><a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">Skills</a></td><td>the docs</td></tr>
       <tr><td><a href="https://code.claude.com/docs/en/workflows" target="_blank" rel="noopener">Workflows</a></td><td>the docs</td></tr>
       <tr><td><a href="https://code.claude.com/docs/en/agent-view" target="_blank" rel="noopener">Agent view</a></td><td>the docs</td></tr>
-      <tr><td><a href="https://code.claude.com/docs/en/agent-teams" target="_blank" rel="noopener">Agent teams</a></td><td>the docs</td></tr>
       <tr><td><a href="https://code.claude.com/docs/en/agents" target="_blank" rel="noopener">Many agents</a></td><td>which way to choose</td></tr>
       <tr><td><a href="https://code.claude.com/docs/en/remote-control" target="_blank" rel="noopener">Remote Control</a></td><td>the docs</td></tr>
     </table>
