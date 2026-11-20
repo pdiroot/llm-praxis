@@ -905,6 +905,13 @@ use a workflow   who does each part</pre>
     <pre class="cmd">/remote-control</pre>
     <p class="note">On the phone</p>
 <pre class="out">Claude app  →  Code  →  the session</pre>
+    <hr class="term-rule">
+    <p class="note">Keep it safe</p>
+    <ul class="diff plain">
+      <li>The Mac only calls out over HTTPS: no port opens on it</li>
+      <li>Your claude.ai account is the key: turn on "Require trusted devices", so each phone needs Face ID or a passkey</li>
+      <li>Permission prompts still come to you: read them on the phone before you approve</li>
+    </ul>
   </div>
 </section>
 
@@ -918,12 +925,16 @@ use a workflow   who does each part</pre>
     <p class="note">Start the server in the clone, and leave it running</p>
     <pre class="cmd" data-sh>task claude:start -- remote-control --spawn worktree</pre>
     <hr class="term-rule">
-<pre class="out">Remote Control   a session on this Mac,
-                 from the phone
-web              a session in the cloud,
-                 claude.ai/code
---teleport       a cloud session, into
-                 this terminal</pre>
+<pre class="out">Remote Control   a session on this Mac, from the phone
+web              a session in the cloud, claude.ai/code
+--teleport       a cloud session, into this terminal</pre>
+    <hr class="term-rule">
+    <p class="note">Keep it safe</p>
+    <ul class="diff plain">
+      <li>Start the server in the project, never in your home folder</li>
+      <li>Never start it with `--permission-mode bypassPermissions`</li>
+      <li>Stop the server when you are done</li>
+    </ul>
   </div>
 </section>
 
