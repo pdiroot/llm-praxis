@@ -513,7 +513,7 @@ argument-hint: &lt;feature request&gt;
     <p class="note">We cover</p>
     <ul class="diff">
       <li>Plugins and marketplaces: `skill-creator`</li>
-      <li>A workflow: research in four stages</li>
+      <li>A workflow: collect, verify, synthesize</li>
       <li>Agent view: two features in parallel</li>
     </ul>
     <p class="note">Extra</p>
@@ -714,7 +714,7 @@ argument-hint: &lt;feature request&gt;
   <div class="term" data-title="iteration 5">
     <ul class="diff">
       <li>What a workflow is</li>
-      <li>Research in four stages</li>
+      <li>Collect, verify, synthesize</li>
       <li>Read the result</li>
       <li>When to use a workflow, and its budget</li>
     </ul>
@@ -733,17 +733,16 @@ argument-hint: &lt;feature request&gt;
    │       4 Sonnet agents read their docs
 verify     4 Sonnet agents check each claim
    │       against its source
-table      Opus builds one table, a link in each cell
-   │
-advise     Opus recommends the next three features</pre>
+synthesize Opus builds one table, a link in each cell,
+           and recommends the next three features</pre>
     <p class="note">A plan for this prompt. Claude writes its own: you see it and approve it.</p>
   </div>
 </section>
 
 <section class="slide">
   <div class="theory">
-    <h2>Research in four stages</h2>
-    <p>Sonnet agents do the many small reads, and Opus does the synthesis: a cheaper model for the volume, a stronger one for the judgment.</p>
+    <h2>Collect, verify, synthesize</h2>
+    <p>A standard pattern for research. Sonnet agents do the many small reads, and Opus does the synthesis: a cheaper model for the volume, a stronger one for the judgment.</p>
     <p>We do not name the tools. Claude picks the four most popular ones and says why.</p>
     <p>You approve the script once. <code>/workflows</code> shows each agent while it works.</p>
     <p class="muted">The agents read the web. A slow network makes this step slow. Some sites refuse automated readers, so a column can come back "unverified".</p>
