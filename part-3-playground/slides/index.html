@@ -897,13 +897,13 @@ use a workflow   who does each part</pre>
   <div class="theory">
     <h2>Remote Control: one session</h2>
     <p>Drive a session on this Mac from your phone or a browser. The code, the files and the tools stay on the Mac. Only the chat goes through claude.ai.</p>
-    <p>Type in the session, then scan the QR code with the Claude app. The terminal and the phone show the same conversation.</p>
+    <p>Run <code>/rc</code> in the session. On a phone with the same account, the session is already in the list of the Claude app: no QR code needed. The terminal and the phone show the same conversation.</p>
     <p class="muted">It needs a claude.ai login in the session. An API key does not work. The Mac must stay awake.</p>
     <p class="muted">All Remote Control traffic goes through Anthropic's servers. At work, check your company's policy first: often it is not allowed. On a personal machine, be careful with what the session can reach.</p>
   </div>
   <div class="term">
-    <p class="note">In the main session</p>
-    <pre class="cmd">/remote-control</pre>
+    <p class="note">In the main session: short for /remote-control</p>
+    <pre class="cmd">/rc</pre>
     <p class="note">On the phone</p>
 <pre class="out">Claude app  →  Code  →  the session</pre>
     <hr class="term-rule">
