@@ -515,9 +515,6 @@ argument-hint: &lt;feature request&gt;
       <li>Plugins and marketplaces: `skill-creator`</li>
       <li>A workflow: collect, verify, synthesize</li>
       <li>Agent view: two features in parallel</li>
-    </ul>
-    <p class="note">Extra</p>
-    <ul class="diff plain">
       <li>Remote Control: one session, then many</li>
     </ul>
   </div>
@@ -898,19 +895,54 @@ use a workflow   who does each part</pre>
 
 <section class="slide">
   <div class="theory">
+    <h2>Remote Control: one session</h2>
+    <p>Drive a session on this Mac from your phone or a browser. The code, the files and the tools stay on the Mac. Only the chat goes through claude.ai.</p>
+    <p>Type in the session, then scan the QR code with the Claude app. The terminal and the phone show the same conversation.</p>
+    <p class="muted">It needs a claude.ai login in the session. An API key does not work. The Mac must stay awake.</p>
+  </div>
+  <div class="term">
+    <p class="note">In the main session</p>
+    <pre class="cmd">/remote-control</pre>
+    <p class="note">On the phone</p>
+<pre class="out">Claude app  →  Code  →  the session</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Remote Control: many sessions</h2>
+    <p>Server mode waits for sessions. You start each new one from the phone or from claude.ai/code. It runs on this Mac, in the clone.</p>
+    <p>With <code>--spawn worktree</code>, each session gets its own worktree, as in agent view. Press <code>w</code> in the server to switch to one shared folder.</p>
+  </div>
+  <div class="term">
+    <p class="note">Start the server in the clone, and leave it running</p>
+    <pre class="cmd" data-sh>task claude:start -- remote-control --spawn worktree</pre>
+    <hr class="term-rule">
+<pre class="out">Remote Control   a session on this Mac,
+                 from the phone
+web              a session in the cloud,
+                 claude.ai/code
+--teleport       a cloud session, into
+                 this terminal</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
     <h2>The whole picture</h2>
     <p>Each step of the workflow, and the iteration that taught it.</p>
-    <p>The loop found the work. The subagents did it. The skill made it one command. The plugin improved the skill. The workflow found what comes next. Agent view built it in parallel.</p>
+    <p>The loop found the work. The subagents did it. The skill made it one command. The plugin improved the skill. The workflow found what comes next. Agent view built it in parallel. Remote Control puts it all on your phone.</p>
   </div>
   <div class="term" data-title="201 and 202">
-<pre class="out">watch for work            /loop          iteration 1
-build until done          /goal          iteration 2
-review with a subagent    reviewer       iteration 2
-run the process           /make-it-so    iteration 3
-improve the process       a plugin       iteration 4
-format each edit          a hook         iteration 4
-plan the next work        a workflow     iteration 5
-build in parallel         agent view     iteration 6</pre>
+<pre class="out">watch for work            /loop            iteration 1
+build until done          /goal            iteration 2
+review with a subagent    reviewer         iteration 2
+run the process           /make-it-so      iteration 3
+improve the process       a plugin         iteration 4
+format each edit          a hook           iteration 4
+plan the next work        a workflow       iteration 5
+build in parallel         agent view       iteration 6
+control from your phone   Remote Control   end of 202</pre>
   </div>
 </section>
 
@@ -969,40 +1001,6 @@ claude agents         agent view
     <p class="note">Start over, or delete everything</p>
     <pre class="cmd" data-sh>task playground:reset</pre>
     <pre class="cmd" data-sh>task playground:terminate</pre>
-  </div>
-</section>
-
-<section class="slide" data-cut="Extra">
-  <div class="theory">
-    <h2>Remote Control: one session</h2>
-    <p>Drive a session on this Mac from your phone or a browser. The code, the files and the tools stay on the Mac. Only the chat goes through claude.ai.</p>
-    <p>Type in the session, then scan the QR code with the Claude app. The terminal and the phone show the same conversation.</p>
-    <p class="muted">It needs a claude.ai login in the session. An API key does not work. The Mac must stay awake.</p>
-  </div>
-  <div class="term">
-    <p class="note">In the main session</p>
-    <pre class="cmd">/remote-control</pre>
-    <p class="note">On the phone</p>
-<pre class="out">Claude app  →  Code  →  the session</pre>
-  </div>
-</section>
-
-<section class="slide" data-cut="Extra">
-  <div class="theory">
-    <h2>Remote Control: many sessions</h2>
-    <p>Server mode waits for sessions. You start each new one from the phone or from claude.ai/code. It runs on this Mac, in the clone.</p>
-    <p>With <code>--spawn worktree</code>, each session gets its own worktree, as in agent view. Press <code>w</code> in the server to switch to one shared folder.</p>
-  </div>
-  <div class="term">
-    <p class="note">Start the server in the clone, and leave it running</p>
-    <pre class="cmd" data-sh>task claude:start -- remote-control --spawn worktree</pre>
-    <hr class="term-rule">
-<pre class="out">Remote Control   a session on this Mac,
-                 from the phone
-web              a session in the cloud,
-                 claude.ai/code
---teleport       a cloud session, into
-                 this terminal</pre>
   </div>
 </section>
 

@@ -23,8 +23,8 @@ state at the end of iteration 3.
 | 5, the workflow | 37 to 41 | A table of the dice notations of the four most popular tools, and the next features | Workflows |
 | 6, parallel sessions | 42 to 46 | Keep and drop, and rerolls, built at the same time | Agent view, worktrees, three ways to run many agents |
 
-Slides 47 to 50 close the session. Slides 51 and 52 are an extra on Remote
-Control, and slides 53 and 54 are an appendix. A rehearsal of 201 measured
+Slides 47 and 48 show Remote Control. Slides 49 to 52 close the session,
+and slides 53 and 54 are an appendix. A rehearsal of 201 measured
 approximately 35 minutes of live steps. With the talk, plan for
 approximately 70 minutes. Alone, plan for 2 hours.
 
