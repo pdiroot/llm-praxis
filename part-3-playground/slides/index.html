@@ -788,12 +788,14 @@ synthesize
     <h2>When to use a workflow, and its budget</h2>
     <p>A workflow uses many more tokens than one session. Limit the number of agents in the prompt, or with the size guideline in <code>/config</code>. There is no token limit: watch <code>/workflows</code> and stop the run if it grows too large.</p>
     <p>Use one when the work splits into many parts that each need a check: a migration, an audit, a research task, the triage of a thousand items.</p>
+    <p>Use a skill instead when the steps are the same each time, such as our process in <code>/make-it-so</code>. A workflow is a plan for one task.</p>
     <p>Do not use one for a change you can see in one file.</p>
   </div>
   <div class="term" data-title="combine">
 <pre class="out">/goal      when is it done
 /loop      when does it run again
-workflow   who does each part</pre>
+workflow   who does each part
+/skill     the same steps each time</pre>
   </div>
 </section>
 
