@@ -606,7 +606,7 @@ argument-hint: &lt;feature request&gt;
 <section class="slide">
   <div class="theory">
     <h2>Improve the skill</h2>
-    <p><code>skill-creator</code> writes, tests and tunes skills. It reads our skill. It rewrites the description, so that Claude starts the skill at the right time. It adds the missing gotchas.</p>
+    <p><code>skill-creator</code> writes, tests and tunes skills. It reads our skill and the history of this session, then makes the steps more exact.</p>
   </div>
   <div class="term">
     <p class="note">Install the plugin</p>
@@ -621,27 +621,21 @@ argument-hint: &lt;feature request&gt;
 <section class="slide">
   <div class="theory">
     <h2>What skill-creator changed</h2>
-    <p>It read the skill and the history of this session. It made the steps more exact, and it wrote down what went wrong in the session.</p>
+    <p>It read the skill and the history of this session. The skill grew from 66 to 131 lines.</p>
+    <p>Most changes make the steps more exact. A few come from this session: our app runs on port 8101, so the subagents must leave that port alone.</p>
     <p>Evals go further: the same tasks run with and without the skill, and a grader compares the results.</p>
   </div>
-  <div class="term" data-title="from two rehearsal runs">
-    <p class="note">Steps it changed</p>
-<pre class="out">description  when to use it, with examples such as
-             "add advantage"
-interview    questions in rounds; the answers are
-             the spec for both subagents
-reports      a subagent report is a claim: run the
-             checks yourself
-merge req.   says what was not tested, such as the
-             page in a browser</pre>
-    <hr class="term-rule">
-    <p class="note">Gotchas it added</p>
-<pre class="out">- The app on port 8101 keeps the old code until
-  it restarts.
-- In a URL, "+" is a space. Send "%2B".
-- Stage files by name, not with "git add -A".
-- GitLab shows no pipeline: the local checks are
-  the only gate.</pre>
+  <div class="term" data-title="from the rehearsal">
+    <p class="note">What changed in the skill</p>
+    <table class="links compare">
+      <tr><td>description</td><td>Example requests, such as "Add advantage and disadvantage"</td></tr>
+      <tr><td>briefs</td><td>A subagent knows only its prompt, so each brief has the branch, the request and the rules</td></tr>
+      <tr><td>checks</td><td>A subagent report is a claim: check <code>git log</code> and the tests yourself</td></tr>
+      <tr><td>interview</td><td>Read the code first, then ask at most four questions at once, with a recommended answer</td></tr>
+      <tr><td>tests</td><td>Deterministic, with a fixed random seed, on port 0, never on 8101</td></tr>
+      <tr><td>/simplify</td><td>Skip a change that alters what the user sees</td></tr>
+      <tr><td>merge request</td><td>A fixed template: summary, tests, review rounds, open findings</td></tr>
+    </table>
   </div>
 </section>
 
