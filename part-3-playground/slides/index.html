@@ -606,7 +606,7 @@ argument-hint: &lt;feature request&gt;
 <section class="slide">
   <div class="theory">
     <h2>Improve the skill</h2>
-    <p><code>skill-creator</code> writes, tests and tunes skills. It reads our skill and the history of this session, then makes the steps more exact.</p>
+    <p><code>skill-creator</code> writes, tests and tunes skills. It reads our skill and makes the steps more exact.</p>
   </div>
   <div class="term">
     <p class="note">Install the plugin</p>
@@ -621,20 +621,18 @@ argument-hint: &lt;feature request&gt;
 <section class="slide">
   <div class="theory">
     <h2>What skill-creator changed</h2>
-    <p>It read the skill and the history of this session. The skill grew from 66 to 131 lines.</p>
-    <p>Most changes make the steps more exact. A few come from this session: our app runs on port 8101, so the subagents must leave that port alone.</p>
+    <p>It makes the steps of a skill more exact. Each run changes different things, so read the diff.</p>
     <p>Evals go further: the same tasks run with and without the skill, and a grader compares the results.</p>
   </div>
-  <div class="term" data-title="from the rehearsal">
-    <p class="note">What changed in the skill</p>
+  <div class="term" data-title="typical changes">
+    <p class="note">What it can change</p>
     <table class="links compare">
-      <tr><td>description</td><td>Example requests, such as "Add advantage and disadvantage"</td></tr>
-      <tr><td>briefs</td><td>A subagent knows only its prompt, so each brief has the branch, the request and the rules</td></tr>
-      <tr><td>checks</td><td>A subagent report is a claim: check <code>git log</code> and the tests yourself</td></tr>
-      <tr><td>interview</td><td>Read the code first, then ask at most four questions at once, with a recommended answer</td></tr>
-      <tr><td>tests</td><td>Deterministic, with a fixed random seed, on port 0, never on 8101</td></tr>
-      <tr><td>/simplify</td><td>Skip a change that alters what the user sees</td></tr>
-      <tr><td>merge request</td><td>A fixed template: summary, tests, review rounds, open findings</td></tr>
+      <tr><td>description</td><td>When to use the skill, with example requests</td></tr>
+      <tr><td>briefs</td><td>What each subagent must know: a subagent sees only its prompt</td></tr>
+      <tr><td>checks</td><td>A subagent report is a claim: check it yourself</td></tr>
+      <tr><td>interview</td><td>Fewer and better questions, with a recommended answer</td></tr>
+      <tr><td>rules</td><td>The mistakes to avoid, such as a port that is in use</td></tr>
+      <tr><td>output</td><td>A fixed template for the merge request and the report</td></tr>
     </table>
   </div>
 </section>
