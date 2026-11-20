@@ -584,14 +584,17 @@ argument-hint: &lt;feature request&gt;
     <h2>A hook: Ruff after each edit</h2>
     <p>Ruff is a linter and formatter for Python. <code>CLAUDE.md</code> asks Claude to run it before each commit. That is a request, and Claude can forget it.</p>
     <p>A hook is a shell command that Claude Code runs on an event, such as after each edit. Claude does not decide to run it, so it runs each time.</p>
-    <p>Exit code 2 sends the error back to Claude, and Claude fixes it.</p>
+    <p>Claude writes the hook as a small script. Exit code 2 sends what Ruff cannot fix back to Claude, and Claude fixes it.</p>
     <p class="muted">The hook is in the project settings, so each session in the project gets it, also in a worktree.</p>
   </div>
-  <div class="term" data-title="hook">
-<pre class="out">event     PostToolUse: after a tool ran
-matcher   Edit|Write: only file edits
-input     JSON on stdin, with the file path
-exit 2    stderr goes back to Claude</pre>
+  <div class="term" data-title=".claude/settings.json, from a test run">
+<pre class="out">"PostToolUse": [{
+  "matcher": "Edit|Write|MultiEdit",
+  "hooks": [{
+    "type": "command",
+    "command": ".claude/hooks/ruff-python.sh"
+  }]
+}]</pre>
     <hr class="term-rule">
     <p class="note">Ask Claude to add it</p>
     <pre class="prompt" data-id="13-hook"></pre>
