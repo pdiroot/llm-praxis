@@ -19,12 +19,12 @@ state at the end of iteration 3.
 
 | Iteration | Slides | Result | You learn |
 |-----------|--------|--------|-----------|
-| 4, the plugins | 29 to 35 | A better `/make-it-so`, and its evals | Marketplaces, `skill-creator` |
-| 5, the workflow | 36 to 40 | A table of the dice notations of four tools, and the next features | Workflows |
-| 6, parallel sessions | 41 to 45 | Keep and drop, and rerolls, built at the same time | Agent view, worktrees, three ways to run many agents |
+| 4, the plugins | 29 to 36 | A better `/make-it-so`, and its evals | Marketplaces, a hook, `skill-creator` |
+| 5, the workflow | 37 to 41 | A table of the dice notations of four tools, and the next features | Workflows |
+| 6, parallel sessions | 42 to 46 | Keep and drop, and rerolls, built at the same time | Agent view, worktrees, three ways to run many agents |
 
-Slides 46 to 49 close the session. Slides 50 and 51 are an extra on Remote
-Control, and slides 52 and 53 are an appendix. A rehearsal of 201 measured
+Slides 47 to 50 close the session. Slides 51 and 52 are an extra on Remote
+Control, and slides 53 and 54 are an appendix. A rehearsal of 201 measured
 approximately 35 minutes of live steps. With the talk, plan for
 approximately 70 minutes. Alone, plan for 2 hours.
 

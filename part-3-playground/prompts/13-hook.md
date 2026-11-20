@@ -1,0 +1,1 @@
+Add a hook to the project settings in ".claude/settings.json". After each Edit or Write of a Python file, it runs `uvx ruff format` and `uvx ruff check --fix` on that file. When ruff check still finds an error, the hook exits with code 2, so that you see the error. Test the hook once. Then commit it to "main" and push "main".

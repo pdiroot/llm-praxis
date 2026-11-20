@@ -544,6 +544,7 @@ argument-hint: &lt;feature request&gt;
   <div class="term" data-title="iteration 4">
     <ul class="diff">
       <li>Plugins and marketplaces</li>
+      <li>A hook: ruff after each edit</li>
       <li>Install `skill-creator`</li>
       <li>Improve `/make-it-so` with it</li>
       <li>What skill-creator changed</li>
@@ -563,7 +564,7 @@ argument-hint: &lt;feature request&gt;
     <h2>Plugins and marketplaces</h2>
     <p>A plugin is a package of skills, subagents, hooks and MCP servers that you install as one unit.</p>
     <p>A marketplace is a list of plugins, often a Git repository. The playground adds Anthropic's official marketplace for you.</p>
-    <p class="muted">A plugin can run hooks and servers. Read what it installs before you say yes.</p>
+    <p class="muted">A plugin runs code on your machine, with your rights: its hooks run shell commands on events, and its MCP servers run as programs. Read what it installs before you say yes.</p>
     <p>The status line of iteration 1 is a plugin: one skill that copies one script. Writing your own is that small.</p>
   </div>
   <div class="term" data-title="plugin">
@@ -575,6 +576,28 @@ argument-hint: &lt;feature request&gt;
        └─ .mcp.json</pre>
     <p class="note">Browse the marketplaces</p>
     <pre class="cmd">/plugin</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>A hook: ruff after each edit</h2>
+    <p>A hook is a shell command that Claude Code runs on an event, such as after each edit. Claude does not decide to run it, so it runs each time.</p>
+    <p><code>CLAUDE.md</code> asks for ruff before each commit. That is a request. The hook makes it a rule.</p>
+    <p>Exit code 2 sends the error back to Claude, and Claude fixes it.</p>
+    <p class="muted">The hook is in the project settings, so each session in the project gets it, also in a worktree.</p>
+  </div>
+  <div class="term" data-title=".claude/settings.json, a sketch">
+<pre class="out">"PostToolUse": [{
+  "matcher": "Edit|Write",
+  "hooks": [{ "type": "command",
+    "command": "ruff format, ruff check --fix
+                on the edited .py file;
+                exit 2 on an error" }]
+}]</pre>
+    <pre class="prompt" data-id="13-hook"></pre>
+    <p class="note">See the hooks of this session</p>
+    <pre class="cmd">/hooks</pre>
   </div>
 </section>
 
@@ -859,6 +882,7 @@ build until done          /goal          iteration 2
 review with a subagent    reviewer       iteration 2
 run the process           /make-it-so    iteration 3
 improve the process       a plugin       iteration 4
+format each edit          a hook         iteration 4
 plan the next work        a workflow     iteration 5
 build in parallel         agent view     iteration 6</pre>
   </div>
@@ -895,6 +919,7 @@ build in parallel         agent view     iteration 6</pre>
 /effort high          think longer
 /&lt;skill&gt;              run a skill
 /plugin               browse and install
+/hooks                the hooks of this session
 use a workflow ...    start a workflow
 /workflows            watch its agents
 claude agents         agent view
