@@ -859,17 +859,23 @@ use a workflow   who does each part</pre>
 <section class="slide">
   <div class="theory">
     <h2>Two merge requests</h2>
-    <p>Each session ran the whole process of <code>/make-it-so</code> in its own worktree: the implementer, the reviewer, the checks, a merge request.</p>
+    <p>Each session ran <code>/make-it-so</code> in its own worktree and opened its own merge request.</p>
     <p>Both features change the parser. Merge the first one, and the second one needs a rebase. Ask its session to do it.</p>
     <p class="muted">You coordinate: you read the rows, answer the questions and choose the order of the merges.</p>
   </div>
   <div class="term" data-title="who does what">
-<pre class="out">you             start the sessions, answer,
-                merge
-each session    one feature, one worktree,
-                one merge request
-subagents       implementer and reviewer, inside
-                each session</pre>
+    <p class="note">Each session runs the whole process</p>
+<pre class="out"><span style="color:var(--amber)">you</span>
+├─ <span style="color:#8cc4ff">session: keep and drop</span>   <span style="color:var(--dim)">.claude/worktrees/keep-drop</span>
+│    implementer → reviewer → checks → <span style="color:#7fd48a">merge request 1</span>
+│
+└─ <span style="color:#8cc4ff">session: rerolls</span>         <span style="color:var(--dim)">.claude/worktrees/rerolls</span>
+     implementer → reviewer → checks → <span style="color:#7fd48a">merge request 2</span></pre>
+    <hr class="term-rule">
+    <p class="note">You merge, one at a time</p>
+<pre class="out">1  <span style="color:#7fd48a">merge request 1</span> → main
+2  the rerolls session rebases on the new main
+3  <span style="color:#7fd48a">merge request 2</span> → main</pre>
   </div>
 </section>
 
