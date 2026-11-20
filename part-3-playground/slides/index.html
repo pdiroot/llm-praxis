@@ -643,7 +643,7 @@ argument-hint: &lt;feature request&gt;
     <h2>What the evals show</h2>
     <p>We compared the skill before and after <code>skill-creator</code>. Three feature requests ran with the old and with the new version, in fresh sessions. A grader checked 13 points in each run.</p>
     <p>Both versions built the features with tests, a review, <code>/simplify</code> and the checks. The new version also did what the old one left vague: a clear spec, a full merge request and a full report.</p>
-    <p>The price: each run takes approximately a quarter longer and uses a quarter more tokens.</p>
+    <p>The price: each run takes 24% longer and uses 25% more tokens.</p>
     <p class="muted">We ran it before the session: six runs in parallel, approximately 30 minutes with the grading. Your numbers will differ, but the direction should be the same.</p>
   </div>
   <div class="term" data-title="benchmark, from a rehearsal">
@@ -653,8 +653,8 @@ argument-hint: &lt;feature request&gt;
       <tr><td>exploding&nbsp;dice</td><td><code>4d6!</code>: a die that shows its highest face rolls again and adds</td><td>8/13</td><td>13/13</td></tr>
       <tr><td>keep highest</td><td><code>4d6kh3</code>: roll four dice, keep the three highest</td><td>10/13</td><td>13/13</td></tr>
       <tr><td>reroll ones</td><td><code>2d6r1</code>: a die that shows 1 rolls again</td><td>8/13</td><td>13/13</td></tr>
-      <tr><td>time</td><td>average for one run</td><td>2.8&nbsp;min</td><td>3.5&nbsp;min</td></tr>
-      <tr><td>tokens</td><td>average for one run</td><td>40k</td><td>50k</td></tr>
+      <tr><td>time</td><td>average for one run</td><td>2.8&nbsp;min</td><td>3.5&nbsp;min (+24%)</td></tr>
+      <tr><td>tokens</td><td>average for one run</td><td>39,800</td><td>49,600 (+25%)</td></tr>
     </table>
     <hr class="term-rule">
     <p class="note">Where they differ: the spec, the review report, the merge request and the final report.</p>
