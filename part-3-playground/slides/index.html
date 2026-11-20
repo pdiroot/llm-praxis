@@ -761,22 +761,25 @@ synthesize
 <section class="slide">
   <div class="theory">
     <h2>The result</h2>
-    <p>8 agents checked each claim against the docs in about 6 minutes. Each cell of the full table has a link.</p>
-    <p>The letters differ between tools: <code>r</code> rerolls one time in Foundry and repeatedly in Roll20.</p>
+    <p>9 agents checked each claim against the docs in about 2.5 minutes. Claude picked the four tools and said why.</p>
+    <p>Roll20 refuses automated readers, so its column came back unverified: a person checks it in a browser.</p>
+    <p>The letters differ between tools: <code>r</code> rerolls once in Foundry, and repeats in Fantasy Grounds.</p>
   </div>
   <div class="term" data-title="dice notations, from the rehearsal">
-<pre class="out">              Roll20  Foundry  Avrae  RPG DR  ours
-keep kh kl      ✓       ✓       ✓      ✓     adv
-drop dh dl      ✓       ✓      ph pl   ✓      -
-explode !       ✓       x       e      ✓      -
-reroll once     ro      r      ro      ro     -
-arithmetic      ✓       ✓       ✓      ✓     +M</pre>
-    <hr class="term-rule">
+    <table class="links compare">
+      <tr><th></th><th>Roll20</th><th>Foundry</th><th>Fantasy&nbsp;Grounds</th><th>Avrae</th><th>ours</th></tr>
+      <tr><td>keep</td><td>?</td><td>kh kl</td><td>k kl</td><td>kh kl</td><td>adv</td></tr>
+      <tr><td>drop</td><td>?</td><td>dh dl</td><td>d, lowest only</td><td>ph pl</td><td>-</td></tr>
+      <tr><td>explode</td><td>?</td><td>x</td><td>e</td><td>e</td><td>-</td></tr>
+      <tr><td>reroll</td><td>?</td><td>rr</td><td>r</td><td>rr</td><td>-</td></tr>
+      <tr><td>reroll&nbsp;once</td><td>?</td><td>r</td><td>-</td><td>ro</td><td>-</td></tr>
+      <tr><td>arithmetic</td><td>?</td><td>✓</td><td>✓</td><td>✓</td><td>+M</td></tr>
+    </table>
     <p class="note">The next three features</p>
     <ul class="diff plain">
-      <li>Keep and drop: `4d6dl1`, `2d20kh1`</li>
-      <li>Rerolls: `r` and `ro`, Great Weapon Fighting</li>
+      <li>Keep highest and lowest: `4d6kh3`, `2d20kl1+5`</li>
       <li>Several dice terms: `1d8+2d6+3`, Sneak Attack</li>
+      <li>Reroll once: `2d6ro&lt;3`, Great Weapon Fighting</li>
     </ul>
   </div>
 </section>
