@@ -909,9 +909,9 @@ use a workflow   who does each part</pre>
     <hr class="term-rule">
     <p class="note">Keep it safe</p>
     <ul class="diff plain">
-      <li>The Mac only calls out over HTTPS: no port opens on it</li>
-      <li>Your claude.ai account is the key: turn on "Require trusted devices", so each phone needs Face ID or a passkey</li>
-      <li>Permission prompts still come to you: read them on the phone before you approve</li>
+      <li>The Mac only calls out over TLS: no port opens on it</li>
+      <li>Your account is the key: turn on "Require trusted devices", so only your devices can steer a session</li>
+      <li>Permission prompts wait on the phone until you answer: read each one</li>
     </ul>
   </div>
 </section>
@@ -932,9 +932,9 @@ web              a session in the cloud, claude.ai/code
     <hr class="term-rule">
     <p class="note">Keep it safe</p>
     <ul class="diff plain">
-      <li>Start the server in the project, never in your home folder</li>
-      <li>Never start it with `--permission-mode bypassPermissions`</li>
-      <li>Stop the server when you are done</li>
+      <li>Start the server in the project folder, not in your home folder</li>
+      <li>Keep the permission prompts on: never start it with `bypassPermissions`</li>
+      <li>Stop the server when you are done: until then it waits for new sessions</li>
     </ul>
   </div>
 </section>
