@@ -729,12 +729,16 @@ argument-hint: &lt;feature request&gt;
     <p class="muted">Claude writes its own harness for the task. To start one, write "use a workflow" in the prompt. The word "workflow" alone does not start one.</p>
   </div>
   <div class="term" data-title="research">
-<pre class="out">collect    pick the four most popular tools, then
-   │       4 Sonnet agents read their docs
-verify     4 Sonnet agents check each claim
-   │       against its source
-synthesize Opus builds one table, a link in each cell,
-           and recommends the next three features</pre>
+<pre class="out">collect
+  Pick the four most popular tools, then
+  4 Sonnet agents read their docs
+                    ↓
+verify
+  4 Sonnet agents check each claim against its source
+                    ↓
+synthesize
+  Opus builds one table, a link in each cell,
+  and recommends the next three features</pre>
     <p class="note">A plan for this prompt. Claude writes its own: you see it and approve it.</p>
   </div>
 </section>
