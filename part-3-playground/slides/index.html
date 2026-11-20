@@ -554,7 +554,7 @@ argument-hint: &lt;feature request&gt;
     </ul>
     <hr class="term-rule">
     <ul class="diff skip">
-      <li>The eval run live: it takes approximately 6 minutes. A slide shows the result</li>
+      <li>The eval run live: it takes approximately 30 minutes. A slide shows the result</li>
     </ul>
   </div>
 </section>
@@ -641,21 +641,23 @@ argument-hint: &lt;feature request&gt;
 <section class="slide">
   <div class="theory">
     <h2>What the evals show</h2>
-    <p>Three feature requests, each run with and without the skill, in fresh sessions. A grader checked 10 points for each run.</p>
-    <p>The feature worked with and without the skill. The skill added the process: a review and <code>/simplify</code> in each run. Without the skill, two of three runs skipped the review.</p>
-    <p class="muted">We ran it before the session. The six runs ran in parallel, in approximately 6 minutes.</p>
+    <p>We compared the skill before and after <code>skill-creator</code>. Three feature requests ran with the old and with the new version, in fresh sessions. A grader checked 13 points in each run.</p>
+    <p>Both versions built the features with tests, a review, <code>/simplify</code> and the checks. The new version also did what the old one left vague: a clear spec, a full merge request and a full report.</p>
+    <p>The price: each run takes longer and uses more tokens.</p>
+    <p class="muted">We ran it before the session: six runs in parallel, approximately 30 minutes with the grading. Your numbers will differ, but the direction should be the same.</p>
   </div>
-  <div class="term" data-title="benchmark, from the rehearsal">
-<pre class="out">                 with skill   without
-exploding dice   10/10        9/10
---seed           10/10        8/10
-drop dice         9/10        8/10
+  <div class="term" data-title="benchmark, from a rehearsal">
+<pre class="out">                 old skill   new skill
+exploding dice    8/13       13/13
+keep highest     10/13       13/13
+reroll ones       8/13       13/13
 
-time, average    5 min        1.5 min
-tokens           approximately 4 times more</pre>
+time, average    2.8 min     3.5 min
+tokens           approximately a quarter more</pre>
     <hr class="term-rule">
-    <p class="note">The one miss: the report pointed to the checks instead of showing them. One line in the skill fixes it.</p>
-    <p class="note">Ask for it yourself: "Evaluate make-it-so with skill-creator."</p>
+    <p class="note">Where they differ: the spec, the review report, the merge request and the final report.</p>
+    <p class="note">What it did not test: no review found a high issue, so the fix loop never ran. An eval sees only what its tasks trigger.</p>
+    <p class="note">Ask for it yourself: "Compare make-it-so with its previous version, with skill-creator."</p>
   </div>
 </section>
 
