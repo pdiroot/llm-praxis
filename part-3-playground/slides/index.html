@@ -729,22 +729,24 @@ argument-hint: &lt;feature request&gt;
     <p class="muted">Claude writes its own harness for the task. To start one, write "use a workflow" in the prompt. The word "workflow" alone does not start one.</p>
   </div>
   <div class="term" data-title="research">
-<pre class="out">collect    4 agents, one for each tool, read the docs
+<pre class="out">collect    pick the four most popular tools, then
+   │       4 Sonnet agents read their docs
+verify     4 Sonnet agents check each claim
+   │       against its source
+table      Opus builds one table, a link in each cell
    │
-verify     4 agents open each source again and check
-   │       each claim
-table      the main session builds one table with a
-   │       link in each cell
-advise     the next three features</pre>
-    <p class="note">Claude chose this plan in the rehearsal. Your run can differ: you see the plan and approve it.</p>
+advise     Opus recommends the next three features</pre>
+    <p class="note">A plan for this prompt. Claude writes its own: you see it and approve it.</p>
   </div>
 </section>
 
 <section class="slide">
   <div class="theory">
     <h2>Research in four stages</h2>
+    <p>Sonnet agents do the many small reads, and Opus does the synthesis: a cheaper model for the volume, a stronger one for the judgment.</p>
+    <p>We do not name the tools. Claude picks the four most popular ones and says why.</p>
     <p>You approve the script once. <code>/workflows</code> shows each agent while it works.</p>
-    <p class="muted">The agents read the web. A slow network makes this step slow. Roll20 refuses automated readers, so its column can come back "unverified".</p>
+    <p class="muted">The agents read the web. A slow network makes this step slow. Some sites refuse automated readers, so a column can come back "unverified".</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="14-research"></pre>

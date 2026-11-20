@@ -14,7 +14,7 @@ window.PROMPTS = {
   "11-restart-web": "Stop the app that runs. Start it again in the background, and give me the link.\n",
   "13-hook": "Add a hook to the project settings: after each edit of a Python file, Ruff formats and fixes that file, and sends back what it cannot fix. Then commit it to \"main\" and push \"main\".\n",
   "13-improve-skill": "Use \"skill-creator\" to improve the skill \"make-it-so\". Do not run the evals. Commit it to \"main\" and push \"main\".\n",
-  "14-research": "Use a workflow to research which dice notations Roll20, Foundry VTT, Avrae and the RPG Dice Roller library support. Collect the official docs of each tool. Verify each claim against its source. Then build one table of features, with a source link in each cell. The table should cover keep highest and lowest, exploding dice, rerolls and modifiers. Recommend the next three features for \"dice-roller\". Use at most 10 agents.\n",
+  "14-research": "Use a workflow to research the dice notations of the four most popular dice rollers and virtual tabletops. Pick the four first, and say why. Sonnet agents collect the official docs of each tool and verify each claim against its source. Then Opus builds one table of features, with a source link in each cell. The table should cover keep highest and lowest, exploding dice, rerolls and modifiers. Opus recommends the next three features for \"dice-roller\". Use at most 10 agents.\n",
   "15-keep-drop": "/make-it-so Add keep and drop: 4d6dl1 and 2d20kh1.\n",
   "15-rerolls": "/make-it-so Add rerolls: r and ro, as in Great Weapon Fighting.\n"
 }
