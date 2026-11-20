@@ -12,7 +12,7 @@ window.PROMPTS = {
   "11-make-it-so": "/make-it-so Add advantage and disadvantage.\n",
   "11-merge-mr": "Merge the open merge request with `glab mr merge`. Then switch to \"main\" and pull.\n",
   "11-restart-web": "Stop the app that runs. Start it again in the background, and give me the link.\n",
-  "13-improve-skill": "Use \"skill-creator\" to improve the skill \"make-it-so\". It should improve the description, the steps and the gotchas. Do not run the evals. Commit the skill to \"main\". Push \"main\".\n",
+  "13-improve-skill": "Use \"skill-creator\" to improve the skill \"make-it-so\". It should improve the description, the steps and the gotchas. Do not run the evals. Commit the skill on a new branch, push it and open a merge request with `glab`.\n",
   "14-research": "Use a workflow to research which dice notations Roll20, Foundry VTT, Avrae and the RPG Dice Roller library support. Collect the official docs of each tool. Verify each claim against its source. Then build one table of features, with a source link in each cell. The table should cover keep highest and lowest, exploding dice, rerolls and modifiers. Recommend the next three features for \"dice-roller\". Use at most 10 agents.\n",
   "15-keep-drop": "/make-it-so Add keep and drop: 4d6dl1 and 2d20kh1.\n",
   "15-rerolls": "/make-it-so Add rerolls: r and ro, as in Great Weapon Fighting.\n"
