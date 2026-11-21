@@ -179,6 +179,7 @@ routine    a prompt on a schedule or an event, in the
     <pre class="cmd" data-sh>task claude:start</pre>
     <p class="note">The loop is simple work, so switch to the cheaper Sonnet</p>
     <pre class="cmd">/model sonnet</pre>
+    <p class="note">Then, in the new session, start the loop</p>
     <pre class="prompt" data-id="02-loop"></pre>
   </div>
 </section>
@@ -262,7 +263,7 @@ name: reviewer
 description: Reviews a Python change for bugs,
   security, edge cases and design.
 model: opus
-effort: high
+effort: medium
 tools: Read, Glob, Grep, Bash
 ---
 
@@ -277,14 +278,14 @@ and the line.</pre>
   <div class="theory">
     <h2>A model and an effort for each job</h2>
     <p>Writing code and running checks is simple work. A fast model does it well.</p>
-    <p>Judging a design needs the strongest model and time to think.</p>
+    <p>Judging a design needs the strongest model. For a small app like ours, medium effort is enough. Raise it for a large codebase.</p>
     <p><code>/effort</code> sets how long Claude thinks: <code>low</code>, <code>medium</code>, <code>high</code>, <code>xhigh</code>, <code>max</code>.</p>
   </div>
   <div class="term" data-title="who does what">
 <pre class="out">implementer   Sonnet: writes the code and the tests,
               runs ruff and the tests
 
-reviewer      Opus, high effort: reads only, judges
+reviewer      Opus, medium effort: reads only, judges
               the design and the security</pre>
     <hr class="term-rule">
     <p class="note">A rule that must apply each time belongs in a hook, not in a prompt.</p>
