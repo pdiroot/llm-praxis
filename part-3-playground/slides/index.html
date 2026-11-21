@@ -926,9 +926,12 @@ use a workflow   who does each part</pre>
     <p class="note">Start the server in the clone, and leave it running</p>
     <pre class="cmd" data-sh>task claude:start -- remote-control --spawn worktree</pre>
     <hr class="term-rule">
-<pre class="out">Remote Control   a session on this Mac, from the phone
-web              a session in the cloud, claude.ai/code
---teleport       a cloud session, into this terminal</pre>
+<p class="note">Where the session runs</p>
+    <table class="links compare">
+      <tr><td>Remote&nbsp;Control</td><td>On this Mac. The phone is only a window into it</td></tr>
+      <tr><td>web</td><td>In the cloud, on a clone from GitHub. The Mac can be off</td></tr>
+      <tr><td>--teleport</td><td>Moves a web session into this terminal, with its branch</td></tr>
+    </table>
     <hr class="term-rule">
     <p class="note">Keep it safe</p>
     <ul class="diff plain">
