@@ -56,6 +56,14 @@ tasks:
     cmds:
       - scripts/demo-claude.sh --continue
 
+  claude:team:
+    interactive: true
+    desc: "Start a main demo session with agent teams turned on. Pass flags after --"
+    env:
+      CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "1"
+    cmds:
+      - scripts/demo-claude.sh {{.CLI_ARGS}}
+
   # ---- Demo: steps the presenter runs on stage --------------------------
 
   demo:merge-request:

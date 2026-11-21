@@ -179,6 +179,7 @@ routine    a prompt on a schedule or an event, in the
     <pre class="cmd" data-sh>task claude:start</pre>
     <p class="note">The loop is simple work, so switch to the cheaper Sonnet</p>
     <pre class="cmd">/model sonnet</pre>
+    <p class="note">Then, in the new session, start the loop</p>
     <pre class="prompt" data-id="02-loop"></pre>
   </div>
 </section>
@@ -262,7 +263,7 @@ name: reviewer
 description: Reviews a Python change for bugs,
   security, edge cases and design.
 model: opus
-effort: high
+effort: medium
 tools: Read, Glob, Grep, Bash
 ---
 
@@ -277,14 +278,14 @@ and the line.</pre>
   <div class="theory">
     <h2>A model and an effort for each job</h2>
     <p>Writing code and running checks is simple work. A fast model does it well.</p>
-    <p>Judging a design needs the strongest model and time to think.</p>
+    <p>Judging a design needs the strongest model. For a small app like ours, medium effort is enough. Raise it for a large codebase.</p>
     <p><code>/effort</code> sets how long Claude thinks: <code>low</code>, <code>medium</code>, <code>high</code>, <code>xhigh</code>, <code>max</code>.</p>
   </div>
   <div class="term" data-title="who does what">
 <pre class="out">implementer   Sonnet: writes the code and the tests,
               runs ruff and the tests
 
-reviewer      Opus, high effort: reads only, judges
+reviewer      Opus, medium effort: reads only, judges
               the design and the security</pre>
     <hr class="term-rule">
     <p class="note">A rule that must apply each time belongs in a hook, not in a prompt.</p>
@@ -485,25 +486,73 @@ argument-hint: &lt;feature request&gt;
   </div>
 </section>
 
+<section class="slide opening">
+  <div class="theory">
+    <h1>Claude Code 202</h1>
+    <p>Plugins, workflows, parallel sessions and Remote Control, on the same dice roller.</p>
+  </div>
+  <div class="term" data-title="claude">
+<pre class="out">Claude Code
+
+/make-it-so, twice at once
+
+> <span class="cursor"></span></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What we do in 202</h2>
+    <ul>
+      <li>We improve our process with a plugin.</li>
+      <li>We let many agents research one question.</li>
+      <li>We run several sessions at once, and drive them from a phone.</li>
+    </ul>
+    <p class="muted">201 gave one session more work. 202 gives the work to more sessions.</p>
+  </div>
+  <div class="term" data-title="202">
+    <p class="note">We cover</p>
+    <ul class="diff">
+      <li>Plugins and marketplaces: `skill-creator`</li>
+      <li>A workflow: collect, verify, synthesize</li>
+      <li>Agent view: two features in parallel</li>
+      <li>Remote Control: one session, then many</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Where 201 ended</h2>
+    <p><code>main</code> has the web app, advantage and disadvantage, and the skill <code>/make-it-so</code>. The implementer and the reviewer are in <code>.claude/agents/</code>.</p>
+  </div>
+  <div class="term" data-title="shell">
+    <p class="note">Resume the stopped playground</p>
+    <pre class="cmd" data-sh>task playground:start</pre>
+    <p class="note">Continue the main session of 201</p>
+    <pre class="cmd" data-sh>task claude:continue</pre>
+  </div>
+</section>
+
 <section class="slide">
   <div class="theory">
     <h2>Iteration 4: the plugins</h2>
-    <p>We wrote our skill by hand. Now a plugin helps us improve it, test it and share it.</p>
+    <p>We wrote our skill with one simple prompt. Now a plugin helps us improve it and test it.</p>
   </div>
   <div class="term" data-title="iteration 4">
     <ul class="diff">
       <li>Plugins and marketplaces</li>
+      <li>A hook: Ruff after each edit</li>
       <li>Install `skill-creator`</li>
       <li>Improve `/make-it-so` with it</li>
-      <li>What skill-creator changed</li>
+      <li>What skill-creator can change</li>
       <li>What the evals show</li>
       <li>Rules for good skills</li>
       <li>Popular plugins</li>
     </ul>
     <hr class="term-rule">
     <ul class="diff skip">
-      <li>The eval run live: it takes approximately 6 minutes. A slide shows the result</li>
-      <li>A branch and a review for the skill file: it is notes, not code</li>
+      <li>The eval run live: it takes approximately 30 minutes. A slide shows the result</li>
     </ul>
   </div>
 </section>
@@ -513,7 +562,7 @@ argument-hint: &lt;feature request&gt;
     <h2>Plugins and marketplaces</h2>
     <p>A plugin is a package of skills, subagents, hooks and MCP servers that you install as one unit.</p>
     <p>A marketplace is a list of plugins, often a Git repository. The playground adds Anthropic's official marketplace for you.</p>
-    <p class="muted">A plugin can run hooks and servers. Read what it installs before you say yes.</p>
+    <p class="muted">A plugin runs code on your machine, with your rights: its hooks run shell commands on events, and its MCP servers run as programs. Read what it installs before you say yes.</p>
     <p>The status line of iteration 1 is a plugin: one skill that copies one script. Writing your own is that small.</p>
   </div>
   <div class="term" data-title="plugin">
@@ -530,60 +579,84 @@ argument-hint: &lt;feature request&gt;
 
 <section class="slide">
   <div class="theory">
+    <h2>A hook: Ruff after each edit</h2>
+    <p>Ruff is a linter and formatter for Python. <code>CLAUDE.md</code> asks Claude to run it before each commit. That is a request, and Claude can forget it.</p>
+    <p>A hook is a shell command that Claude Code runs on an event, such as after each edit. Claude does not decide to run it, so it runs each time.</p>
+    <p>Claude writes the hook as a small script. Exit code 2 sends what Ruff cannot fix back to Claude, and Claude fixes it.</p>
+    <p class="muted">The hook is in the project settings, so each session in the project gets it, also in a worktree.</p>
+  </div>
+  <div class="term" data-title=".claude/settings.json, from a test run">
+<pre class="out">"PostToolUse": [{
+  "matcher": "Edit|Write|MultiEdit",
+  "hooks": [{
+    "type": "command",
+    "command": ".claude/hooks/ruff-python.sh"
+  }]
+}]</pre>
+    <hr class="term-rule">
+    <p class="note">Ask Claude to add it</p>
+    <pre class="prompt" data-id="13-hook"></pre>
+    <p class="note">See the hooks of this session</p>
+    <pre class="cmd">/hooks</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
     <h2>Improve the skill</h2>
-    <p><code>skill-creator</code> writes, tests and tunes skills. It reads our skill. It rewrites the description, so that Claude starts the skill at the right time. It adds the missing gotchas.</p>
+    <p><code>skill-creator</code> writes, tests and tunes skills. It reads our skill and makes the steps more exact.</p>
   </div>
   <div class="term">
+    <p class="note">Install the plugin</p>
     <pre class="cmd">/plugin install skill-creator@claude-plugins-official</pre>
+    <p class="note">Load it in this session</p>
+    <pre class="cmd">/reload-plugins</pre>
+    <p class="note">Improve the skill with it</p>
     <pre class="prompt" data-id="13-improve-skill"></pre>
   </div>
 </section>
 
 <section class="slide">
   <div class="theory">
-    <h2>What skill-creator changed</h2>
-    <p>It read the skill and the history of this session. It made the steps more exact, and it wrote down what went wrong in the session.</p>
-    <p>Evals go further: the same tasks run with and without the skill, and a grader compares the results.</p>
+    <h2>What skill-creator can change</h2>
+    <p>It makes the steps of a skill more exact. Your run can bring other improvements than ours, but they go the same way: clearer steps and fewer guesses.</p>
+    <p>Evals test a skill instead of trusting it. <code>skill-creator</code> writes a few test tasks and runs each one with and without the skill. A grader scores each result against a checklist.</p>
+    <p>So you see whether the skill helps at all, and whether your last change made it better or worse.</p>
   </div>
-  <div class="term" data-title="from two rehearsal runs">
-    <p class="note">Steps it changed</p>
-<pre class="out">description  when to use it, with examples such as
-             "add advantage"
-interview    questions in rounds; the answers are
-             the spec for both subagents
-reports      a subagent report is a claim: run the
-             checks yourself
-merge req.   says what was not tested, such as the
-             page in a browser</pre>
-    <hr class="term-rule">
-    <p class="note">Gotchas it added</p>
-<pre class="out">- The app on port 8101 keeps the old code until
-  it restarts.
-- In a URL, "+" is a space. Send "%2B".
-- Stage files by name, not with "git add -A".
-- GitLab shows no pipeline: the local checks are
-  the only gate.</pre>
+  <div class="term" data-title="typical changes">
+    <p class="note">What it can change</p>
+    <table class="links compare">
+      <tr><td>description</td><td>When to use the skill, with example requests</td></tr>
+      <tr><td>briefs</td><td>What each subagent must know: a subagent sees only its prompt</td></tr>
+      <tr><td>checks</td><td>Do not take a subagent's word for it: run the tests and check git yourself</td></tr>
+      <tr><td>interview</td><td>Fewer and better questions, with a recommended answer</td></tr>
+      <tr><td>rules</td><td>The mistakes to avoid, such as a port that is in use</td></tr>
+      <tr><td>output</td><td>A fixed template for the merge request and the report</td></tr>
+    </table>
   </div>
 </section>
 
 <section class="slide">
   <div class="theory">
     <h2>What the evals show</h2>
-    <p>Three feature requests, each run with and without the skill, in fresh sessions. A grader checked 10 points for each run.</p>
-    <p>The feature worked with and without the skill. The skill added the process: a review and <code>/simplify</code> in each run. Without the skill, two of three runs skipped the review.</p>
-    <p class="muted">We ran it before the session. The six runs ran in parallel, in approximately 6 minutes.</p>
+    <p>We compared the skill before and after <code>skill-creator</code>: three feature requests, each with the old and the new version.</p>
+    <p>Both versions built the features with tests, a review, <code>/simplify</code> and the checks. The new version also did what the old one left vague: a clear spec, a full merge request and a full report.</p>
+    <p>The price: each run takes 24% longer and uses 25% more tokens.</p>
+    <p class="muted">We ran it before the session: six runs in parallel, approximately 30 minutes with the grading. Your numbers will differ, but the direction should be the same.</p>
   </div>
-  <div class="term" data-title="benchmark, from the rehearsal">
-<pre class="out">                 with skill   without
-exploding dice   10/10        9/10
---seed           10/10        8/10
-drop dice         9/10        8/10
-
-time, average    5 min        1.5 min
-tokens           approximately 4 times more</pre>
+  <div class="term" data-title="benchmark, from a rehearsal">
+<p class="note">A grader checks 13 points of each run</p>
+    <table class="links compare">
+      <tr><th>Request</th><th>What it adds</th><th>Old</th><th>New</th></tr>
+      <tr><td>exploding&nbsp;dice</td><td><code>4d6!</code>: a die that shows its highest face rolls again and adds</td><td>8/13</td><td>13/13</td></tr>
+      <tr><td>keep highest</td><td><code>4d6kh3</code>: roll four dice, keep the three highest</td><td>10/13</td><td>13/13</td></tr>
+      <tr><td>reroll ones</td><td><code>2d6r1</code>: a die that shows 1 rolls again</td><td>8/13</td><td>13/13</td></tr>
+      <tr><td>time</td><td>average for one run</td><td>2.8&nbsp;min</td><td>3.5&nbsp;min (+24%)</td></tr>
+      <tr><td>tokens</td><td>average for one run</td><td>39,800</td><td>49,600 (+25%)</td></tr>
+    </table>
     <hr class="term-rule">
-    <p class="note">The one miss: the report pointed to the checks instead of showing them. One line in the skill fixes it.</p>
-    <p class="note">Ask for it yourself: "Evaluate make-it-so with skill-creator."</p>
+    <p class="note">What it did not test: no review found a high issue, so the fix loop never ran. An eval sees only what its tasks trigger.</p>
+    <p class="note">Ask for it yourself: "Compare make-it-so with its previous version, with skill-creator."</p>
   </div>
 </section>
 
@@ -593,21 +666,14 @@ tokens           approximately 4 times more</pre>
     <p>From teams at Anthropic that run hundreds of skills.</p>
   </div>
   <div class="term" data-title="rules">
-<pre class="out">skip the obvious   Claude knows the defaults already
-
-gotchas            add a line each time Claude makes
-                   a mistake
-
-a folder           SKILL.md points to the other files
-
-do not fix steps   give facts, let Claude choose the
-                   steps
-
-description        write it for the model: it starts
-                   the skill
-
-give it code       helper scripts to call, not to
-                   rewrite</pre>
+    <table class="links compare">
+      <tr><td>Skip the obvious</td><td>Claude knows the defaults. Write only what is special to your project</td></tr>
+      <tr><td>Add gotchas</td><td>Each time Claude makes a mistake, add one line about it</td></tr>
+      <tr><td>Give facts, not fixed steps</td><td>Say what must be true and why. Let Claude choose how to get there</td></tr>
+      <tr><td>Write the description for the model</td><td>Claude reads it to decide when to use the skill. Say when, with example requests</td></tr>
+      <tr><td>Use a folder</td><td>Keep SKILL.md short. Put details, templates and scripts in files next to it</td></tr>
+      <tr><td>Give it code</td><td>A helper script that Claude runs, instead of code that it writes again each time</td></tr>
+    </table>
   </div>
 </section>
 
@@ -617,12 +683,24 @@ give it code       helper scripts to call, not to
     <p>Start with a few. Each plugin adds to the context of each session.</p>
   </div>
   <div class="term" data-title="claude-plugins-official">
-<pre class="out">skill-creator      write and test skills
-code-review        a review in many agents
-security-guidance  warns on risky edits
-frontend-design    UI with a clear style
-commit-commands    commit, push, open a PR
-plugin-dev         write your own plugin</pre>
+<p class="note">For Claude Code itself</p>
+    <table class="links compare">
+      <tr><td>skill-creator</td><td>Write, improve and test skills</td></tr>
+      <tr><td>plugin-dev</td><td>Write your own plugin</td></tr>
+      <tr><td>claude-code-setup</td><td>Suggest hooks, skills and subagents for a project</td></tr>
+      <tr><td>claude&#8209;md&#8209;management</td><td>Keep CLAUDE.md short and current</td></tr>
+      <tr><td>hookify</td><td>A hook from one sentence: "never edit .env"</td></tr>
+    </table>
+    <p class="note">For your code</p>
+    <table class="links compare">
+      <tr><td>code-review</td><td>Review a pull request with several agents</td></tr>
+      <tr><td>security-guidance</td><td>Warn about risky code while Claude edits it</td></tr>
+      <tr><td>commit-commands</td><td>Commit, push and open a pull request</td></tr>
+      <tr><td>feature-dev</td><td>Explore, design, build and review a feature</td></tr>
+      <tr><td>frontend-design</td><td>Web pages with a clear style</td></tr>
+      <tr><td>pyright-lsp</td><td>Python types and errors while Claude edits</td></tr>
+      <tr><td>context7</td><td>Current docs of a library, not old ones</td></tr>
+    </table>
   </div>
 </section>
 
@@ -634,13 +712,9 @@ plugin-dev         write your own plugin</pre>
   <div class="term" data-title="iteration 5">
     <ul class="diff">
       <li>What a workflow is</li>
-      <li>Research in four stages</li>
+      <li>Collect, verify, synthesize</li>
       <li>Read the result</li>
       <li>When to use a workflow, and its budget</li>
-    </ul>
-    <hr class="term-rule">
-    <ul class="diff skip">
-      <li>Building the new features: you do it with `/make-it-so`</li>
     </ul>
   </div>
 </section>
@@ -653,22 +727,27 @@ plugin-dev         write your own plugin</pre>
     <p class="muted">Claude writes its own harness for the task. To start one, write "use a workflow" in the prompt. The word "workflow" alone does not start one.</p>
   </div>
   <div class="term" data-title="research">
-<pre class="out">collect    4 agents, one for each tool, read the docs
-   │
-verify     4 agents open each source again and check
-   │       each claim
-table      the main session builds one table with a
-   │       link in each cell
-advise     the next three features</pre>
-    <p class="note">Claude chose this plan in the rehearsal. Your run can differ: you see the plan and approve it.</p>
+<pre class="out">collect
+  Pick the four most popular tools, then
+  4 Sonnet agents read their docs
+                    ↓
+verify
+  4 Sonnet agents check each claim against its source
+                    ↓
+synthesize
+  Opus builds one table, a link in each cell,
+  and recommends the next three features</pre>
+    <p class="note">A plan for this prompt. Claude writes its own: you see it and approve it.</p>
   </div>
 </section>
 
 <section class="slide">
   <div class="theory">
-    <h2>Research in four stages</h2>
+    <h2>Collect, verify, synthesize</h2>
+    <p>A standard pattern for research. Sonnet agents do the many small reads, and Opus does the synthesis: a cheaper model for the volume, a stronger one for the judgment.</p>
+    <p>We do not name the tools. Claude picks the four most popular ones and says why.</p>
     <p>You approve the script once. <code>/workflows</code> shows each agent while it works.</p>
-    <p class="muted">The agents read the web. A slow network makes this step slow. Roll20 refuses automated readers, so its column can come back "unverified".</p>
+    <p class="muted">The agents read the web. A slow network makes this step slow. Some sites refuse automated readers, so a column can come back "unverified".</p>
   </div>
   <div class="term">
     <pre class="prompt" data-id="14-research"></pre>
@@ -680,22 +759,24 @@ advise     the next three features</pre>
 <section class="slide">
   <div class="theory">
     <h2>The result</h2>
-    <p>8 agents checked each claim against the docs in about 6 minutes. Each cell of the full table has a link.</p>
-    <p>The letters differ between tools: <code>r</code> rerolls one time in Foundry and repeatedly in Roll20.</p>
+    <p>9 agents checked each claim against the docs in about 2.5 minutes. Claude picked the four tools and said why.</p>
+    <p>Roll20 refuses automated readers, so its column came back unverified.</p>
   </div>
   <div class="term" data-title="dice notations, from the rehearsal">
-<pre class="out">              Roll20  Foundry  Avrae  RPG DR  ours
-keep kh kl      ✓       ✓       ✓      ✓     adv
-drop dh dl      ✓       ✓      ph pl   ✓      -
-explode !       ✓       x       e      ✓      -
-reroll once     ro      r      ro      ro     -
-arithmetic      ✓       ✓       ✓      ✓     +M</pre>
-    <hr class="term-rule">
+    <table class="links compare">
+      <tr><th></th><th>Roll20</th><th>Foundry</th><th>Fantasy&nbsp;Grounds</th><th>Avrae</th><th>ours</th></tr>
+      <tr><td>keep</td><td>?</td><td>kh kl</td><td>k kl</td><td>kh kl</td><td>adv</td></tr>
+      <tr><td>drop</td><td>?</td><td>dh dl</td><td>d, lowest only</td><td>ph pl</td><td>-</td></tr>
+      <tr><td>explode</td><td>?</td><td>x</td><td>e</td><td>e</td><td>-</td></tr>
+      <tr><td>reroll</td><td>?</td><td>rr</td><td>r</td><td>rr</td><td>-</td></tr>
+      <tr><td>reroll&nbsp;once</td><td>?</td><td>r</td><td>-</td><td>ro</td><td>-</td></tr>
+      <tr><td>arithmetic</td><td>?</td><td>✓</td><td>✓</td><td>✓</td><td>+M</td></tr>
+    </table>
     <p class="note">The next three features</p>
     <ul class="diff plain">
-      <li>Keep and drop: `4d6dl1`, `2d20kh1`</li>
-      <li>Rerolls: `r` and `ro`, Great Weapon Fighting</li>
+      <li>Keep highest and lowest: `4d6kh3`, `2d20kl1+5`</li>
       <li>Several dice terms: `1d8+2d6+3`, Sneak Attack</li>
+      <li>Reroll once: `2d6ro&lt;3`, Great Weapon Fighting</li>
     </ul>
   </div>
 </section>
@@ -703,14 +784,162 @@ arithmetic      ✓       ✓       ✓      ✓     +M</pre>
 <section class="slide">
   <div class="theory">
     <h2>When to use a workflow, and its budget</h2>
-    <p>A workflow uses many more tokens than one session. Give it a limit in the prompt: the number of agents or the tokens.</p>
+    <p>A workflow uses many more tokens than one session. Limit the number of agents in the prompt, or with the size guideline in <code>/config</code>. There is no token limit: watch <code>/workflows</code> and stop the run if it grows too large.</p>
     <p>Use one when the work splits into many parts that each need a check: a migration, an audit, a research task, the triage of a thousand items.</p>
+    <p>Use a skill instead when the steps are the same each time, such as our process in <code>/make-it-so</code>. A workflow is a plan for one task.</p>
     <p>Do not use one for a change you can see in one file.</p>
   </div>
   <div class="term" data-title="combine">
-<pre class="out">/goal      when is it done
-/loop      when does it run again
-workflow   who does each part</pre>
+<pre class="out">/loop            when does it run again
+/goal            when is it done
+/&lt;skill-name&gt;    the same steps each time
+use a workflow   who does each part</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Iteration 6: parallel sessions</h2>
+    <p>One session builds features one after the other. Agent view builds two at the same time.</p>
+  </div>
+  <div class="term" data-title="iteration 6">
+    <ul class="diff">
+      <li>What agent view is</li>
+      <li>Two features with `/make-it-so`, at the same time</li>
+      <li>Peek, reply, attach</li>
+      <li>Two merge requests</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>What agent view is</h2>
+    <p>One screen for all your sessions. Each prompt starts a new session in the background.</p>
+    <p>Before a session edits, it moves into a worktree: a second checkout of the repository, with its own branch. So two sessions never change the same files.</p>
+    <p class="muted">The sessions do not talk to each other. Each one reports only to you.</p>
+  </div>
+  <div class="term" data-title="agent view, a sketch">
+    <p class="note">One list, all your sessions</p>
+<div style="border:1px solid var(--pine-line); border-radius:8px; padding:.6em 1em; margin:.4em 0 .8em">
+      <div style="color:var(--dim); margin-bottom:.4em">claude agents</div>
+      <table class="links" style="width:auto">
+        <tr><td style="color:#7fd48a">●</td><td>keep and drop</td><td style="color:#7fd48a">working</td></tr>
+        <tr><td style="color:var(--amber)">●</td><td>rerolls</td><td style="color:var(--amber)">waits for you</td></tr>
+        <tr><td style="color:var(--dim)">✓</td><td style="color:var(--dim)">advantage</td><td style="color:var(--dim)">done</td></tr>
+      </table>
+      <div style="color:var(--dim); margin-top:.4em">&gt; a new prompt starts a new session</div>
+    </div>
+    <p class="keys"><kbd>Space</kbd> peek and reply &nbsp; <kbd>Enter</kbd> attach &nbsp; <kbd>←</kbd> back to the list</p>
+    <hr class="term-rule">
+    <p class="note">Each session edits its own checkout</p>
+<pre class="out">dice-roller                         <span style="color:#8cc4ff">main</span>
+├─ .claude/worktrees/keep-drop      <span style="color:#8cc4ff">feat/keep-drop</span>
+└─ .claude/worktrees/rerolls        <span style="color:#8cc4ff">feat/rerolls</span></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Two features at once</h2>
+    <p>Open agent view in a second terminal. Type each prompt, then press Enter. Each prompt starts its own session.</p>
+    <p class="muted">The skill asks its questions first. Answer them in the peek panel.</p>
+  </div>
+  <div class="term">
+    <pre class="cmd" data-sh>task claude:start -- agents</pre>
+    <p class="note">The first session</p>
+    <pre class="prompt" data-id="15-keep-drop"></pre>
+    <p class="note">The second session</p>
+    <pre class="prompt" data-id="15-rerolls"></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Two merge requests</h2>
+    <p>Each session ran <code>/make-it-so</code> in its own worktree and opened its own merge request.</p>
+    <p>Both features change the parser. Merge the first one, and the second one needs a rebase. Ask its session to do it.</p>
+    <p class="muted">You coordinate: you read the rows, answer the questions and choose the order of the merges.</p>
+  </div>
+  <div class="term" data-title="who does what">
+    <p class="note">Each session runs the whole process</p>
+<pre class="out"><span style="color:var(--amber)">you</span>
+├─ <span style="color:#8cc4ff">session: keep and drop</span>   <span style="color:var(--dim)">.claude/worktrees/keep-drop</span>
+│    implementer → reviewer → checks → <span style="color:#7fd48a">merge request 1</span>
+│
+└─ <span style="color:#8cc4ff">session: rerolls</span>         <span style="color:var(--dim)">.claude/worktrees/rerolls</span>
+     implementer → reviewer → checks → <span style="color:#7fd48a">merge request 2</span></pre>
+    <hr class="term-rule">
+    <p class="note">You merge, one at a time</p>
+<pre class="out">1  <span style="color:#7fd48a">merge request 1</span> → main
+2  the rerolls session rebases on the new main
+3  <span style="color:#7fd48a">merge request 2</span> → main</pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Who coordinates?</h2>
+    <p>Three ways to run many agents. Choose by who holds the plan.</p>
+    <p class="muted">Agents that talk to each other, in a team or across sessions, are the topic of Claude Code 301.</p>
+  </div>
+  <div class="term" data-title="many agents">
+    <table class="links compare">
+      <tr><th></th><th>plan</th><th>reports to</th><th>lives</th><th>tokens</th></tr>
+      <tr><td>subagents</td><td>Claude</td><td>Claude</td><td>one task</td><td>a bit more</td></tr>
+      <tr><td>workflow</td><td>a script</td><td>the script</td><td>one run</td><td>many times</td></tr>
+      <tr><td>agent&nbsp;view</td><td>you</td><td>you</td><td>until closed</td><td>the same</td></tr>
+    </table>
+    <p class="note">Agent view runs the same sessions at the same time, so the cost does not grow. A workflow gives each agent its own context, so the cost grows with each agent.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Remote Control: one session</h2>
+    <p>Drive a session on this Mac from your phone or a browser. The code, the files and the tools stay on the Mac. Only the chat goes through claude.ai.</p>
+    <p>Run <code>/rc</code> in the session. On a phone with the same account, the session is already in the list of the Claude app: no QR code needed. The terminal and the phone show the same conversation.</p>
+    <p class="muted">It needs a claude.ai login in the session. An API key does not work. The Mac must stay awake.</p>
+    <p class="muted">All Remote Control traffic goes through Anthropic's servers. At work, check your company's policy first: often it is not allowed. On a personal machine, be careful with what the session can reach.</p>
+  </div>
+  <div class="term">
+    <p class="note">In the main session: short for /remote-control</p>
+    <pre class="cmd">/rc</pre>
+    <p class="note">On the phone</p>
+<pre class="out">Claude app  →  Code  →  the session</pre>
+    <hr class="term-rule">
+    <p class="note">Keep it safe</p>
+    <ul class="diff plain">
+      <li>The Mac only calls out over TLS: no port opens on it</li>
+      <li>Your account is the key: turn on "Require trusted devices", so only your devices can steer a session</li>
+      <li>Permission prompts wait on the phone until you answer: read each one</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="theory">
+    <h2>Remote Control: many sessions</h2>
+    <p>Server mode waits for sessions. You start each new one from the phone or from claude.ai/code. It runs on this Mac, in the clone.</p>
+    <p>With <code>--spawn worktree</code>, each session gets its own worktree, as in agent view. Press <code>w</code> in the server to switch to one shared folder.</p>
+  </div>
+  <div class="term">
+    <p class="note">Start the server in the clone, and leave it running</p>
+    <pre class="cmd" data-sh>task claude:start -- remote-control --spawn worktree</pre>
+    <hr class="term-rule">
+<p class="note">Where the session runs</p>
+    <table class="links compare">
+      <tr><td>Remote&nbsp;Control</td><td>On this Mac. The phone is only a window into it</td></tr>
+      <tr><td>cloud&nbsp;session</td><td>In the cloud, on a clone from GitHub. The Mac can be off. Start one at claude.ai/code or with claude --cloud</td></tr>
+      <tr><td>--teleport</td><td>Moves a cloud session into this terminal, with its branch</td></tr>
+    </table>
+    <hr class="term-rule">
+    <p class="note">Keep it safe</p>
+    <ul class="diff plain">
+      <li>Start the server in the project folder, not in your home folder</li>
+      <li>Keep the permission prompts on: never start it with `bypassPermissions`</li>
+      <li>Stop the server when you are done: until then it waits for new sessions</li>
+    </ul>
   </div>
 </section>
 
@@ -718,15 +947,18 @@ workflow   who does each part</pre>
   <div class="theory">
     <h2>The whole picture</h2>
     <p>Each step of the workflow, and the iteration that taught it.</p>
-    <p>The loop found the work. The subagents did it. The skill made it one command. The plugin improved the skill. The workflow found what comes next.</p>
+    <p>The loop found the work. The subagents did it. The skill made it one command. The plugin improved the skill. The workflow found what comes next. Agent view built it in parallel. Remote Control puts it all on your phone.</p>
   </div>
-  <div class="term" data-title="the workflow of 201">
-<pre class="out">watch for work            /loop          iteration 1
-build until done          /goal          iteration 2
-review with a subagent    reviewer       iteration 2
-run the process           /make-it-so    iteration 3
-improve the process       a plugin       iteration 4
-plan the next work        a workflow     iteration 5</pre>
+  <div class="term" data-title="201 and 202">
+<pre class="out">watch for work            /loop            iteration 1
+build until done          /goal            iteration 2
+review with a subagent    reviewer         iteration 2
+run the process           /make-it-so      iteration 3
+improve the process       a plugin         iteration 4
+format each edit          a hook           iteration 4
+plan the next work        a workflow       iteration 5
+build in parallel         agent view       iteration 6
+control from your phone   Remote Control   end of 202</pre>
   </div>
 </section>
 
@@ -739,6 +971,8 @@ plan the next work        a workflow     iteration 5</pre>
       <li>Write your process down once, as a skill.</li>
       <li>Install what others built before you write your own.</li>
       <li>Use a workflow when one agent is not enough.</li>
+      <li>Run independent work in parallel sessions.</li>
+      <li>Use Remote Control to rule them all.</li>
     </ul>
   </div>
   <div class="term" data-title="claude">
@@ -760,8 +994,11 @@ plan the next work        a workflow     iteration 5</pre>
 /effort high          think longer
 /&lt;skill&gt;              run a skill
 /plugin               browse and install
+/hooks                the hooks of this session
 use a workflow ...    start a workflow
-/workflows            watch its agents</pre>
+/workflows            watch its agents
+claude agents         agent view
+/remote-control       drive this session from a phone</pre>
   </div>
 </section>
 
@@ -769,7 +1006,7 @@ use a workflow ...    start a workflow
   <div class="theory">
     <h2>Run it yourself</h2>
     <p>On a Mac with Docker Desktop it works as it is. The README has the full steps.</p>
-    <p>Homework: build the first feature that the research recommends, with <code>/make-it-so</code>.</p>
+    <p>Homework: build the third feature, several dice terms such as <code>1d8+2d6+3</code>, with <code>/make-it-so</code>.</p>
   </div>
   <div class="term" data-title="shell">
     <p class="note">Get the playground</p>
@@ -781,32 +1018,6 @@ use a workflow ...    start a workflow
     <p class="note">Start over, or delete everything</p>
     <pre class="cmd" data-sh>task playground:reset</pre>
     <pre class="cmd" data-sh>task playground:terminate</pre>
-  </div>
-</section>
-
-<section class="slide" data-cut="Appendix">
-  <div class="theory">
-    <h2>Parallel sessions</h2>
-    <p>Several sessions that edit one repository need several checkouts. If not, they change the same files. The loop of iteration 1 only reads, so it can share the clone.</p>
-    <p>A worktree is a second checkout of the same repository. <code>claude --worktree</code> starts a session in a new one.</p>
-  </div>
-  <div class="term" data-title="shell">
-    <pre class="cmd" data-sh>claude --worktree</pre>
-    <p class="note">See all your sessions in one list</p>
-    <pre class="cmd" data-sh>claude agents</pre>
-  </div>
-</section>
-
-<section class="slide" data-cut="Appendix">
-  <div class="theory">
-    <h2>Other places to run it</h2>
-    <p>The same Claude Code runs in more places than this terminal.</p>
-  </div>
-  <div class="term" data-title="clients">
-<pre class="out">desktop app     sessions side by side
-web             claude.ai/code, in the cloud
-phone           start a task on the way
-Remote Control  drive this terminal session from the phone</pre>
   </div>
 </section>
 
@@ -836,6 +1047,9 @@ Remote Control  drive this terminal session from the phone</pre>
       <tr><td><a href="https://code.claude.com/docs/en/sub-agents" target="_blank" rel="noopener">Subagents</a></td><td>the docs</td></tr>
       <tr><td><a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">Skills</a></td><td>the docs</td></tr>
       <tr><td><a href="https://code.claude.com/docs/en/workflows" target="_blank" rel="noopener">Workflows</a></td><td>the docs</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/agent-view" target="_blank" rel="noopener">Agent view</a></td><td>the docs</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/agents" target="_blank" rel="noopener">Many agents</a></td><td>which way to choose</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/remote-control" target="_blank" rel="noopener">Remote Control</a></td><td>the docs</td></tr>
     </table>
   </div>
 </section>
