@@ -172,7 +172,7 @@ routine    a prompt on a schedule or an event, in the
     <p>Open a second terminal and start a second session in the same project. It watches GitLab and reviews each new merge request while we work in the first one.</p>
     <p>Keep it on the screen. We come back to it later.</p>
     <p class="muted">The reviewer comes in iteration 2.</p>
-    <p class="muted">To stop it, ask Claude to cancel the loop. A loop ends on its own after seven days.</p>
+    <p class="muted">To stop it, ask Claude to cancel the loop. A loop ends on its own after 30 days, if the session stays open.</p>
   </div>
   <div class="term" data-title="second terminal">
     <p class="note">In a second terminal, start a second session</p>
@@ -189,6 +189,7 @@ routine    a prompt on a schedule or an event, in the
     <h2>What loops are for</h2>
     <p>Anything you check again and again by hand.</p>
     <p>When I am on call, my agents fetch the metrics every 20 minutes. When the metrics show that a server or an app can fail soon, they start an investigation. When the alert comes, the first findings are already there.</p>
+    <p>Give no interval, and Claude sets the pace itself. It checks often while something changes, less often when nothing does, and ends the loop when the job is done.</p>
   </div>
   <div class="term" data-title="ideas">
     <ul class="diff plain">
@@ -204,6 +205,9 @@ routine    a prompt on a schedule or an event, in the
       <li>Tell you: an alert, a message</li>
       <li>Do it: start the investigation</li>
     </ul>
+    <hr class="term-rule">
+    <p class="note">No interval: Claude sets the pace and stops when done</p>
+    <pre class="cmd">/loop check the server until it is up again, then send me an SMS</pre>
   </div>
 </section>
 
@@ -987,10 +991,11 @@ control from your phone   Remote Control   end of 202</pre>
   </div>
   <div class="term" data-title="cheat sheet">
 <pre class="out">/loop 5m &lt;prompt&gt;     repeat in this session
+/loop &lt;prompt&gt;        Claude sets the pace, stops when done
 /goal &lt;condition&gt;     work until it is true
 /goal clear           drop the goal
 /schedule             a routine in the cloud
-/tasks                subagents and background work
+/tasks                subagents, background work and loops
 /effort high          think longer
 /&lt;skill&gt;              run a skill
 /plugin               browse and install
